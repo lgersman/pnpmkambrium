@@ -1,0 +1,12 @@
+{
+  "name": "@pnpm-kambrium/create",
+  "version": "1.0.0",
+  "description": "`npm create` template package for @pnpm-kambrium",
+  "scripts": {
+  },
+  "keywords": ["pnpm"],
+  "author": "lars gersmann <lars.gersmann@cm4all.com>",
+  "dependencies": {
+    "@pnpm-kambrium/core": "workspace:*"
+  }
+}

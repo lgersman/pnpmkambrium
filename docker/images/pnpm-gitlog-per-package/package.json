@@ -1,10 +1,10 @@
 {
-  "name": "@pnpm-kambrium/create",
+  "name": "@pnpm-kambrium/pnpm-gitlog-per-package",
+  "private": true,
   "version": "1.0.0",
-  "description": "`npm create` template package for @pnpm-kambrium",
+  "description": "",
   "scripts": {
   },
   "keywords": ["pnpm"],
   "author": "lars gersmann <lars.gersmann@cm4all.com>",
-  "license": "MIT"
 }

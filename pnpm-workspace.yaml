@@ -1,2 +1,3 @@
+# see https://pnpm.io/pnpm-workspace_yaml
 packages:
-  - 'packages/*'
+  - 'npm/packages/*'
