@@ -10,5 +10,9 @@
   },
   "keywords": ["pnpm"],
   "author": "lars gersmann <lars.gersmann@cm4all.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@changesets/changelog-github": "0.4.7",
+    "@changesets/cli": "2.25.2"
+  }  
 }
