@@ -10,10 +10,13 @@ importers:
       '@changesets/changelog-github': 0.4.7
       '@changesets/cli': 2.25.2
 
-  npm/packages/core:
+  packages/docker/pnpm-gitlog-per-package:
     specifiers: {}
 
-  npm/packages/create:
+  packages/npm/core:
+    specifiers: {}
+
+  packages/npm/create:
     specifiers:
       '@pnpm-kambrium/core': workspace:*
     dependencies:
