@@ -1,4 +1,5 @@
 {
+  "name": "pnpm-kambrium",
   "private":"true",
   "version": "1.0.0",
   "description": "pnpm-kambrium is a monorepo toolchain based on pnpm",
@@ -6,10 +7,11 @@
     "node": ">= 18.8.0",
     "pnpm": ">= 7.14.0"
   },
-  "scripts": {
-  },
   "keywords": ["pnpm"],
-  "author": "lars gersmann <lars.gersmann@cm4all.com>",
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  },
   "license": "MIT",
   "devDependencies": {
     "@changesets/changelog-github": "0.4.7",
