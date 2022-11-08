@@ -4,8 +4,9 @@
 # MAKEFLAGS += --silent
 
 KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-
 include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
+
+MONOREPO_SCOPE != jq -r '.name | values' package.json
 
 # this target triggers pnpm to download/install the required nodejs if not yet available 
 $(NODE):
@@ -22,19 +23,24 @@ node_modules: pnpm-lock.yaml
 >	$(PNPM) install --frozen-lockfile
 > @touch -m node_modules
 
+.PHONY: commit
+#HELP: * git gz and commit
+commit: node_modules
+> pnpm nano-staged --allow-empty && PNPM_WORKSPACE_PACKAGES=$$(pnpm list --recursive --filter '@$(MONOREPO_SCOPE)/*' --json | jq -c  '[.[].name | select( . != null )]') pnpm git cz
+
 .PHONY: lint
 #HELP: * lint sources
 lint: node_modules/
-> $(PNPM) prettier --ignore-unknown --check .
+> $(PNPM) prettier --cache --ignore-unknown --check .
 > $(PNPM) eslint --no-error-on-unmatched-pattern .
-> $(PNPM) stylelint --allow-empty-input ./packages/**/*.{css,scss}
+> ! command -v $$($(PNPM) bin)/stylelint || $(PNPM) stylelint --allow-empty-input ./packages/**/*.{css,scss}
 
 .PHONY: lint-fix
 #HELP: * lint sources and fix them where possible
 lint-fix: node_modules
-> $(PNPM) prettier --check --write .
+> $(PNPM) prettier --cache --check --write .
 > $(PNPM) eslint --no-error-on-unmatched-pattern --fix .
-> $(PNPM) stylelint --allow-empty-input --fix ./packages/**/*.{css,scss} 
+> ! command -v $$($(PNPM) bin)/stylelint || $(PNPM) stylelint --allow-empty-input --fix ./packages/**/*.{css,scss}
 
 # see https://gist.github.com/Olshansk/689fc2dee28a44397c6e31a0776ede30
 .PHONY: help

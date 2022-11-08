@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+pnpm nano-staged --allow-empty
