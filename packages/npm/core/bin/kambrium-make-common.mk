@@ -1,29 +1,55 @@
-# ensure make is supporting .RECIPEPREFIX
+#
+# contains common Makefile settings 
+#
+
+#
+# ensure installed make version is supporting .RECIPEPREFIX
+#
 ifeq ($(origin .RECIPEPREFIX), undefined)
   $(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
 endif
 # make to use > as the block character
 .RECIPEPREFIX = >
 
+#
 # alwas use bash as shell (to get <<< and stuff working), otherwise sh would be used by default
+#
 SHELL != which bash
-# use bash strict mode o that make will fail if a bash statement fails
-.SHELLFLAGS := -eu -o pipefail -c
-# debug make shell execution
-#.SHELLFLAGS += -vx
 
-# disable default rules enabled by default (build yacc, cc and stuff)
+#
+# use bash strict mode o that make will fail if a bash statement fails
+#
+.SHELLFLAGS := -eu -o pipefail -c
+
+# #
+# # debug make shell execution
+# #
+# .SHELLFLAGS += -vx
+
+#
+# disable stone age default rules enabled by default (yacc, cc and stuff)
+#
 MAKEFLAGS += --no-builtin-rules 
+
+#
 # warn if unused variables in use
+#
 MAKEFLAGS += --warn-undefined-variables
+
+# #
 # # suppress "make[2]: Entering directory" messages
+# #
 # MAKEFLAGS += --no-print-directory
 
+#
 # always execute targets as a single shell script (i.e. : not line by line) 
+#
 .ONESHELL:
 
+#
+# execute help target if make gets called without any arguments 
+#
 .DEFAULT_GOAL := help
-# --
 
 # ensure pnpm is available
 ifeq (,$(shell which pnpm))
