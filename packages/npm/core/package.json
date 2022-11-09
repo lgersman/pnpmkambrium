@@ -8,5 +8,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "presets/",
+    "bin/"
+  ],
   "author": "lars gersmann <lars.gersmann@cm4all.com>"
 }
