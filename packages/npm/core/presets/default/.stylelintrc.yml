@@ -1,6 +1,19 @@
 #
 # default stylelint configuration
 #
+# this file is usually referenced in your own top level .stylelintrc.yaml.
+#
+# ```
+# extends:
+#   - "@pnpm-kambrium/core/presets/default/.stylelintrc.yml"
+# # customize your stylelint configuration
+# #  - "@wordpress/stylelint-config"
+# #  - "@wordpress/stylelint-config/scss"
+# ```
+#
+# You can remove it from there depending on your needs.
+#
+
 extends:
   - stylelint-config-recommended-scss
   - stylelint-config-prettier

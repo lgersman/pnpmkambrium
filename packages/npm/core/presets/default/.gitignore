@@ -1,0 +1,12 @@
+#
+# default .gitignore configuration
+# 
+# this file is usually soft-linked to your monorepo root. 
+# if you want to customize your .gitignore simply replace the soft-link to this file 
+# in your project with your own file.
+#
+node_modules
+dist
+.pnpm-debug.log
+build
+/docker/*.tgz

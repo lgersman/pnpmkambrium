@@ -1,0 +1,8 @@
+#
+# default git attributes config 
+#
+# this file is usually soft-linked to your monorepo root. 
+# if you want to customize your .gitattributes simply replace the soft-link to this file 
+# in your project with your own file.
+#
+* text=auto eol=lf
