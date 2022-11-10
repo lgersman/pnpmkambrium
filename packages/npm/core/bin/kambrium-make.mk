@@ -29,7 +29,8 @@ node_modules: pnpm-lock.yaml
 .PHONY: commit
 #HELP: * git gz and commit
 commit: node_modules
-> pnpm nano-staged --allow-empty && PNPM_WORKSPACE_PACKAGES=$$(pnpm list --recursive --filter '@$(MONOREPO_SCOPE)/*' --json | jq -c  '[.[].name | select( . != null )]') pnpm git cz
+> pnpm nano-staged --allow-empty && \
+> PNPM_WORKSPACE_PACKAGES=$$(pnpm list --recursive --filter '@$(MONOREPO_SCOPE)/*' --json | jq -c  '[.[].name | select( . != null )]') pnpm git cz
 
 .PHONY: lint
 #HELP: * lint sources
