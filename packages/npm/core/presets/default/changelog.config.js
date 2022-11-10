@@ -18,7 +18,7 @@ module.exports = {
   list: ['test', 'feat', 'fix', 'chore', 'build', 'docs', 'refactor', 'style', 'ci', 'perf', 'wip'],
   maxMessageLength: 120,
   minMessageLength: 3,
-  questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues', 'lerna'],
+  questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues'],
   scopes: ['', ...JSON.parse(process.env['PNPM_WORKSPACE_PACKAGES'] ?? '[]')],
   types: {
     chore: {
