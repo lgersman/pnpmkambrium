@@ -16,7 +16,7 @@ module.exports = {
   disableEmoji: true,
   format: '{type}{scope}: {subject}',
   list: ['test', 'feat', 'fix', 'chore', 'build', 'docs', 'refactor', 'style', 'ci', 'perf', 'wip'],
-  maxMessageLength: 64,
+  maxMessageLength: 120,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues', 'lerna'],
   scopes: ['', ...JSON.parse(process.env['PNPM_WORKSPACE_PACKAGES'] ?? '[]')],
