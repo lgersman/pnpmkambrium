@@ -1,5 +1,5 @@
 #
-# default .gitignore configuration
+# default git ignore configuration
 # 
 # this file is usually soft-linked to your monorepo root. 
 # if you want to customize your .gitignore simply replace the soft-link to this file 

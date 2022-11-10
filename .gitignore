@@ -1,5 +1,1 @@
-node_modules
-dist
-.pnpm-debug.log
-build
-/docker/*.tgz
+./packages/npm/core/presets/default/.gitignore
