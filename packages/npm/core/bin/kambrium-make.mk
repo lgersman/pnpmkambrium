@@ -8,6 +8,8 @@ include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
 
 MONOREPO_SCOPE != jq -r '.name | values' package.json
 
+PRETTIER := prettier --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --cache --check
+
 # this target triggers pnpm to download/install the required nodejs if not yet available 
 $(NODE):
 # > @$(PNPM) exec node --version 1&>/dev/null
@@ -31,14 +33,14 @@ commit: node_modules
 .PHONY: lint
 #HELP: * lint sources
 lint: node_modules/
-> $(PNPM) prettier --cache --ignore-unknown --check .
+> $(PNPM) $(PRETTIER) --ignore-unknown .
 > $(PNPM) eslint --no-error-on-unmatched-pattern .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input ./packages/**/*.{css,scss}
 
 .PHONY: lint-fix
 #HELP: * lint sources and fix them where possible
 lint-fix: node_modules
-> $(PNPM) prettier --cache --check --write .
+> $(PNPM) $(PRETTIER) --cache --check --write .
 > $(PNPM) eslint --no-error-on-unmatched-pattern --fix .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input --fix ./packages/**/*.{css,scss}
 
