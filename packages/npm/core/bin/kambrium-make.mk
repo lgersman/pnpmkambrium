@@ -36,14 +36,16 @@ commit: node_modules
 lint: node_modules/
 > $(PRETTIER) --ignore-unknown .
 > $(ESLINT) .
-> ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input ./packages/**/*.{css,scss}
+> ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
+> 	$(PNPM) stylelint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
 
 .PHONY: lint-fix
 #HELP: * lint sources and fix them where possible
 lint-fix: node_modules
 > $(PRETTIER) --cache --check --write .
 > $(ESLINT) --fix .
-> ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input --fix ./packages/**/*.{css,scss}
+> ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
+> $(PNPM) stylelint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
 
 # see https://gist.github.com/Olshansk/689fc2dee28a44397c6e31a0776ede30
 .PHONY: help
