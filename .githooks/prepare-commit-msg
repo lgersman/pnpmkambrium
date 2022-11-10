@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+exec < /dev/tty && \
+  PNPM_WORKSPACE_PACKAGES=$( \
+    pnpm list --recursive --filter "@$(jq -r '.name | values' package.json)/*" --json | jq -c  '[.[].name | select( . != null )]' \
+  ) pnpm git cz --hook || true
