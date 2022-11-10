@@ -8,7 +8,8 @@ include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
 
 MONOREPO_SCOPE != jq -r '.name | values' package.json
 
-PRETTIER := prettier --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --cache --check
+PRETTIER := $(PNPM) prettier --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --cache --check
+ESLINT := $(PNPM) eslint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --no-error-on-unmatched-pattern
 
 # this target triggers pnpm to download/install the required nodejs if not yet available 
 $(NODE):
@@ -33,15 +34,15 @@ commit: node_modules
 .PHONY: lint
 #HELP: * lint sources
 lint: node_modules/
-> $(PNPM) $(PRETTIER) --ignore-unknown .
-> $(PNPM) eslint --no-error-on-unmatched-pattern .
+> $(PRETTIER) --ignore-unknown .
+> $(ESLINT) .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input ./packages/**/*.{css,scss}
 
 .PHONY: lint-fix
 #HELP: * lint sources and fix them where possible
 lint-fix: node_modules
-> $(PNPM) $(PRETTIER) --cache --check --write .
-> $(PNPM) eslint --no-error-on-unmatched-pattern --fix .
+> $(PRETTIER) --cache --check --write .
+> $(ESLINT) --fix .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || $(PNPM) stylelint --allow-empty-input --fix ./packages/**/*.{css,scss}
 
 # see https://gist.github.com/Olshansk/689fc2dee28a44397c6e31a0776ede30
