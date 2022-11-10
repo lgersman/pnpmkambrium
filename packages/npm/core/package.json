@@ -12,5 +12,8 @@
     "presets/",
     "bin/"
   ],
-  "author": "lars gersmann <lars.gersmann@cm4all.com>"
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
 }

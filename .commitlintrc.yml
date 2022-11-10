@@ -4,16 +4,4 @@ rules:
   type-enum:
     - 2
     - always
-    - [
-        "test",
-        "feat",
-        "fix",
-        "chore",
-        "build",
-        "docs",
-        "refactor",
-        "style",
-        "ci",
-        "perf",
-        "wip",
-      ]
+    - ["test", "feat", "fix", "chore", "build", "docs", "refactor", "style", "ci", "perf", "wip"]
