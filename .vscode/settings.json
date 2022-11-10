@@ -4,15 +4,7 @@
     "source.fixAll.eslint": true, // this allows ESLint to auto fix on save
     "source.organizeImports": false
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "html",
-    "markdown",
-    "json",
-    "jsonc",
-    "json5"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "html", "markdown", "json", "jsonc", "json5"],
   // enable globally (here: format on save)
   "editor.formatOnSave": true,
   // enable per-language (here: Prettier as formatter)
