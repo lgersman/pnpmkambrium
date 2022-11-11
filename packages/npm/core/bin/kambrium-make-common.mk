@@ -14,7 +14,7 @@ endif
 #
 # alwas use bash as shell (to get <<< and stuff working), otherwise sh would be used by default
 #
-SHELL != which bash
+SHELL != sh -c "command -v bash"
 
 #
 # use bash strict mode o that make will fail if a bash statement fails
@@ -52,7 +52,7 @@ MAKEFLAGS += --warn-undefined-variables
 .DEFAULT_GOAL := help
 
 # ensure pnpm is available
-ifeq (,$(shell which pnpm))
+ifeq (,$(shell command -v pnpm))
 	define PNPM_NOT_FOUND
 pnpm is not installed or not in PATH. 
 Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
@@ -61,10 +61,13 @@ Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
 See more here : https://docs.npmjs.com/getting-started/installing-node 
 	endef
 	$(error $(PNPM_NOT_FOUND))
+else
+	PNPM != command -v pnpm
 endif
 
 # ensure a recent nodejs version is available
-ifeq (,$(shell which nodejs))
+# (required by pnpm)
+ifeq (,$(shell command -v nodejs))
 	define NODEJS_NOT_FOUND
 node is not installed or not in PATH. 
 See more here : https://nodejs.org/en/download/ 
@@ -72,9 +75,5 @@ See more here : https://nodejs.org/en/download/
 	$(error $(NODEJS_NOT_FOUND))
 endif
 
-PNPM != which pnpm
-# disable PNPM update notifier
-# export NO_UPDATE_NOTIFIER=1
-
 NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc
-NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node 
+NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node

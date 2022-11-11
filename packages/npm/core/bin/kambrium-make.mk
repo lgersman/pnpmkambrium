@@ -5,6 +5,11 @@
 
 KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-rules.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-functions.mk
+
+# ensure required commands are installed
+_ := $(call ensure-commands-exists, touch jq)
 
 MONOREPO_SCOPE != jq -r '.name | values' package.json
 
@@ -25,12 +30,6 @@ node_modules: pnpm-lock.yaml
 > $(PNPM) env use --global $(NODE_VERSION)
 >	$(PNPM) install --frozen-lockfile
 > @touch -m node_modules
-
-.PHONY: commit
-#HELP: * git gz and commit
-commit: node_modules
-> pnpm nano-staged --allow-empty && \
-> PNPM_WORKSPACE_PACKAGES=$$(pnpm list --recursive --filter '@$(MONOREPO_SCOPE)/*' --json | jq -c  '[.[].name | select( . != null )]') pnpm git cz
 
 .PHONY: lint
 #HELP: * lint sources
