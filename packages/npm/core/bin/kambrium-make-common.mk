@@ -67,7 +67,7 @@ endif
 
 # ensure a recent nodejs version is available
 # (required by pnpm)
-ifeq (,$(shell command -v nodejs))
+ifeq (,$(shell command -v node))
 	define NODEJS_NOT_FOUND
 node is not installed or not in PATH. 
 See more here : https://nodejs.org/en/download/ 
