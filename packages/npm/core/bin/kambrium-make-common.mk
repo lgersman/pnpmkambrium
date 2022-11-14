@@ -75,5 +75,3 @@ See more here : https://nodejs.org/en/download/
 	$(error $(NODEJS_NOT_FOUND))
 endif
 
-NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc
-NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node

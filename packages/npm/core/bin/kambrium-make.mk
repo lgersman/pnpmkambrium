@@ -5,15 +5,25 @@
 
 KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
-include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-rules.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-functions.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-rules.mk
 
-# ensure required commands are installed
-_ := $(call ensure-commands-exists, touch jq)
+# ensure required utilities are installed
+_ := $(call ensure-commands-exists, node sed git touch jq)
 
+# node version to use by pnpm (defined in .npmrc)
+NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc
+
+# path to node binary configured in .npmrc
+NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node
+
+# pick up npm scope from package.json name
 MONOREPO_SCOPE != jq -r '.name | values' package.json
 
+# always run prettier using ignored files from .lintignore 
 PRETTIER := $(PNPM) prettier --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --cache --check
+
+# always run eslint using ignored files from .lintignore 
 ESLINT := $(PNPM) eslint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --no-error-on-unmatched-pattern
 
 # this target triggers pnpm to download/install the required nodejs if not yet available 
