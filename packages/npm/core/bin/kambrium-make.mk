@@ -3,10 +3,14 @@
 # make output less verbose
 # MAKEFLAGS += --silent
 
-KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
-include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-functions.mk
-include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-rules.mk
+# KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+# include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-common.mk
+# include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-functions.mk
+# include $(KAMBRIUM_MAKEFILE_DIR)/kambrium-make-rules.mk
+include kambrium-make-common.mk
+include kambrium-make-functions.mk
+include kambrium-make-rules.mk
+include kambrium-make-docker.mk
 
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq)
