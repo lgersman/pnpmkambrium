@@ -13,7 +13,7 @@ include kambrium-make-rules.mk
 include kambrium-make-docker.mk
 
 # ensure required utilities are installed
-_ := $(call ensure-commands-exists, node sed git touch jq docker)
+_ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)
 
 # node version to use by pnpm (defined in .npmrc)
 NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc

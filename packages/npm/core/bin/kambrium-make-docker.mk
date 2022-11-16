@@ -12,7 +12,6 @@ export DOCKER_SCAN_SUGGEST:=false
 #
 export DOCKER_BUILDKIT:=1
 
-
 #HELP: build all outdated docker images in packages/docker/ 
 packages/docker/: $(wildcard packages/docker/*/) ;
 
@@ -29,16 +28,16 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
-> DOCKER_IMAGE=$$(jq -r '.name | values' package.json | sed -r 's/@//g')
+> IFS="/" read -r PACKAGE_SCOPE PACKAGE_NAME <<<$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g'); unset 
 # @TODO: inject variables from $(@D)/.env (can also be a script!)
 # @TODO: call build script from $$PACKAGE_JSON if defined
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \
 > 	--progress=plain \
->		-t $$DOCKER_IMAGE:latest \
-> 	-t $$DOCKER_IMAGE:$$PACKAGE_VERSION \
+>		-t $$PACKAGE_NAME:latest \
+> 	-t $$PACKAGE_NAME:$$PACKAGE_VERSION \
 >		--label "maintainer=$$PACKAGE_AUTHOR" \
-> 	--label "org.opencontainers.image.title=$$DOCKER_IMAGE" \
+> 	--label "org.opencontainers.image.title=$$PACKAGE_NAME" \
 > 	--label "org.opencontainers.image.description=$$(jq -r '.description | values' $$PACKAGE_JSON)" \
 > 	--label "org.opencontainers.image.authors=$$PACKAGE_AUTHOR" \
 >		--label "org.opencontainers.image.source=$$(jq -r '.repository.url | values' $$PACKAGE_JSON)" \
@@ -47,10 +46,13 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 > 	--label "org.opencontainers.image.licenses=$$(jq -r '.license | values' $$PACKAGE_JSON)" \
 > 	-f $(@D)/Dockerfile .
 # output generated image labels
-# > docker image inspect --format='' $(DOCKER_IMAGE):latest 2> /dev/null | jq '.[0].Config.Labels'
-> docker image inspect --format='' $(DOCKER_IMAGE):latest | jq '.[0].Config.Labels | values' > 
-# output some image statistics
-> docker image ls $(DOCKER_IMAGE):$$PACKAGE_VERSION
+> cat << EOF | tee $@
+> $$(docker image inspect $$PACKAGE_NAME:latest | jq '.[0].Config.Labels | values')
+> 
+> ---
+> 
+> $$(docker image ls $$PACKAGE_NAME:$$PACKAGE_VERSION)
+> EOF
 
 # #> @: # neat trick: add this line to silent the whole task
 # # switch into sub-package directory
