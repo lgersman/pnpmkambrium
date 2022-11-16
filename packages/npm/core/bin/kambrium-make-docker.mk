@@ -1,9 +1,22 @@
-# contains generic make rules for docker
+# contains generic docker related make settings and rules
 
-#HELP: build all docker images in packages/docker/ 
+#
+# disable boring scan info while building docker images
+# see https://github.com/docker/scan-cli-plugin/issues/149
+#
+export DOCKER_SCAN_SUGGEST:=false
+
+#
+# use  buildx for more performant image builds 
+# see https://docs.docker.com/build/buildkit/
+#
+export DOCKER_BUILDKIT:=1
+
+
+#HELP: build all outdated docker images in packages/docker/ 
 packages/docker/: $(wildcard packages/docker/*/) ;
 
-#HELP: build a docker image by name\n\tExample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
+#HELP: build outdated docker image by name\n\tExample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
 packages/docker/%/: packages/docker/%/build-info ;
 
 #
@@ -11,40 +24,33 @@ packages/docker/%/: packages/docker/%/build-info ;
 # 
 # we utilize file "build-info" to track if the docker image was build/is up to date
 #
-.SECONDARY: packages/docker/%/build-info
 packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildcard packages/docker$*/* packages/docker$*/**/*)) package.json 
 # target depends on root located package.json and every file located in packages/docker/% except build-info 
-> $(info docker directory is "$*")
-> $(info dependencies are "$^")
-> touch -m $@
-
-# > PACKAGE_VERSION=$$(jq -r '.version | values' package.json)
-# > PACKAGE_AUTHOR="$$(jq -r '.author.name | values' package.json) <$$(jq -r '.author.email | values' package.json)>"
-# > NODEJS_VERSION=$$(grep -oP 'use-node-version=\K.*' .npmrc)
-# # value can be alpine|bullseye|bullseye-slim
-# > LINUX_DIST=bullseye-slim
-# > export DOCKER_SCAN_SUGGEST=false
-# > export DOCKER_BUILDKIT=1
-# # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-# > docker build \
-# > 	--progress=plain \
-# > 	--build-arg nodejs_base=$$NODEJS_VERSION-$$LINUX_DIST \
-# >		-t $(DOCKER_IMAGE):latest \
-# > 	-t $(DOCKER_IMAGE):$$PACKAGE_VERSION \
-# >		--label "maintainer=$$PACKAGE_AUTHOR" \
-# > 	--label "org.opencontainers.image.title=$(DOCKER_IMAGE)" \
-# > 	--label "org.opencontainers.image.description=$$(jq -r '.description | values' package.json)" \
-# > 	--label "org.opencontainers.image.authors=$$PACKAGE_AUTHOR" \
-# >		--label "org.opencontainers.image.source=$$(jq -r '.repository.url | values' package.json)" \
-# > 	--label "org.opencontainers.image.url=$$(jq -r '.homepage | values' package.json)" \
-# > 	--label "org.opencontainers.image.vendor=https://cm4all.com" \
-# > 	--label "org.opencontainers.image.licenses=$$(jq -r '.license | values' package.json)" \
-# > 	-f ./docker/Dockerfile .
-# # output generated image labels
-# # > docker image inspect --format='' $(DOCKER_IMAGE):latest 2> /dev/null | jq '.[0].Config.Labels'
-# > docker image inspect --format='' $(DOCKER_IMAGE):latest | jq '.[0].Config.Labels | values'
-# # output some image statistics
-# > docker image ls $(DOCKER_IMAGE):$$PACKAGE_VERSION
+> PACKAGE_JSON=$(@D)/package.json
+> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
+> PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
+> DOCKER_IMAGE=$$(jq -r '.name | values' package.json | sed -r 's/@//g')
+# @TODO: inject variables from $(@D)/.env (can also be a script!)
+# @TODO: call build script from $$PACKAGE_JSON if defined
+# image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+> docker build \
+> 	--progress=plain \
+>		-t $$DOCKER_IMAGE:latest \
+> 	-t $$DOCKER_IMAGE:$$PACKAGE_VERSION \
+>		--label "maintainer=$$PACKAGE_AUTHOR" \
+> 	--label "org.opencontainers.image.title=$$DOCKER_IMAGE" \
+> 	--label "org.opencontainers.image.description=$$(jq -r '.description | values' $$PACKAGE_JSON)" \
+> 	--label "org.opencontainers.image.authors=$$PACKAGE_AUTHOR" \
+>		--label "org.opencontainers.image.source=$$(jq -r '.repository.url | values' $$PACKAGE_JSON)" \
+> 	--label "org.opencontainers.image.url=$$(jq -r '.homepage | values' $$PACKAGE_JSON)" \
+> 	--label "org.opencontainers.image.vendor=https://cm4all.com" \
+> 	--label "org.opencontainers.image.licenses=$$(jq -r '.license | values' $$PACKAGE_JSON)" \
+> 	-f $(@D)/Dockerfile .
+# output generated image labels
+# > docker image inspect --format='' $(DOCKER_IMAGE):latest 2> /dev/null | jq '.[0].Config.Labels'
+> docker image inspect --format='' $(DOCKER_IMAGE):latest | jq '.[0].Config.Labels | values' > 
+# output some image statistics
+> docker image ls $(DOCKER_IMAGE):$$PACKAGE_VERSION
 
 # #> @: # neat trick: add this line to silent the whole task
 # # switch into sub-package directory

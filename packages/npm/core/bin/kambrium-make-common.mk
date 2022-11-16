@@ -51,6 +51,20 @@ MAKEFLAGS += --warn-undefined-variables
 #
 .DEFAULT_GOAL := help
 
+#
+# targets like "make packages/docker/" making build-info files
+# would be treated as immediate files and removed immediately after executing sub target 
+# packages/docker/[subpackage]/build-info
+# 
+# solution: .SECONDARY with no prerequisites causes all targets to be treated as secondary 
+# (i.e., no target is removed because it is considered intermediate).
+# see https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+#
+# alternative would be to mark such targets as non intermediate using 
+# .PRECIOUS: packages/docker/%/build-info 
+#
+.SECONDARY:
+
 # ensure pnpm is available
 ifeq (,$(shell command -v pnpm))
 	define PNPM_NOT_FOUND
