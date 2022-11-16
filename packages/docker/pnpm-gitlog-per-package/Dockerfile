@@ -1,8 +1,30 @@
 # syntax=docker/dockerfile:1.4
 
-FROM debian:bullseye-slim
-
+FROM bitnami/minideb:bullseye
+#pnpm-gitlog-per-package   1.0.0     b59cf557a688   2 seconds ago   171MB
 SHELL ["/bin/bash", "-c"]
+
+RUN install_packages  \
+  git \
+  curl \
+  fzf
+
+RUN curl -fsSL https://get.pnpm.io/install.sh | $SHELL -
+
+
+# FROM debian:bullseye-slim
+# pnpm-gitlog-per-package   1.0.0     06131e402472   1 second ago   267MB
+# SHELL ["/bin/bash", "-c"]
+
+# RUN apt-get update \
+#   && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+#   git \
+#   curl \
+#   fzf \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*
+
+# RUN curl -fsSL https://get.pnpm.io/install.sh | $SHELL -
 
 # FROM bitnami/minideb:jessie
 # # only 50mb !
