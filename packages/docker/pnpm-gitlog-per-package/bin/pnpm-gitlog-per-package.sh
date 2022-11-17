@@ -4,6 +4,10 @@
 #
 # Usage: execute git-log-by-monorepo-package.sh in the root of a monorepo 
 #
+# script supports git log command customization using environment variable GIT_LOG_OPTIONS. 
+# Example: 
+# GIT_LOG_OPTIONS="--stat --abbrev-commit" ./packages/docker/pnpm-gitlog-per-package/bin/pnpm-gitlog-per-package.sh
+#
 # Requires: git, pnpm, wget, fzf >= 0.29.0 (will be installed if not present)
 #
 # Author: Lars Gersmann<lars.gersmann@gmail.com>
@@ -23,11 +27,14 @@ _package2path() {
   echo $path
 }
 
+GIT_LOG_OPTIONS=${GIT_LOG_OPTIONS:-""}
+
 _command_info() {
   local package="$1"
+   local filter=${2:-''}
   local path="$(_package2path "$package")"
   
-  git log --color -- $path
+  git --no-pager log --color $GIT_LOG_OPTIONS --grep "$filter" -- $path
 }
 
 parse_params() {
@@ -53,13 +60,15 @@ parse_params() {
   #[[ -z "${param-}" ]] && die "Missing required parameter: param"
   #[[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
 }
+#echo "'${BASH_SOURCE[0]}' $@" > foo.txt
+
 parse_params "$@"
 
 if ! (command -v "$script_dir/fzf" 1 > /dev/null); then
   (cd "$script_dir/.." && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin)
 fi
 
-PREVIEW_CMD="'${BASH_SOURCE[0]}' _command_info '{}'"
+PREVIEW_CMD="'${BASH_SOURCE[0]}' _command_info '{}' '{q}'"
 package=$("$script_dir/fzf" \
   --reverse \
   --no-sort \
@@ -69,7 +78,7 @@ package=$("$script_dir/fzf" \
   --border=rounded \
   --no-info \
   --exit-0 \
-  --prompt='' \
+  --prompt='search: ' \
   --header-lines=3 \
   --ansi \
   --bind 'esc:execute(echo "$1" && exit)' \
@@ -80,5 +89,5 @@ monorepo package
 
 $(pnpm list --recursive --filter='*/*' --json | jq -r  '.[].name | select( . != null )')")
 )  
- 
-echo "git log --color -- $(_package2path $package)"
+
+echo "git --no-pager log --color $GIT_LOG_OPTIONS -- $(_package2path $package)"

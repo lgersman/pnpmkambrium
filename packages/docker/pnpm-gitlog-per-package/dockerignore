@@ -1,1 +1,4 @@
-/bin/fzf
+/**/*
+!/packages/docker/pnpm-gitlog-per-package
+/packages/docker/bin/fzf
+!/LICENSE.md
