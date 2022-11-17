@@ -36,7 +36,7 @@ pnpm-lock.yaml: package.json
 >	$(PNPM) install --lockfile-only
 > @touch -m pnpm-lock.yaml
 
-node_modules: pnpm-lock.yaml 
+node_modules/: pnpm-lock.yaml 
 # pnpm bug: "pnpm use env ..." is actually not needed but postinall npx calls fails
 > $(PNPM) env use --global $(NODE_VERSION)
 >	$(PNPM) install --frozen-lockfile
@@ -63,7 +63,7 @@ lint-fix: node_modules
 clean:
 # remove everything matching .gitignore entries (-f is force, you can add -q to suppress command output, exclude node_modules and node_modules/**)
 #   => If an untracked directory is managed by a different git repository, it is not removed by default. Use -f option twice if you really want to remove such a directory.
-> git clean -Xfd -e '!/*.env' -e '!/*.code-workspace' -e '!**/node_modules' -e '!**/node_modules/**' 
+> git clean -Xfd -e '!/*.env' -e '!/*.code-workspace' -e '!**/node_modules' -e '!**/node_modules/**' -e '!**/.pnpm-store' -e '!**/pnpm-store/**' 
 
 # delete all files in the current directory (or created by this makefile) that are created by configuring or building the program.
 # see https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html 
