@@ -78,7 +78,7 @@ package=$("$script_dir/fzf" \
   < <(echo "
 monorepo package
 
-$(pnpm list --recursive --json | jq -r  '.[].name | select( . != null )')")
+$(pnpm list --recursive --filter='*/*' --json | jq -r  '.[].name | select( . != null )')")
 )  
  
 echo "git log --color -- $(_package2path $package)"
