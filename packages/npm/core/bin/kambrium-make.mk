@@ -73,7 +73,7 @@ distclean: clean
 > git clean -Xfd -e '!/*.env' -e '!/*.code-workspace'
 > rm pnpm-lock.yaml
 # remove built docker images
-> docker image rm $$(docker images -q $(MONOREPO_SCOPE)/*) 2>/dev/null || true
+> docker image rm -f $$(docker images -q $(MONOREPO_SCOPE)/*) 2>/dev/null || true
 # clean up unused containers. Container, networks, images, and the build cache
 # > docker system prune -a
 # remove unused volumes
