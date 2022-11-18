@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  pnpm-gitlog-per-package:
+    build:
+      dockerfile: packages/docker/pnpm-gitlog-per-package/Dockerfile.debian
+      context: ${PWD}
+    image: pnpm-kambrium/pnpm-gitlog-per-package:latest
+    tty: true
+    stdin_open: true
+    # optional : customize git log options
+    #    environment:
+    #      GIT_LOG_OPTIONS: "--stat --abbrev-commit"
+    volumes:
+      - type: bind
+        source: ${PWD}
+        target: /app

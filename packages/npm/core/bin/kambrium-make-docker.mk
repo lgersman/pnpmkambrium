@@ -29,11 +29,12 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
-> IFS="/" read -r PACKAGE_SCOPE PACKAGE_NAME <<<$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g'); unset 
+> PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # @TODO: inject variables from $(@D)/.env (can also be a script!)
 # @TODO: call build script from $$PACKAGE_JSON if defined
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \
+>		--no-cache \
 > 	--progress=plain \
 >		-t $$PACKAGE_NAME:latest \
 > 	-t $$PACKAGE_NAME:$$PACKAGE_VERSION \
