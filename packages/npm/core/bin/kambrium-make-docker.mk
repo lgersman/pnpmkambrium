@@ -34,7 +34,6 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # @TODO: call build script from $$PACKAGE_JSON if defined
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \
->		--no-cache \
 > 	--progress=plain \
 >		-t $$PACKAGE_NAME:latest \
 > 	-t $$PACKAGE_NAME:$$PACKAGE_VERSION \
