@@ -1,0 +1,15 @@
+{
+  "name": "@pnpm-kambrium/gum",
+  "private": true,
+  "description": "a distroless image providing the most recent gum version in an docker image under 30MB",
+  "version": "1.0.0",
+  "scripts": {},
+  "keywords": [
+    "gum",
+    "distroless"
+  ],
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}
