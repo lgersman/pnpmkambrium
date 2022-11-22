@@ -1,0 +1,16 @@
+{
+  "name": "@pnpm-kambrium/fzf",
+  "private": true,
+  "description": "a distroless image providing the most recent fzf (~24MB)",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {},
+  "keywords": [
+    "fzf",
+    "distroless"
+  ],
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}
