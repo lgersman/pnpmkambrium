@@ -12,8 +12,13 @@ export DOCKER_SCAN_SUGGEST:=false
 #
 export DOCKER_BUILDKIT:=1
 
+#
+# target docker registry
+#
+DOCKER_REGISTRY?=registry.hub.docker.com
+
 #HELP: build all outdated docker images in packages/docker/ 
-packages/docker/: $(wildcard packages/docker/*/) ;
+packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
 
 
 #HELP: build outdated docker image by name\n\tExample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
@@ -54,6 +59,30 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 > 
 > $$(docker image ls $$PACKAGE_NAME:$$PACKAGE_VERSION)
 > EOF
+
+#
+# push docker images to registry
+#
+.PHONY: docker-push
+#HELP: * push docker images to registry
+docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
+
+#
+# push docker image to registry
+# 
+# used registry can be configured using variable DOCKER_REGISTRY
+#
+docker-push-%: packages/docker/$*/
+> @echo "#### pushing docker $*"
+> @PACKAGE_JSON=$(@D)/package.json
+> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
+> PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
+# > docker login --username [username] and docker access-token or real password must be initially before push
+> echo 'xxx' | docker login --username uuu --password-stdin $(DOCKER_REGISTRY) 
+> echo docker push $$PACKAGE_NAME:latest
+> echo docker push $$PACKAGE_NAME:$$PACKAGE_VERSION
+
+
 
 # #> @: # neat trick: add this line to silent the whole task
 # # switch into sub-package directory
