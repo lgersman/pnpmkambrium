@@ -72,15 +72,21 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # used registry can be configured using variable DOCKER_REGISTRY
 #
-docker-push-%: packages/docker/$*/
-> @echo "#### pushing docker $*"
-> @PACKAGE_JSON=$(@D)/package.json
-> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
+docker-push-%: packages/docker/$*/ guard-env-DOCKER_TOKEN
+> @
+> PACKAGE_JSON=packages/docker/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
-# > docker login --username [username] and docker access-token or real password must be initially before push
-> echo 'xxx' | docker login --username uuu --password-stdin $(DOCKER_REGISTRY) 
-> echo docker push $$PACKAGE_NAME:latest
-> echo docker push $$PACKAGE_NAME:$$PACKAGE_VERSION
+> echo -n "push docker image $$PACKAGE_NAME "
+> if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
+> 	PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
+> 	# docker login --username [username] and docker access-token or real password must be initially before push
+> 	echo $(DOCKER_TOKEN) | docker login --username uuu --password-stdin $(DOCKER_REGISTRY) 
+> 	echo docker push $$PACKAGE_NAME:latest
+> 	echo docker push $$PACKAGE_NAME:$$PACKAGE_VERSION
+>		echo '[done]'
+> else 
+> 	echo "[skipped]: package.json is marked as private"
+> fi
 
 
 
