@@ -15,7 +15,7 @@ export DOCKER_BUILDKIT:=1
 #
 # target docker registry
 #
-DOCKER_REGISTRY?=registry.hub.docker.com
+export DOCKER_REGISTRY?=registry.hub.docker.com
 
 #HELP: build all outdated docker images in packages/docker/ 
 packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
@@ -73,19 +73,25 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # used registry can be configured using variable DOCKER_REGISTRY
 #
-docker-push-%: packages/docker/$*/ guard-env-DOCKER_TOKEN
-> @
+docker-push-%: packages/docker/$*/
+# > @
+# read .env file from package if exists 
+> DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/docker/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
-> echo -n "push docker image $$PACKAGE_NAME "
+# if DOCKER_USER is not set take the package scope (example: "@foo/bar" package scope is "foo")
+> DOCKER_USER=$${DOCKER_USER:-$${PACKAGE_NAME%/*}}
+# abort if DOCKER_TOKEN is not defined 
+> : $${DOCKER_TOKEN:?"DOCKER_TOKEN environment is required but not given"}
+> echo -n "push docker image $$PACKAGE_NAME using docker user $$DOCKER_USER "
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
 > 	PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > 	# docker login --username [username] and docker access-token or real password must be initially before push
-> 	echo $(DOCKER_TOKEN) | docker login --username uuu --password-stdin $(DOCKER_REGISTRY) 
-> 	echo docker push $$PACKAGE_NAME:latest
-> 	echo docker push $$PACKAGE_NAME:$$PACKAGE_VERSION
+> 	echo "$$DOCKER_TOKEN" | docker login --username $$DOCKER_USER --password-stdin $$DOCKER_REGISTRY
+> 	docker push $$PACKAGE_NAME:latest
+> 	docker push $$PACKAGE_NAME:$$PACKAGE_VERSION
 >		echo '[done]'
-> else 
+> else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
 
