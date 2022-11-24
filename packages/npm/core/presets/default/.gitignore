@@ -12,3 +12,4 @@ build
 /docker/*.tgz
 build-info
 /.pnpm-store
+!/packages/npm/core/presets/default/.env

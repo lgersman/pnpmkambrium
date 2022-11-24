@@ -27,6 +27,8 @@ PRETTIER := $(PNPM) prettier --ignore-path='$(shell git rev-parse --show-topleve
 # always run eslint using ignored files from .lintignore 
 ESLINT := $(PNPM) eslint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --no-error-on-unmatched-pattern
 
+-include .env
+
 # this target triggers pnpm to download/install the required nodejs if not yet available 
 $(NODE):
 # > @$(PNPM) exec node --version 1&>/dev/null
