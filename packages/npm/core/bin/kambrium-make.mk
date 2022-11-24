@@ -47,6 +47,7 @@ node_modules/: pnpm-lock.yaml
 .PHONY: lint
 #HELP: *  lint sources
 lint: node_modules/
+> pnpm run -r --if-present lint
 > $(PRETTIER) --ignore-unknown .
 > $(ESLINT) .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
@@ -55,6 +56,7 @@ lint: node_modules/
 .PHONY: lint-fix
 #HELP: *  lint sources and fix them where possible
 lint-fix: node_modules
+> pnpm run -r --if-present lint-fix
 > $(PRETTIER) --cache --check --write .
 > $(ESLINT) --fix .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \

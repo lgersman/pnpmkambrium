@@ -38,6 +38,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # @TODO: inject variables from $(@D)/.env (can also be a script!)
 # @TODO: call build script from $$PACKAGE_JSON if defined
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+> pnpm run --if-present build $$PACKAGE_NAME
 > docker build \
 > 	--progress=plain \
 >		-t $$PACKAGE_NAME:latest \
