@@ -21,7 +21,7 @@ DOCKER_REGISTRY?=registry.hub.docker.com
 packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
 
 
-#HELP: build outdated docker image by name\n\tExample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
+#HELP: build outdated docker image by name\n\texample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
 packages/docker/%/: packages/docker/%/build-info ;
 
 #
@@ -65,7 +65,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # push docker images to registry
 #
 .PHONY: docker-push
-#HELP: * push docker images to registry
+#HELP: * push docker images to registry.\n\tenvironment variables:\n\tDOCKER_REGISTRY docker registry to use (default: registry.hub.docker.com)\n\tDOCKER_USER     docker user to login (default: package-scope)\n\tDOCKER_TOKEN    (required) token/password to authenticate 
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
 #
