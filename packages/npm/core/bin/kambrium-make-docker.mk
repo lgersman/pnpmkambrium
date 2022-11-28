@@ -50,7 +50,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 >		--label "org.opencontainers.image.source=$$(jq -r '.repository.url | values' $$PACKAGE_JSON)" \
 > 	--label "org.opencontainers.image.url=$$(jq -r '.homepage | values' $$PACKAGE_JSON)" \
 > 	--label "org.opencontainers.image.vendor=https://cm4all.com" \
-> 	--label "org.opencontainers.image.licenses=$$(jq -r '.license | values' $$PACKAGE_JSON)" \
+> 	--label "org.opencontainers.image.licenses=$$(jq -r -e '.license | values' ./packages/docker/gum/package.json || jq -r '.license | values' package.json)" \
 > 	-f $(@D)/Dockerfile .
 # output generated image labels
 > cat << EOF | tee $@
@@ -94,8 +94,6 @@ docker-push-%: packages/docker/$*/
 > else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
-
-
 
 # #> @: # neat trick: add this line to silent the whole task
 # # switch into sub-package directory
