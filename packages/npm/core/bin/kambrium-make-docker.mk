@@ -71,15 +71,27 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 #
 # push docker images to registry
 #
+# see supported enviuronment variables on make target docker-push-%
+#
 .PHONY: docker-push
-#HELP: * push docker images to registry.\n\tenvironment variables:\n\tDOCKER_REGISTRY docker registry to use (default: registry.hub.docker.com)\n\tDOCKER_USER     docker user to login (default: package-scope)\n\tDOCKER_TOKEN    (required) token/password to authenticate 
+#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm make docker-push' to push all docker sub packages
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
 #
 # push docker image to registry
 # 
-# used registry can be configured using variable DOCKER_REGISTRY
+# environment variables can be provided either by 
+# 	- environment
+#		- docker package `.env` file:
+#		- monorepo `.env` file
 #
+# supported variables are : 
+# 	- DOCKER_TOKEN (required) can be the docker password (a docker token is preferred for security reasons)
+# 	- DOCKER_USER use the docker identity/username, your docker account email will not work
+# 	- DOCKER_REPOSITORY =xxxx
+# 	- DOCKER_REGISTRY=xxx
+#
+#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm make docker-push-gum' to push docker 'package packages/docker/gum'
 docker-push-%: packages/docker/$*/
 # > @
 # read .env file from package if exists 
@@ -104,11 +116,10 @@ docker-push-%: packages/docker/$*/
 > 
 >		# if DOCKER_REGISTRY == registry.hub.docker.com : update description and README.md
 >		if [[ "$$DOCKER_REGISTRY" == "registry.hub.docker.com" ]]; then
-> 		: $${DOCKER_PASSWORD:?"DOCKER_PASSWORD environment is required but not given"}
 > 		echo -n "updating description/README.md for docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
 # > 			cat ~/my_password.txt | docker login --username foo --password-stdin
 # > 			docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
-> 		LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_PASSWORD")
+> 		LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_TOKEN")
 > 		JWT_TOKEN=$$(curl -s --show-error  -H "Content-Type: application/json" -X POST -d "$$LOGIN_PAYLOAD" https://hub.docker.com/v2/users/login/ | jq --exit-status -r .token)
 # 		GET : > curl -v -H "Authorization: JWT $${JWT_TOKEN}" "https://hub.docker.com/v2/repositories/$(DOCKER_IMAGE)/"
 > 		DESCRIPTION=$$(docker image inspect --format='' $$DOCKER_IMAGE:latest | jq -r '.[0].Config.Labels["org.opencontainers.image.description"] | values')
@@ -116,7 +127,7 @@ docker-push-%: packages/docker/$*/
 # see https://stackoverflow.com/a/48470227/1554103
 > 		jq -n \
 >   		--arg description "$$(jq -r '.description | values' $$PACKAGE_JSON)" \
->   		--arg full_description "$$(cat ./docker/README.md ||:)" '{description: $$description, full_description: $$full_description}' \
+>   		--arg full_description "$$(cat packages/docker/$*/README.md 2>/dev/null ||:)" '{description: $$description, full_description: $$full_description}' \
 >			| curl -s --show-error \
 > 			-H "Content-Type: application/json" \
 >				-H "Authorization: JWT $${JWT_TOKEN}" \
