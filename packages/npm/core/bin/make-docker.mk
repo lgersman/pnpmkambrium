@@ -30,9 +30,12 @@ packages/docker/%/: packages/docker/%/build-info ;
 # we utilize file "build-info" to track if the docker image was build/is up to date
 #
 packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildcard packages/docker$*/* packages/docker$*/**/*)) package.json 
+# target depends on root located package.json and every file located in packages/docker/% except build-info
+> @
+# set -a causes variables¹ defined from now on to be automatically exported.
+> set -a 
 # read .env file from package if exists 
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
-# target depends on root located package.json and every file located in packages/docker/% except build-info 
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
@@ -42,10 +45,8 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # if DOCKER_REPOSITORY is not set take the package repository (example: "@foo/bar" package repository is "bar")
 > DOCKER_REPOSITORY=$${DOCKER_REPOSITORY:-$${PACKAGE_NAME#*/}}
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
-# @TODO: inject variables from $(@D)/.env (can also be a script!)
-# @TODO: call build script from $$PACKAGE_JSON if defined
+> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-> pnpm run --if-present build $$PACKAGE_NAME
 > docker build \
 > 	--progress=plain \
 >		-t $$DOCKER_IMAGE:latest \
@@ -63,7 +64,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 > cat << EOF | tee $@
 > $$(docker image inspect $$DOCKER_IMAGE:latest | jq '.[0].Config.Labels | values')
 > 
-> ---
+> $$(echo -n "---")
 > 
 > $$(docker image ls $$DOCKER_IMAGE:$$PACKAGE_VERSION)
 > EOF
@@ -105,7 +106,7 @@ docker-push-%: packages/docker/$*/
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
 # abort if DOCKER_TOKEN is not defined 
 > : $${DOCKER_TOKEN:?"DOCKER_TOKEN environment is required but not given"}
-> echo "push docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
+> echo "push docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER"
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
 > 	PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > 	# docker login --username [username] and docker access-token or real password must be initially before push
@@ -116,7 +117,7 @@ docker-push-%: packages/docker/$*/
 > 
 >		# if DOCKER_REGISTRY == registry.hub.docker.com : update description and README.md
 >		if [[ "$$DOCKER_REGISTRY" == "registry.hub.docker.com" ]]; then
-> 		echo "updating description/README.md for docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
+> 		echo "updating description/README.md for docker image $$DOCKER_IMAGE"
 # > 			cat ~/my_password.txt | docker login --username foo --password-stdin
 # > 			docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
 > 		LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_TOKEN")
