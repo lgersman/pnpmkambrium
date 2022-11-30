@@ -24,7 +24,7 @@ add pnpm git log tooling using a docker image
 
     ```
 
-  - build docker image : `pnpm make packages/docker/pnpm-gitlog-per-package/`
+  - build docker image : `pnpm kambrium-make packages/docker/pnpm-gitlog-per-package/`
 
     - build using the docker-compose file : `docker compose -f packages/docker/pnpm-gitlog-per-package/docker-compose.yml build`
 

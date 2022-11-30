@@ -4,10 +4,10 @@
 # MAKEFLAGS += --silent
 
 KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-include $(KAMBRIUM_MAKEFILE_DIR)kambrium-make-common.mk
-include $(KAMBRIUM_MAKEFILE_DIR)kambrium-make-functions.mk
-include $(KAMBRIUM_MAKEFILE_DIR)kambrium-make-rules.mk
-include $(KAMBRIUM_MAKEFILE_DIR)kambrium-make-docker.mk
+include $(KAMBRIUM_MAKEFILE_DIR)make-common.mk
+include $(KAMBRIUM_MAKEFILE_DIR)make-functions.mk
+include $(KAMBRIUM_MAKEFILE_DIR)make-rules.mk
+include $(KAMBRIUM_MAKEFILE_DIR)make-docker.mk
 
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)

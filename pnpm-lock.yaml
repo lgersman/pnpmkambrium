@@ -7,6 +7,7 @@ importers:
       '@changesets/cli': 2.25.2
       '@commitlint/cli': 17.2.0
       '@commitlint/config-conventional': 17.2.0
+      '@pnpm-kambrium/core': workspace:*
       eslint: 8.26.0
       eslint-config-prettier: 8.5.0
       eslint-plugin-import: 2.26.0
@@ -21,6 +22,7 @@ importers:
       '@changesets/cli': 2.25.2
       '@commitlint/cli': 17.2.0
       '@commitlint/config-conventional': 17.2.0
+      '@pnpm-kambrium/core': link:packages/npm/core
       eslint: 8.26.0
       eslint-config-prettier: 8.5.0_eslint@8.26.0
       eslint-plugin-import: 2.26.0_eslint@8.26.0
@@ -31,6 +33,12 @@ importers:
       git-cz: 4.9.0
       nano-staged: 0.8.0
       prettier: 2.7.1
+
+  packages/docker/fzf:
+    specifiers: {}
+
+  packages/docker/gum:
+    specifiers: {}
 
   packages/docker/pnpm-gitlog-per-package:
     specifiers: {}

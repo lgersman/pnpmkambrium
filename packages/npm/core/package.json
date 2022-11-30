@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "bin": {
-    "kambrium-make": "bin/kambrium-make.mk"
+    "kambrium-make": "bin/make.mk"
   },
   "publishConfig": {
     "access": "public"

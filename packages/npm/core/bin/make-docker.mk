@@ -21,7 +21,7 @@ export DOCKER_REGISTRY?=registry.hub.docker.com
 packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
 
 
-#HELP: build outdated docker image by name\n\texample: 'pnpm make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
+#HELP: build outdated docker image by name\n\texample: 'pnpm kambrium-make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
 packages/docker/%/: packages/docker/%/build-info ;
 
 #
@@ -74,7 +74,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # see supported enviuronment variables on make target docker-push-%
 #
 .PHONY: docker-push
-#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm make docker-push' to push all docker sub packages
+#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm kambrium-make docker-push' to push all docker sub packages
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
 #
@@ -91,7 +91,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 	- DOCKER_REPOSITORY =xxxx
 # 	- DOCKER_REGISTRY=xxx
 #
-#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm make docker-push-gum' to push docker 'package packages/docker/gum'
+#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm kambrium-make docker-push-gum' to push docker 'package packages/docker/gum'
 docker-push-%: packages/docker/$*/
 # > @
 # read .env file from package if exists 
@@ -105,7 +105,7 @@ docker-push-%: packages/docker/$*/
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
 # abort if DOCKER_TOKEN is not defined 
 > : $${DOCKER_TOKEN:?"DOCKER_TOKEN environment is required but not given"}
-> echo -n "push docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
+> echo "push docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
 > 	PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > 	# docker login --username [username] and docker access-token or real password must be initially before push
@@ -116,7 +116,7 @@ docker-push-%: packages/docker/$*/
 > 
 >		# if DOCKER_REGISTRY == registry.hub.docker.com : update description and README.md
 >		if [[ "$$DOCKER_REGISTRY" == "registry.hub.docker.com" ]]; then
-> 		echo -n "updating description/README.md for docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
+> 		echo "updating description/README.md for docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER "
 # > 			cat ~/my_password.txt | docker login --username foo --password-stdin
 # > 			docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
 > 		LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_TOKEN")
@@ -141,20 +141,3 @@ docker-push-%: packages/docker/$*/
 > else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
-
-# #> @: # neat trick: add this line to silent the whole task
-# # switch into sub-package directory
-# > cd $(@D) 
-# # inject .env file 
-# > test -f .env && source .env
-# # pick version from package.json 
-# > VERSION=`jq -r .version package.json`
-# # fallback : if IMAGE is not defined via.env => eval it from package.json
-# > : $${IMAGE:=`jq -r .name package.json`}
-# > IMAGE="$${IMAGE/@}"
-# # build the image
-# # optional add --build-arg MDBOOK_VERSION='0.4.13'
-# > test -f .env && source .env
-# # > test -x $1 && $1
-# > docker build  --tag $$IMAGE:$$VERSION -t $$IMAGE .
-# # @TODO: add self hosted docker registry  ? 
