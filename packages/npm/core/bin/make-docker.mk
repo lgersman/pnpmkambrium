@@ -72,10 +72,10 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 #
 # push docker images to registry
 #
-# see supported enviuronment variables on make target docker-push-%
+# see supported environment variables on make target docker-push-%
 #
 .PHONY: docker-push
-#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm kambrium-make docker-push' to push all docker sub packages
+#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-token pnpm kambrium-make docker-push' to push all docker sub packages
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
 #
@@ -83,7 +83,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # environment variables can be provided either by 
 # 	- environment
-#		- docker package `.env` file:
+#		- sub package `.env` file:
 #		- monorepo `.env` file
 #
 # supported variables are : 
@@ -92,7 +92,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 	- DOCKER_REPOSITORY =xxxx
 # 	- DOCKER_REGISTRY=xxx
 #
-#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-docker-token pnpm kambrium-make docker-push-gum' to push docker 'package packages/docker/gum'
+#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token pnpm kambrium-make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$*/
 # > @
 # read .env file from package if exists 
