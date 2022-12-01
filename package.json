@@ -8,7 +8,7 @@
     "pnpm": ">= 7.14.0"
   },
   "scripts": {
-    "prepare": "npx -y only-allow pnpm && git config core.hookspath ./node_modules/@pnpm-kambrium/core/presets/default/.githooks"
+    "prepare": "npx -y only-allow pnpm && git config core.hookspath ./node_modules/@pnpmkambrium/core/presets/default/.githooks"
   },
   "keywords": [
     "pnpm"

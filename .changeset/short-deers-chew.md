@@ -1,5 +1,5 @@
 ---
-'@pnpm-kambrium/core': patch
+'@pnpmkambrium/core': patch
 ---
 
 add generic npm package build support
