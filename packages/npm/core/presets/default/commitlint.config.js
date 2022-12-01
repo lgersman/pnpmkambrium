@@ -5,7 +5,7 @@
 #
 # ```
 # extends:
-#   - "@pnpm-kambrium/core/presets/default/commitlint.config.js"
+#   - "@pnpmkambrium/core/presets/default/commitlint.config.js"
 # ```
 #
 # You can remove it from there depending on your needs.

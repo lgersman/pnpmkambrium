@@ -5,7 +5,7 @@
 #
 # ```
 # extends:
-#   - "@pnpm-kambrium/core/presets/default/.stylelintrc.yml"
+#   - "@pnpmkambrium/core/presets/default/.stylelintrc.yml"
 # # customize your stylelint configuration
 # #  - "@wordpress/stylelint-config"
 # #  - "@wordpress/stylelint-config/scss"

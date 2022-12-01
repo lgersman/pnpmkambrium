@@ -1,5 +1,5 @@
 {
-  "name": "@pnpm-kambrium/fzf",
+  "name": "@pnpmkambrium/fzf",
   "private": true,
   "description": "a distroless image providing the most recent fzf (~24MB)",
   "version": "1.0.0",

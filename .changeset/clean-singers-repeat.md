@@ -1,5 +1,5 @@
 ---
-'@pnpm-kambrium/fzf': patch
+'@pnpmkambrium/fzf': patch
 ---
 
 add fzf docker image

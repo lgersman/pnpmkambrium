@@ -1,8 +1,8 @@
 {
-  "name": "pnpm-kambrium",
+  "name": "pnpmkambrium",
   "private": "true",
   "version": "1.0.0",
-  "description": "pnpm-kambrium is a monorepo toolchain based on pnpm",
+  "description": "pnpmkambrium is a monorepo toolchain based on pnpm",
   "engines": {
     "node": ">= 18.8.0",
     "pnpm": ">= 7.14.0"
@@ -19,11 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lgersman/pnpm-kambrium"
+    "url": "https://github.com/lgersman/pnpmkambrium"
   },
   "license": "MIT",
   "devDependencies": {
-    "@pnpm-kambrium/core": "workspace:*",
+    "@pnpmkambrium/core": "workspace:*",
     "@changesets/cli": "2.25.2",
     "@commitlint/cli": "17.2.0",
     "@commitlint/config-conventional": "17.2.0",

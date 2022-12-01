@@ -1,7 +1,7 @@
 {
-  "name": "@pnpm-kambrium/create",
+  "name": "@pnpmkambrium/create",
   "version": "1.0.0",
-  "description": "`npm create` template package for @pnpm-kambrium",
+  "description": "`npm create` template package for @pnpmkambrium",
   "scripts": {},
   "keywords": [
     "pnpm"
@@ -11,7 +11,7 @@
     "name": "lars gersmann"
   },
   "dependencies": {
-    "@pnpm-kambrium/core": "workspace:*"
+    "@pnpmkambrium/core": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

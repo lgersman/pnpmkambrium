@@ -18,14 +18,14 @@ You can provide [fzf](https://github.com/junegunn/fzf) input using
 
 - environment variable `FZF_INPUT`.
 
-  Example : `docker run -it -e FZF_INPUT="$(ls /)" --rm pnpm-kambrium/fzf'`
+  Example : `docker run -it -e FZF_INPUT="$(ls /)" --rm pnpmkambrium/fzf'`
 
 - or by providing a file `/FZF_INPUT`
 
-  Example : `docker run -it -v $(ls / > FZF_INPUT && echo $(pwd)/FZF_INPUT):/FZF_INPUT --rm pnpm-kambrium/fzf`
+  Example : `docker run -it -v $(ls / > FZF_INPUT && echo $(pwd)/FZF_INPUT):/FZF_INPUT --rm pnpmkambrium/fzf`
 
 ## `fzf` options
 
 All options provided to the container will be delegated to [fzf](https://github.com/junegunn/fzf).
 
-Example: `docker run -it -e FZF_INPUT="$(ls $(pwd)/foo)" -v $(pwd)/foo:/foo --rm pnpm-kambrium/fzf --preview='ls -la /foo/{}'`
+Example: `docker run -it -e FZF_INPUT="$(ls $(pwd)/foo)" -v $(pwd)/foo:/foo --rm pnpmkambrium/fzf --preview='ls -la /foo/{}'`

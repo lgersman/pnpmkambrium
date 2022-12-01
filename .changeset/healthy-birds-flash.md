@@ -1,7 +1,7 @@
 ---
-'@pnpm-kambrium/pnpm-gitlog-per-package': patch
-'@pnpm-kambrium/core': patch
-'@pnpm-kambrium/create': patch
+'@pnpmkambrium/pnpm-gitlog-per-package': patch
+'@pnpmkambrium/core': patch
+'@pnpmkambrium/create': patch
 ---
 
 - add git hooks / commitizen support using NPM script/hook `prepare` in your monorepo root package.json :

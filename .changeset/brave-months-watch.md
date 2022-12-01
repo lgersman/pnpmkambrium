@@ -1,6 +1,6 @@
 ---
-'@pnpm-kambrium/core': patch
-'@pnpm-kambrium/create': patch
+'@pnpmkambrium/core': patch
+'@pnpmkambrium/create': patch
 ---
 
 add monospace wide prettier/eslint support

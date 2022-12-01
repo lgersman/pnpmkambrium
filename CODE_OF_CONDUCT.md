@@ -1,4 +1,4 @@
-# Code of Conduct - pnpm-kambrium
+# Code of Conduct - pnpmkambrium
 
 ## Our Pledge
 

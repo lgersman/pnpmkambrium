@@ -4,7 +4,7 @@
 # this file is usually referenced in your own top level changelog.config.js.
 #
 # ```
-# const settings = require('@pnpm-kambrium/core/presets/default/changelog.config.js');
+# const settings = require('@pnpmkambrium/core/presets/default/changelog.config.js');
 # module.exports = {
 #   ...settings,
 # };

@@ -1,5 +1,5 @@
 ---
-'@pnpm-kambrium/gum': patch
+'@pnpmkambrium/gum': patch
 ---
 
 added [gum](https://github.com/charmbracelet/gum) docker image

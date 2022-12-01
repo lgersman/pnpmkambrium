@@ -29,7 +29,7 @@ SHELL != sh -c "command -v bash"
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)
 #
-MAKEFLAGS += --no-builtin-rules 
+MAKEFLAGS += --no-builtin-rules
 
 #
 # warn if unused variables in use

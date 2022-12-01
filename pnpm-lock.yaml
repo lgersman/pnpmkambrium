@@ -7,7 +7,7 @@ importers:
       '@changesets/cli': 2.25.2
       '@commitlint/cli': 17.2.0
       '@commitlint/config-conventional': 17.2.0
-      '@pnpm-kambrium/core': workspace:*
+      '@pnpmkambrium/core': workspace:*
       eslint: 8.26.0
       eslint-config-prettier: 8.5.0
       eslint-plugin-import: 2.26.0
@@ -22,7 +22,7 @@ importers:
       '@changesets/cli': 2.25.2
       '@commitlint/cli': 17.2.0
       '@commitlint/config-conventional': 17.2.0
-      '@pnpm-kambrium/core': link:packages/npm/core
+      '@pnpmkambrium/core': link:packages/npm/core
       eslint: 8.26.0
       eslint-config-prettier: 8.5.0_eslint@8.26.0
       eslint-plugin-import: 2.26.0_eslint@8.26.0
@@ -48,9 +48,9 @@ importers:
 
   packages/npm/create:
     specifiers:
-      '@pnpm-kambrium/core': workspace:*
+      '@pnpmkambrium/core': workspace:*
     dependencies:
-      '@pnpm-kambrium/core': link:../core
+      '@pnpmkambrium/core': link:../core
 
 packages:
 

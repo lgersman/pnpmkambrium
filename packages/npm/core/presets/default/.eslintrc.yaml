@@ -5,7 +5,7 @@
 #
 # ```
 # extends:
-#   - "./node_modules/@pnpm-kambrium/core/presets/default/.eslintrc.yaml"
+#   - "./node_modules/@pnpmkambrium/core/presets/default/.eslintrc.yaml"
 # ```
 #
 # You can remove it from there depending on your needs.

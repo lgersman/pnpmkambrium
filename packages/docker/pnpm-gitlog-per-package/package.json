@@ -1,5 +1,5 @@
 {
-  "name": "@pnpm-kambrium/pnpm-gitlog-per-package",
+  "name": "@pnpmkambrium/pnpm-gitlog-per-package",
   "private": true,
   "version": "1.0.0",
   "description": "",

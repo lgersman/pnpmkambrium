@@ -5,7 +5,7 @@ services:
       dockerfile: packages/docker/pnpm-gitlog-per-package/Dockerfile
 
       context: ${PWD}
-    image: pnpm-kambrium/pnpm-gitlog-per-package:latest
+    image: pnpmkambrium/pnpm-gitlog-per-package:latest
     tty: true
     stdin_open: true
     # optional : customize git log options

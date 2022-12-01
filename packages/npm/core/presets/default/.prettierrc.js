@@ -4,7 +4,7 @@
 # this file is usually referenced in your own top level .prettierrc.js.
 #
 # ```
-# const settings = require('@pnpm-kambrium/core/presets/default/.prettierrc.js');
+# const settings = require('@pnpmkambrium/core/presets/default/.prettierrc.js');
 # module.exports = {
 #   ...settings,
 # };

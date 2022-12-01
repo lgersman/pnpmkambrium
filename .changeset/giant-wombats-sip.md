@@ -1,5 +1,5 @@
 ---
-'@pnpm-kambrium/pnpm-gitlog-per-package': patch
+'@pnpmkambrium/pnpm-gitlog-per-package': patch
 ---
 
 add pnpm git log tooling using a docker image
@@ -33,10 +33,10 @@ add pnpm git log tooling using a docker image
   - run docker image :
 
     ```
-    docker run -it --rm -v $(pwd):/app pnpm-kambrium/pnpm-gitlog-per-package
+    docker run -it --rm -v $(pwd):/app pnpmkambrium/pnpm-gitlog-per-package
 
     # run with customized git log format
-    docker run -it --rm -e GIT_LOG_OPTIONS="--stat --abbrev-commit"  -v $(pwd):/app pnpm-kambrium/pnpm-gitlog-per-package
+    docker run -it --rm -e GIT_LOG_OPTIONS="--stat --abbrev-commit"  -v $(pwd):/app pnpmkambrium/pnpm-gitlog-per-package
     ```
 
     run using a docker-compose file :
@@ -47,7 +47,7 @@ add pnpm git log tooling using a docker image
     version: '3.3'
     services:
       main:
-        image: pnpm-kambrium/pnpm-gitlog-per-package:latest
+        image: pnpmkambrium/pnpm-gitlog-per-package:latest
         stdin_open: true
         tty:true
         # optional : customize git log options
