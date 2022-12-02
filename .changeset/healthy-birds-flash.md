@@ -1,5 +1,5 @@
 ---
-'@pnpmkambrium/pnpm-gitlog-per-package': patch
+'@pnpmkambrium/gitlog-per-package': patch
 '@pnpmkambrium/core': patch
 '@pnpmkambrium/create': patch
 ---

@@ -14,10 +14,10 @@ RUN cd /usr/local && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/ma
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
-COPY ./packages/docker/pnpm-gitlog-per-package/README.md /
+COPY ./packages/docker/gitlog-per-package/README.md /
 COPY ./LICENSE.md /
-COPY --chown=node:node --chmod=755 ./packages/docker/pnpm-gitlog-per-package/bin/pnpm-gitlog-per-package.sh /usr/local/bin/
-COPY --chown=node:node --chmod=755 ./packages/docker/pnpm-gitlog-per-package/entrypoint.sh /usr/local/bin/
+COPY --chown=node:node --chmod=755 ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh /usr/local/bin/
+COPY --chown=node:node --chmod=755 ./packages/docker/gitlog-per-package/entrypoint.sh /usr/local/bin/
 
 RUN npm config set update-notifier false && npm install --no-fund --silent -g pnpm
 

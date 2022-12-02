@@ -1,5 +1,5 @@
 /**/*
-!/packages/docker/pnpm-gitlog-per-package
+!/packages/docker/gitlog-per-package
 /packages/docker/bin/fzf
 !/LICENSE.md
 /docs

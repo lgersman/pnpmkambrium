@@ -1,0 +1,16 @@
+{
+  "name": "@pnpmkambrium/gitlog-per-package",
+  "version": "1.0.0",
+  "description": "provides a fzf based git log per monorepo package viewer",
+  "scripts": {},
+  "keywords": [
+    "pnpm",
+    "monorepo",
+    "git",
+    "log"
+  ],
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}

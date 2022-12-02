@@ -48,4 +48,18 @@ Execute `pnpm kambrium-make` for more docker related targets.
 
 Execute `pnpm kambrium-make` for more docker related targets.
 
-@TODO:
+# Caveats
+
+- You made changes in your sub package but `pnpm kambrium-make ...` does not rebuild/thinks nothing has changed
+
+  Your can workaround this issue by simply force rebuilding the package using `pnpm kambrium-make -B ...`
+
+- Don't use minus (`-`) sign in docker sub package scopes
+
+  Suppose you have a sub package `/packages/docker/bar` named `@my-foo/bar`.
+
+  `pnpm kambrium-make docker-build-bar` and `pnpm kambrium-make docker-push-bar` will derive the `DOCKER_USER` environment variable from scope (package scope="`@my-foo`", derived DOCKER_USER="`my-foo`") by default.
+
+  Unfortunately Docker usernames are prohibited to contain the minus (`-`) sign. _NPM package names in contrast allow minus (`-`) sign in package scopes._
+
+  Either remove the minus (`-`) sign from the sub package scope or set environment variable `DOCKER_USER` (using an `.env` file or at commandline) to the desired docker user.

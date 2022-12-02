@@ -14,4 +14,4 @@ if [[ ! -d /app ]]; then
   exit 1
 fi 
 
-cd /app && $(which pnpm-gitlog-per-package.sh)
+cd /app && $(which gitlog-per-package.sh)

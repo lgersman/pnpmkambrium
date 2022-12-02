@@ -6,7 +6,7 @@
 #
 # script supports git log command customization using environment variable GIT_LOG_OPTIONS. 
 # Example: 
-# GIT_LOG_OPTIONS="--stat --abbrev-commit" ./packages/docker/pnpm-gitlog-per-package/bin/pnpm-gitlog-per-package.sh
+# GIT_LOG_OPTIONS="--stat --abbrev-commit" ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh
 #
 # Requires: git, pnpm, wget, fzf >= 0.29.0 (will be installed if not present)
 #
