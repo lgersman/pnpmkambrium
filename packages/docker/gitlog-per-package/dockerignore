@@ -1,5 +1,5 @@
 /**/*
 !/packages/docker/gitlog-per-package
-/packages/docker/bin/fzf
+/packages/docker/gitlog-per-package/bin/fzf
 !/LICENSE.md
 /docs

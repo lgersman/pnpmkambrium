@@ -1,0 +1,16 @@
+{
+  "name": "@pnpmkambrium/shaunch",
+  "version": "1.0.0",
+  "description": "provides a fzf based launcher for shell script integrating markdown documentation",
+  "scripts": {},
+  "keywords": [
+    "pnpm",
+    "monorepo",
+    "git",
+    "log"
+  ],
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}

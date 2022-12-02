@@ -1,0 +1,6 @@
+/**/*
+!/packages/docker/shaunch
+/packages/docker/shaunch/bin/fzf
+/packages/docker/shaunch/bin/bat
+!/LICENSE.md
+/docs
