@@ -8,7 +8,7 @@
 # Example: 
 # @TODO:
 #
-# Requires: pnpm, wget, bat/batcat, fzf >= 0.29.0 (will be installed if not present)
+# Requires: wget, bat/batcat (will be installed if not present), fzf >= 0.29.0 (will be installed if not present)
 #
 # Author: Lars Gersmann<lars.gersmann@cm4all.com>
 # Created: 2022-12-02
@@ -41,10 +41,11 @@ Script description here.
 
 Available options:
 
--h, --help      Print this help and exit
--v, --verbose   Print script debug info
--f, --flag      Some flag description
--t, --title     title string above the commands to launch
+-h, --help                 Print this help and exit
+-v, --verbose              Print script debug info
+-f, --flag                 Some flag description
+-t, --title                title string above the commands to launch
+-c, --commands-directory   commands directory (defaults to current directory) 
 EOF
   exit
 }
@@ -56,18 +57,26 @@ parse_params() {
 
   while :; do
     case "${1-}" in
-    -h | --help)
-      help
-    ;;
-    -v | --verbose) 
-      set -x 
-    ;;
-    -t | --title) 
-      TITLE="${2-}"
-      shift
-    ;;
-    -?*) die "Unknown option: $1" ;;
-    *) break ;;
+      -h | --help)
+        help
+      ;;
+      -v | --verbose) 
+        set -x 
+      ;;
+      -t | --title) 
+        TITLE="${2-}"
+        shift
+      ;;
+      -c | --commands-directory) 
+        COMMANDS_DIRECTORY="${2-}"
+        shift
+      ;;
+      -?*) 
+        die "Unknown option: $1" 
+      ;;
+      *) 
+        break 
+      ;;
     esac
     shift
   done
@@ -78,8 +87,9 @@ parse_params() {
 parse_params "$@"
 
 TITLE=${TITLE:-Commands}
+COMMANDS_DIRECTORY=${COMMANDS_DIRECTORY:-.}
 
-PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always '{}.md'"
+PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always '$COMMANDS_DIRECTORY/{}.md'"
 cmd=$("$script_dir/fzf" \
   --reverse \
   --no-sort \
@@ -97,7 +107,7 @@ cmd=$("$script_dir/fzf" \
   < <(echo "
 $TITLE
 
-$(find . -maxdepth 1 -type f -executable -printf '%f\n' | sort)")
+$(find "$COMMANDS_DIRECTORY" -maxdepth 1 -type f -executable -printf '%f\n' | sort)")
 )  
 
 # @TODO: it would be nice to output the selected command to the terminal prompt AFTER the script exists
