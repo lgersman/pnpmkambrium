@@ -41,11 +41,14 @@ Script description here.
 
 Available options:
 
--h, --help                 Print this help and exit
--v, --verbose              Print script debug info
--f, --flag                 Some flag description
--t, --title                title string above the commands to launch
--c, --commands-directory   commands directory (defaults to current directory) 
+-h, --help                      Print this help and exit
+-v, --verbose                   Print script debug info
+-f, --flag                      Some flag description
+-t, --title                     Title string above the commands to launch
+-c, --commands-directory <dir>  Directory to scan for commands (defaults to current directory)
+--suppress-exit-on-escape       if set $(basename ${BASH_SOURCE[0]}) cannot be exited using <Escape>
+-e, --execute                   Executes selected command directly after pressing <Enter>
+  -r --restart                  Restart $(basename ${BASH_SOURCE[0]}) after command was executed (only if execute option ist enabled) 
 EOF
   exit
 }
@@ -71,6 +74,15 @@ parse_params() {
         COMMANDS_DIRECTORY="${2-}"
         shift
       ;;
+      -e | --execute) 
+        EXECUTE="y"
+      ;;
+      -r | --restart) 
+        RESTART="y"
+      ;;
+      --suppress-exit-on-escape)
+        SUPPRESS_EXIT_ON_ESCAPE=''
+      ;;
       -?*) 
         die "Unknown option: $1" 
       ;;
@@ -88,8 +100,11 @@ parse_params "$@"
 
 TITLE=${TITLE:-Commands}
 COMMANDS_DIRECTORY=${COMMANDS_DIRECTORY:-.}
+EXECUTE=${EXECUTE:-n}
+RESTART=${RESTART:-n}
+SUPPRESS_EXIT_ON_ESCAPE=${SUPPRESS_EXIT_ON_ESCAPE:-}
 
-PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always '$COMMANDS_DIRECTORY/{}.md'"
+PREVIEW_CMD="cd '$COMMANDS_DIRECTORY' && $script_dir/bat --paging=always --style=plain --color=always '{}.md'"
 cmd=$("$script_dir/fzf" \
   --reverse \
   --no-sort \
@@ -110,6 +125,10 @@ $TITLE
 $(find "$COMMANDS_DIRECTORY" -maxdepth 1 -type f -executable -printf '%f\n' | sort)")
 )  
 
-# @TODO: it would be nice to output the selected command to the terminal prompt AFTER the script exists
-# like fzf can do using _fzf_complete
-echo "./${cmd}"
+if [[ "$EXECUTE" == 'y' ]]; then
+  echo "whoop"
+else
+  # @TODO: it would be nice to output the selected command to the terminal prompt AFTER the script exists
+  # like fzf can do using _fzf_complete
+  echo "./${cmd}"
+fi
