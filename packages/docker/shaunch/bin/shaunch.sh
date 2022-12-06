@@ -73,10 +73,33 @@ function _scan_commands() {
   echo $json | jq .
 }
 
+function _render_markdown() {
+  local help=$(echo "$COMMANDS" | jq --arg caption "$1" -r '.[] | select(.caption==$caption).help')
+
+  if (command -v "$help" 1 > /dev/null); then
+    # if markdown file is a executable : execute it and interpret its output as markdown
+    $help | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+  elif [[ -f "$help" ]]; then
+    # if its a regular markdown file 
+    $script_dir/bat --paging=always --style=plain --color=always "$help"
+  else
+    # otherwise interpret content as markdown content
+    echo "$help" | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+  fi
+}
+
+# export original command to make it available to calling scripts
+export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
+
 # parse commandline parameters
 parse_params() {
   while :; do
     case "${1-}" in
+      _render_markdown)
+        shift
+        _render_markdown "$@"
+        exit
+      ;;
       -h | --help)
         help
       ;;
@@ -115,13 +138,7 @@ parse_params() {
 
 parse_params "$@"
 
-# export original command to make it available to calling scripts
-export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
-
-# prefetch available command captions
-CAPTIONS=$(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')
-
-PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always \$(echo '$COMMANDS' | jq -r '.[] | select(.caption==\"{}\").help')"
+PREVIEW_CMD="'${BASH_SOURCE[0]}' _render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
 cmd=$("$script_dir/fzf" \
   --reverse \
@@ -139,7 +156,7 @@ cmd=$("$script_dir/fzf" \
   < <(echo "
 $TITLE
 
-${CAPTIONS}")
+$(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')")
 )  
 
 bash -c "$(echo $COMMANDS | jq -r ".[] | select(.caption==\"$cmd\").exec")"
