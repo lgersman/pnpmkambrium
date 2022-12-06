@@ -51,24 +51,29 @@ EOF
   exit
 }
 
+# built-in fallback function scanning a directory for exeutables and matching md file
 function _scan_commands() {
   local dir=$(realpath --relative-to=$(pwd) $1)
   local json='[]'
 
   for script in $(find "$dir" -maxdepth 1 -type f -executable -printf '%f\n' | sort); do
-    json=$(\
-      echo "$json" | 
-      jq \
-        --arg caption "$script" \
-        --arg help "${dir}/${script}.md" \
-        --arg exec "${dir}/${script}" \
-        '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
-      )
+    # append script only if matching markdown file exists
+    if [[ -f "${dir}/${script}.md" ]]; then
+      json=$(\
+        echo "$json" | 
+        jq \
+          --arg caption "$script" \
+          --arg help "${dir}/${script}.md" \
+          --arg exec "${dir}/${script}" \
+          '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
+        )
+    fi
   done
 
   echo $json | jq .
 }
 
+# parse commandline parameters
 parse_params() {
   while :; do
     case "${1-}" in
@@ -108,15 +113,15 @@ parse_params() {
   TITLE=${TITLE:-Commands}
 }
 
+parse_params "$@"
+
 # export original command to make it available to calling scripts
 export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
 
-parse_params "$@"
-
-# echo $COMMANDS | jq -r '.[] | select(.caption=="unmount").help'
+# prefetch available command captions
 CAPTIONS=$(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')
 
-PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always  \$(echo '$COMMANDS' | jq -r '.[] | select(.caption==\"{}\").help')"
+PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always \$(echo '$COMMANDS' | jq -r '.[] | select(.caption==\"{}\").help')"
 # --bind 'esc:execute(echo "$1" && exit)' \
 cmd=$("$script_dir/fzf" \
   --reverse \
