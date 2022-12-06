@@ -31,7 +31,7 @@ GIT_LOG_OPTIONS=${GIT_LOG_OPTIONS:-""}
 
 _command_info() {
   local package="$1"
-   local filter=${2:-''}
+  local filter=${2:-''}
   local path="$(_package2path "$package")"
   
   git --no-pager log --color $GIT_LOG_OPTIONS --grep "$filter" -- $path
@@ -47,6 +47,7 @@ parse_params() {
     _command_info)
       shift
       _command_info "$@"
+      exit
     ;;
     -?*) die "Unknown option: $1" ;;
     *) break ;;
