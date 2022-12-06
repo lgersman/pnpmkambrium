@@ -2,5 +2,6 @@
 !/packages/docker/shaunch
 /packages/docker/shaunch/bin/fzf
 /packages/docker/shaunch/bin/bat
+/packages/docker/shaunch/examples
 !/LICENSE.md
 /docs
