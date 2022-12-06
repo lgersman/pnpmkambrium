@@ -14,5 +14,5 @@ cat <<EOF
     "help" : "$script_dir/../commands-by-directory/exit.md",
     "exec" : "echo 'Good bye'"
   }
-] 
+]
 EOF
