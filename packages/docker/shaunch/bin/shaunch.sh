@@ -8,7 +8,7 @@
 # Example: 
 # @TODO:
 #
-# Requires: wget, bat/batcat (will be installed if not present), fzf >= 0.29.0 (will be installed if not present)
+# Requires: wget, jq, bat/batcat (will be installed if not present), fzf >= 0.29.0 (will be installed if not present)
 #
 # Author: Lars Gersmann<lars.gersmann@cm4all.com>
 # Created: 2022-12-02
@@ -45,19 +45,31 @@ Available options:
 -v, --verbose                   Print script debug info
 -f, --flag                      Some flag description
 -t, --title                     Title string above the commands to launch
--c, --commands-directory <dir>  Directory to scan for commands (defaults to current directory)
---suppress-exit-on-escape       if set $(basename ${BASH_SOURCE[0]}) cannot be exited using <Escape>
--e, --execute                   Executes selected command directly after pressing <Enter>
-  -r --restart                  Restart $(basename ${BASH_SOURCE[0]}) after command was executed (only if execute option ist enabled) 
+-c, --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
+                                or executable returning commands 
 EOF
   exit
 }
 
-parse_params() {
-  # default values of variables set from params
-  flag=0
-  param=''
+function _scan_commands() {
+  local dir=$(realpath --relative-to=$(pwd) $1)
+  local json='[]'
 
+  for script in $(find "$dir" -maxdepth 1 -type f -executable -printf '%f\n' | sort); do
+    json=$(\
+      echo "$json" | 
+      jq \
+        --arg caption "$script" \
+        --arg help "${dir}/${script}.md" \
+        --arg exec "${dir}/${script}" \
+        '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
+      )
+  done
+
+  echo $json | jq .
+}
+
+parse_params() {
   while :; do
     case "${1-}" in
       -h | --help)
@@ -70,18 +82,16 @@ parse_params() {
         TITLE="${2-}"
         shift
       ;;
-      -c | --commands-directory) 
-        COMMANDS_DIRECTORY="${2-}"
+      -c | --commands) 
+        if [[ -d "${2-}" ]]; then
+          export COMMANDS=$(_scan_commands "${2-}")
+        elif [[ -x "${2-}" ]]; then
+          export COMMANDS=$("${2-}")
+        else 
+          >&2 echo "given option commands(=${2-}) expected to be a directory or executable"
+          exit -1;
+        fi
         shift
-      ;;
-      -e | --execute) 
-        EXECUTE="y"
-      ;;
-      -r | --restart) 
-        RESTART="y"
-      ;;
-      --suppress-exit-on-escape)
-        SUPPRESS_EXIT_ON_ESCAPE=''
       ;;
       -?*) 
         die "Unknown option: $1" 
@@ -94,17 +104,20 @@ parse_params() {
   done
 
   args=("$@")
+
+  TITLE=${TITLE:-Commands}
 }
+
+# export original command to make it available to calling scripts
+export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
 
 parse_params "$@"
 
-TITLE=${TITLE:-Commands}
-COMMANDS_DIRECTORY=${COMMANDS_DIRECTORY:-.}
-EXECUTE=${EXECUTE:-n}
-RESTART=${RESTART:-n}
-SUPPRESS_EXIT_ON_ESCAPE=${SUPPRESS_EXIT_ON_ESCAPE:-}
+# echo $COMMANDS | jq -r '.[] | select(.caption=="unmount").help'
+CAPTIONS=$(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')
 
-PREVIEW_CMD="cd '$COMMANDS_DIRECTORY' && $script_dir/bat --paging=always --style=plain --color=always '{}.md'"
+PREVIEW_CMD="$script_dir/bat --paging=always --style=plain --color=always  \$(echo '$COMMANDS' | jq -r '.[] | select(.caption==\"{}\").help')"
+# --bind 'esc:execute(echo "$1" && exit)' \
 cmd=$("$script_dir/fzf" \
   --reverse \
   --no-sort \
@@ -116,19 +129,12 @@ cmd=$("$script_dir/fzf" \
   --prompt='filter: ' \
   --header-lines=3 \
   --ansi \
-  --bind 'esc:execute(echo "$1" && exit)' \
   --preview-window=80% \
   --preview="$PREVIEW_CMD" \
   < <(echo "
 $TITLE
 
-$(find "$COMMANDS_DIRECTORY" -maxdepth 1 -type f -executable -printf '%f\n' | sort)")
+${CAPTIONS}")
 )  
 
-if [[ "$EXECUTE" == 'y' ]]; then
-  echo "whoop"
-else
-  # @TODO: it would be nice to output the selected command to the terminal prompt AFTER the script exists
-  # like fzf can do using _fzf_complete
-  echo "./${cmd}"
-fi
+bash -c "$(echo $COMMANDS | jq -r ".[] | select(.caption==\"$cmd\").exec")"

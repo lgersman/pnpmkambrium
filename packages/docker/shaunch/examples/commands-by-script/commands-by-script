@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cat <<EOF
+[
+  {
+    "caption" : "mount",
+    "help" : "$script_dir/../commands-by-directory/mount.sh.md",
+    "exec" : "echo 'mounted\nPress any key to continue ...'; read  -n 1; . $SHAUNCH_COMMAND"
+  },
+  {
+    "caption" : "exit",
+    "help" : "$script_dir/../commands-by-directory/exit.md",
+    "exec" : "echo 'Good bye'"
+  }
+] 
+EOF

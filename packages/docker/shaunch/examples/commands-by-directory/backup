@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# do backup here
+
+cat <<EOF
+
+backup done 
+
+Press any key to continue ...
+EOF
+
+read  -n 1
+
+# restart shaunch
+$SHAUNCH_COMMAND

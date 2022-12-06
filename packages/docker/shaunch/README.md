@@ -31,7 +31,11 @@ docker run -it --rm -v $(pwd):/app pnpmkambrium/shaunch
 
 # development
 
-- execute script locally using `./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/example`
+- execute script locally
+
+  - by browsing a directory : `./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-directory/`
+
+  - by executing a script: `./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-script/commands-by-script`
 
 - build docker image : `pnpm kambrium-make packages/docker/shaunch/`
 

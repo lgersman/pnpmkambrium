@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# ensure backup drive was unmounted
+
+cat <<EOF
+
+backup drive unmounted
+
+Press any key to continue ...
+EOF
+
+read  -n 1
+
+# restart shaunch
+$SHAUNCH_COMMAND
