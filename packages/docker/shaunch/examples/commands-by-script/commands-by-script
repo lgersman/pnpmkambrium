@@ -11,7 +11,7 @@ cat <<EOF
   },
   {
     "caption" : "Status",
-    "help" : "$script_dir/status.sh",
+    "help" : "$script_dir/status.md",
     "exec" : ". $SHAUNCH_COMMAND"
   },
   {

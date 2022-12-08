@@ -2,17 +2,13 @@
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
-UNAME_A=`uname -a`
-
 cat <<EOF
 
 # Status
 
-This software is running on a
+This machine is operated using
 
-```
-${UNAME_A}
-```
+**$(uname -a)**
 
 system.
 EOF
