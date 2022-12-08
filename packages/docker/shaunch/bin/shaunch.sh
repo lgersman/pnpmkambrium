@@ -88,6 +88,14 @@ function _render_markdown() {
   fi
 }
 
+function _execute() {
+  local command_caption="$1"
+  export FZF_PROCESS_ID="$2"
+
+  local exec=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).exec')
+  bash -c "$exec"
+}
+
 # export original command to make it available to calling scripts
 export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
 
@@ -98,6 +106,11 @@ parse_params() {
       _render_markdown)
         shift
         _render_markdown "$@"
+        exit
+      ;;
+      _execute)
+        shift
+        _execute "$@"
         exit
       ;;
       -h | --help)
@@ -148,6 +161,7 @@ cmd=$("$script_dir/fzf" \
   --border=rounded \
   --no-info \
   --exit-0 \
+  --bind "Enter:execute('${BASH_SOURCE[0]}' _execute '{}' \$$ >/dev/tty)" \
   --prompt='filter: ' \
   --header-lines=3 \
   --ansi \
@@ -159,4 +173,4 @@ $TITLE
 $(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')")
 )  
 
-bash -c "$(echo $COMMANDS | jq -r ".[] | select(.caption==\"$cmd\").exec")"
+# bash -c "$(echo $COMMANDS | jq -r ".[] | select(.caption==\"$cmd\").exec")"

@@ -7,17 +7,17 @@ cat <<EOF
   {
     "caption" : "Mount",
     "help" : "$script_dir/mount.md.sh",
-    "exec" : "echo 'mounted\nPress any key to continue ...'; read  -n 1; . $SHAUNCH_COMMAND"
+    "exec" : "echo 'mounted\nPress any key to continue ...'; read  -n 1;"
   },
   {
     "caption" : "Status",
     "help" : "$script_dir/status.md",
-    "exec" : ". $SHAUNCH_COMMAND"
+    "exec" : ":"
   },
   {
     "caption" : "Exit",
     "help" : "# Exit\n\nQuits the program",
-    "exec" : "echo 'Good bye'"
+    "exec" : "echo 'Good bye'; echo \$FZF_PROCESS_ID; read  -n 1;"
   }
 ]
 EOF
