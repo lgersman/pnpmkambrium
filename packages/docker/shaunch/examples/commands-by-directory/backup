@@ -11,5 +11,3 @@ EOF
 
 read  -n 1
 
-# restart shaunch
-$SHAUNCH_COMMAND

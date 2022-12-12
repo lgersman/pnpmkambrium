@@ -34,8 +34,8 @@ if ! (command -v "$script_dir/bat" 1 > /dev/null); then
 fi
 
 help() {
-  cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-f] -p param_value arg1 [arg2...]
+  cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") -c <dir/executable> [options...]
 
 Script description here.
 
@@ -52,7 +52,7 @@ EOF
 }
 
 # built-in fallback function scanning a directory for exeutables and matching md file
-function _scan_commands() {
+function scan_commands() {
   local dir=$(realpath --relative-to=$(pwd) $1)
   local json='[]'
 
@@ -73,7 +73,8 @@ function _scan_commands() {
   echo $json | jq .
 }
 
-function _render_markdown() {
+# executed on preview by markdown
+function render_markdown() {
   local help=$(echo "$COMMANDS" | jq --arg caption "$1" -r '.[] | select(.caption==$caption).help')
 
   if (command -v "$help" 1 > /dev/null); then
@@ -88,29 +89,54 @@ function _render_markdown() {
   fi
 }
 
-function _execute() {
+# executed on enter key from fzf
+function execute() {
   local command_caption="$1"
-  export FZF_PROCESS_ID="$2"
 
   local exec=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).exec')
   bash -c "$exec"
 }
 
-# export original command to make it available to calling scripts
-export SHAUNCH_COMMAND="${BASH_SOURCE[0]} $@"
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  >&2 echo "$msg"
+  exit "$code"
+}
+
+export _shaunch_pid=${_shaunch_pid:-$$}
+
+# exported command to make it available to calling scripts
+function shaunch() {
+  while :; do
+    case "${1-}" in
+      exit)
+        kill -INT "$_shaunch_pid" 
+        break;
+      ;;
+      *) 
+        echo "Unknown shaunch command: $1" 
+        break 
+      ;;
+    esac
+    shift
+  done
+}
+
+export -f shaunch
 
 # parse commandline parameters
 parse_params() {
   while :; do
     case "${1-}" in
-      _render_markdown)
+      render_markdown)
         shift
-        _render_markdown "$@"
+        render_markdown "$@"
         exit
       ;;
-      _execute)
+      execute)
         shift
-        _execute "$@"
+        execute "$@"
         exit
       ;;
       -h | --help)
@@ -125,12 +151,11 @@ parse_params() {
       ;;
       -c | --commands) 
         if [[ -d "${2-}" ]]; then
-          export COMMANDS=$(_scan_commands "${2-}")
+          export COMMANDS=$(scan_commands "${2-}")
         elif [[ -x "${2-}" ]]; then
           export COMMANDS=$("${2-}")
         else 
-          >&2 echo "given option commands(=${2-}) expected to be a directory or executable"
-          exit -1;
+          die "given option commands(=${2-}) expected to be a directory or executable"
         fi
         shift
       ;;
@@ -149,9 +174,13 @@ parse_params() {
   TITLE=${TITLE:-Commands}
 }
 
+if [[ $# == 0 ]]; then
+  help
+fi
+
 parse_params "$@"
 
-PREVIEW_CMD="'${BASH_SOURCE[0]}' _render_markdown '{}'"
+PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
 cmd=$("$script_dir/fzf" \
   --reverse \
@@ -161,7 +190,7 @@ cmd=$("$script_dir/fzf" \
   --border=rounded \
   --no-info \
   --exit-0 \
-  --bind "Enter:execute('${BASH_SOURCE[0]}' _execute '{}' \$$ >/dev/tty)" \
+  --bind "Enter:execute('${BASH_SOURCE[0]}' execute '{}' >/dev/tty)" \
   --prompt='filter: ' \
   --header-lines=3 \
   --ansi \
@@ -171,6 +200,6 @@ cmd=$("$script_dir/fzf" \
 $TITLE
 
 $(echo $COMMANDS | jq -r '.[] | select(.caption) | .caption')")
-)  
+)
 
 # bash -c "$(echo $COMMANDS | jq -r ".[] | select(.caption==\"$cmd\").exec")"

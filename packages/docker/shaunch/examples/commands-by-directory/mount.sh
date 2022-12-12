@@ -10,6 +10,3 @@ Press any key to continue ...
 EOF
 
 read  -n 1
-
-# restart shaunch
-$SHAUNCH_COMMAND

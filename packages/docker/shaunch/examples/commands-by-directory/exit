@@ -6,3 +6,5 @@ script ${BASH_SOURCE[0]} executed
 
 Exited shaunch
 EOF
+
+shaunch exit 
