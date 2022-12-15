@@ -184,6 +184,8 @@ PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
 cmd=$("$script_dir/fzf" \
   --reverse \
+  --border-label " Launcher " \
+  --preview-label " Documentation " \
   --no-sort \
   --select-1 \
   --no-multi \
