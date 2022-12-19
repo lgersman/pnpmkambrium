@@ -7,7 +7,7 @@ cat <<EOF
   {
     "caption" : "Mount",
     "help" : "$script_dir/mount.md.sh",
-    "exec" : "echo 'mounted\nPress any key to continue ...'; read  -n 1;"
+    "exec" : "echo 'mounted\nPress any key to continue ...'; read  -n 1"
   },
   {
     "caption" : "Status",

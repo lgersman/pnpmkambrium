@@ -104,14 +104,15 @@ die() {
   exit "$code"
 }
 
-export _shaunch_pid=${_shaunch_pid:-$$}
+# export _shaunch_pid=${_shaunch_pid:-$$}
 
 # exported command to make it available to calling scripts
 function shaunch() {
   while :; do
     case "${1-}" in
       exit)
-        kill -INT "$_shaunch_pid" 
+        # kill fzf
+        kill "$_shaunch_pid" 
         break;
       ;;
       *) 
@@ -182,6 +183,7 @@ parse_params "$@"
 
 PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
+# see https://github.com/junegunn/fzf/issues/3089#issuecomment-1353158088 for the $PPID thingie
 cmd=$("$script_dir/fzf" \
   --reverse \
   --border-label " Launcher " \
@@ -192,7 +194,7 @@ cmd=$("$script_dir/fzf" \
   --border=rounded \
   --no-info \
   --exit-0 \
-  --bind "Enter:execute('${BASH_SOURCE[0]}' execute '{}' >/dev/tty)" \
+  --bind "Enter:execute(export _shaunch_pid=\$PPID; '${BASH_SOURCE[0]}' execute '{}' >/dev/tty)" \
   --prompt='filter: ' \
   --header-lines=3 \
   --ansi \
