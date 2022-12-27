@@ -1,0 +1,15 @@
+{
+  "name": "@pnpmkambrium/mdbook",
+  "description": "a distroless image providing the most recent mdbook version including mdbook-toc and mdbook-mermaid",
+  "version": "1.0.0",
+  "scripts": {},
+  "keywords": [
+    "mdbook",
+    "distroless"
+  ],
+  "license": "MPL-2.0",
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}

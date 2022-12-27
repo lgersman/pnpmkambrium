@@ -13,3 +13,4 @@ build
 build-info
 /.pnpm-store
 !/packages/npm/core/presets/default/.env
+/packages/docs/book

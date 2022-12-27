@@ -3,5 +3,6 @@
 /packages/docker/shaunch/bin/fzf
 /packages/docker/shaunch/bin/bat
 /packages/docker/shaunch/examples
+/packages/docker/shaunch/build-info
 !/LICENSE.md
 /docs
