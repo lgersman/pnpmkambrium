@@ -28,6 +28,7 @@ root: true
 ignorePatterns:
   - '**/*.md'
   - 'packages/docs/**/*.min.js'
+  - '**/*.json'
 rules:
   prettier/prettier:
     - error
