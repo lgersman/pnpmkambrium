@@ -15,4 +15,7 @@ command = "mdbook-mermaid"
 [output.html]
 additional-js = ["mermaid.min.js", "mermaid-init.js"]
 
-[preprocessor.presentation-preprocessor]
+#[preprocessor.presentation-preprocessor]
+
+[build]
+build-dir = "./build"

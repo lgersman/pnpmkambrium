@@ -1,4 +1,4 @@
-this project keeps the documentation of the monorepo
+this package keeps the documentation of the monorepo
 
 - initialize : `docker run --rm -it --mount type=bind,source=$(pwd)/packages/docs/gh-pages,target=/data -u $(id -u):$(id -g) pnpmkambrium/mdbook init`
 

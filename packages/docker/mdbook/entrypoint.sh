@@ -18,7 +18,11 @@ if [[ $# -eq 1 ]]; then
     # ensure book.toml exists
     if [[ ! -f /data/book.toml ]]; then
       echo "'/data/book.toml' does not exist - will generate it"
-      echo 'n' | mdbook init --title="" 
+      echo 'n' | mdbook init --title=""
+
+      # for some reason we cannot tell "mdbook init" about our custom build directory
+      # all mdbook options document here did not work : https://rust-lang.github.io/mdBook/format/configuration/environment-variables.html 
+      mv ./book ./build
 
       echo "initializing mdbook plugin mdbook-toc"
       printf '\n[preprocessor.toc]\ncommand = "mdbook-toc"\n' >> /data/book.toml
@@ -26,8 +30,11 @@ if [[ $# -eq 1 ]]; then
       echo "initializing mdbook plugin mdbook-mermaid"
       mdbook-mermaid install |:
 
-      echo "initializing mdbook plugin mdbook-presentation-preprocessor"
-      printf '\n[preprocessor.presentation-preprocessor]\n' >> /data/book.toml      
+      echo "(disabled) initializing mdbook plugin mdbook-presentation-preprocessor"
+      printf '\n#[preprocessor.presentation-preprocessor]\n' >> /data/book.toml
+
+      echo "configure build output directory"
+      printf '\n[build]\nbuild-dir = "./build"\n' >> /data/book.toml      
 
       exit 0
     else 
