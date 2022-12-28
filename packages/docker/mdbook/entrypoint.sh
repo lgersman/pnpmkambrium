@@ -29,6 +29,7 @@ if [[ $# -eq 1 ]]; then
     
       echo "initializing mdbook plugin mdbook-mermaid"
       mdbook-mermaid install |:
+      printf '#see more options here : https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options\n' >> /data/book.toml
 
       echo "(disabled) initializing mdbook plugin mdbook-presentation-preprocessor"
       printf '\n#[preprocessor.presentation-preprocessor]\n' >> /data/book.toml

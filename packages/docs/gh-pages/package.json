@@ -1,0 +1,9 @@
+{
+  "name": "@pnpmkambrium/gh-pages",
+  "version": "1.0.0",
+  "description": "Website of pnpmkambrium project",
+  "author": {
+    "email": "lars.gersmann@cm4all.com",
+    "name": "lars gersmann"
+  }
+}

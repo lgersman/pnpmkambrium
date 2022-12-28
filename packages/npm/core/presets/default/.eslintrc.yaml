@@ -27,6 +27,7 @@ root: true
 # tell vscode to not run eslint on markdown files
 ignorePatterns:
   - '**/*.md'
+  - 'packages/docs/**/*.min.js'
 rules:
   prettier/prettier:
     - error

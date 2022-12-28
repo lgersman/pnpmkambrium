@@ -14,6 +14,7 @@ command = "mdbook-mermaid"
 
 [output.html]
 additional-js = ["mermaid.min.js", "mermaid-init.js"]
+# see more options here : https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options
 
 #[preprocessor.presentation-preprocessor]
 

@@ -5,7 +5,7 @@
 #
 export NPM_REGISTRY?=https://registry.npmjs.org/
 
-#HELP: build all outdated docker images in packages/npm/ 
+#HELP: build all outdated packages in packages/npm/ 
 packages/npm/: $(addsuffix build-info,$(wildcard packages/npm/*/)) ;
 
 
@@ -19,20 +19,21 @@ packages/npm/%/: packages/npm/%/build-info ;
 #
 packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard packages/npm$*/* packages/npm$*/**/*)) package.json 
 # target depends on root located package.json and every file located in packages/npm/% except build-info 
-> @
+# > @
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a
 # read .env file from package if exists
-> DOT_ENV="packages/npm/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> DOT_ENV="$(@D)/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
+> rm -f dist/*.tgz
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
-> (cd packages/npm/$* && pnpm pack --pack-destination ./dist 1>/dev/null)
+> (cd $(@D) && pnpm pack --pack-destination ./dist 1>/dev/null)
 > cat << EOF | tee $@
-> $$(cd packages/npm/$*/dist && echo *.tgz) 
+> $$(cd $(@D)/dist && ls -1shS *.tgz) 
 > 
 > $$(echo -n "---")
 > 
-> $$(tar -ztf packages/npm/$*/dist/*.tgz)
+> $$(tar -ztf $(@D)/dist/*.tgz)
 > EOF
 
 #

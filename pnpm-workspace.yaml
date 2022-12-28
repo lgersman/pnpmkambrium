@@ -2,3 +2,4 @@
 packages:
   - 'packages/npm/*'
   - 'packages/docker/*'
+  - 'packages/docs/*'
