@@ -5,5 +5,15 @@
   "author": {
     "email": "lars.gersmann@cm4all.com",
     "name": "lars gersmann"
-  }
+  },
+  "contributors": [
+    {
+      "name": "mitch",
+      "email": "mitch@ure.de"
+    },
+    {
+      "name": "beta",
+      "email": "beta@carot.in"
+    }
+  ]
 }

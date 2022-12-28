@@ -28,7 +28,15 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON 1>/dev/null; then
 > 	echo $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
->		MDBOOK_BOOK='{"title": "My Awesome Book", "authors": ["Michael-F-Bryan"]}'
+# >		MDBOOK_BOOK='{"title": "My Awesome Book", "authors": ["Michael-F-Bryan"]}'
+# jq -n --compact-output --arg title "PACKAGE_NAME"       --arg description "PACKAGE_DESCRIPTION" --argjson authors "$(jq --compact-output -j '[.contributors[]? | .name]' packages/docs/gh-pages/package.json)" '{title: $title, description: $description, authors: $authors}'
+>		MDBOOK_BOOK=$(jq -n --compact-output \
+			--arg title "$$PACKAGE_NAME" \
+      --arg description "$$PACKAGE_DESCRIPTION" \
+			--argjson authors "$$(jq --compact-output -j '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
+			'{title: $$title, description: $$description, authors: $$authors}' \
+		)
+> 	echo "HUY MDBOOK_BOOK=$$MDBOOK_BOOK"
 # add link to github repo
 > 	docker run --rm -it -e "MDBOOK_BOOK=$$MDBOOK_BOOK" --mount type=bind,source=$$(pwd)/$(@D),target=/data -u $(id -u):$(id -g) pnpmkambrium/mdbook mdbook build
 > fi
