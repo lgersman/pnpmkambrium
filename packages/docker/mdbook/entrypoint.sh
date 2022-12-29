@@ -7,7 +7,18 @@ if [[ ! -d /data ]]; then
 fi 
 
 if [[ $# -eq 0 ]]; then
-  echo "@TODO: show help"
+  cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [command]
+
+A mdbook runner providing some mdbook extensions 
+
+Available commands:
+
+init                          initialize an empty mdbook project with the required files
+mdbook [mdbook-command]       starts mdbook 
+
+see https://rust-lang.github.io/mdBook/cli/index.html for available [mdbook-command]'s 
+EOF
   exit 0
 fi
 
