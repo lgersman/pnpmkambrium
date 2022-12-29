@@ -10,3 +10,25 @@
 # see see https://www.gnu.org/software/make/manual/make.html#Call-Function and https://www.gnu.org/software/make/manual/make.html#Canned-Recipes
 ensure-commands-exists = $(foreach command,$1,\
   $(if $(shell command -v $(command)),some string,$(error "Could not find executable '$(command)' - please install '$(command)'")))
+
+# function for testing the existence of a list of docker images
+#
+# example usage : 
+# mytarget: 
+# # ensure images  foo/bar, fedora:latest exists
+# > $(call ensure-docker-images-exists, foo/bar fedora:latest)
+#
+define ensure-docker-images-exists
+	$(foreach image,$1,
+		if ! docker image inspect '$(image)' >/dev/null 2>&1; then
+			if ! pnpm --filter='@$(image)' pwd | grep 'No projects' 1>/dev/null; then
+				make_target="$$(realpath --relative-to=$$(git rev-parse --show-toplevel) $$(pnpm --filter="@$(image)" exec pwd))/"
+				1>&2 echo "Image '@$(image)' not available : It's available as monorepo sub package(path='$$make_target') - build it and try again."
+				exit -1
+			else 
+				docker pull "$(image)" >/dev/null 2>&1 || 1>&2 echo "Image '@$(image)' not available : could not download image from docker hub"
+				exit -1
+			fi
+		fi
+	) 
+endef
