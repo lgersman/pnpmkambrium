@@ -37,7 +37,7 @@ help() {
   cat <<EOF
 Usage: $(basename "${BASH_SOURCE[0]}") -c <dir/executable> [options...]
 
-Script description here.
+A terminal ui exposing commands and their markdown documentaion 
 
 Available options:
 
