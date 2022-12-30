@@ -2,27 +2,36 @@
 
 # @TODO: dockerize using distroless go:debug
 
-# FROM node:latest
-# SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+FROM debian:bullseye-slim
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
-# RUN apt update && \
-#   apt install -y git \
-#   ca-certificates \
-#   jq \
-#   wget && \
-#   rm -rf /var/lib/apt/lists/*
+RUN apt update && \
+  apt install -y git \
+  ca-certificates \
+  jq \
+  wget && \
+  rm -rf /var/lib/apt/lists/*
 
-# RUN cd /usr/local && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin
+RUN cd /usr/local && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin
 
-# COPY ./packages/docker/shaunch/README.md /
-# COPY ./LICENSE.md /
-# COPY --chown=node:node --chmod=755 ./packages/docker/shaunch/bin/shaunch.sh /usr/local/bin/
-# COPY --chown=node:node --chmod=755 ./packages/docker/shaunch/entrypoint.sh /usr/local/bin/
+RUN wget -qO- https://api.github.com/repos/sharkdp/bat/releases/latest | \
+  grep "browser_download_url.*-i686-unknown-linux-musl.tar.gz" | \
+  cut -d : -f 2,3 | \
+  tr -d \" | \
+  wget -i - -qO - | \
+  tar -zxvf - --strip-components=1 -C /usr/local/bin --wildcards */bat
 
-# RUN npm config set update-notifier false && npm install --no-fund --silent -g pnpm
+# see https://github.com/nodejs/docker-node/blob/9220863a62a5f9d76bb761d1e385674de39224a6/19/bullseye/Dockerfile#L3
+RUN groupadd --gid 1000 node \
+  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
-# USER node
+COPY ./packages/docker/shaunch/README.md /
+COPY ./LICENSE.md /
+COPY --chown=node:node --chmod=755 ./packages/docker/shaunch/bin/shaunch.sh /usr/local/bin/
+COPY --chown=node:node --chmod=755 ./packages/docker/shaunch/entrypoint.sh /usr/local/bin/
 
-# ENTRYPOINT ["entrypoint.sh"]
+USER node
+
+ENTRYPOINT ["entrypoint.sh"]
