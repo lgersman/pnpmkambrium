@@ -41,12 +41,14 @@ A terminal ui exposing commands and their markdown documentaion
 
 Available options:
 
--h, --help                      Print this help and exit
--v, --verbose                   Print script debug info
--f, --flag                      Some flag description
--t, --title                     Title string above the commands to launch
--c, --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
-                                or executable returning commands 
+-h,  --help                      Print this help and exit
+-v,  --verbose                   Print script debug info
+-f,  --flag                      Some flag description
+-pl, --preview-label             preview/documentation label text
+-bl, --border-label              shaunch label text
+-t,  --title                     Title string above the commands to launch
+-c,  --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
+                                 or executable returning commands 
 EOF
   exit
 }
@@ -150,6 +152,14 @@ parse_params() {
         TITLE="${2-}"
         shift
       ;;
+      -pl | --preview-label) 
+        PREVIEW_LABEL="${2-}"
+        shift
+      ;;
+      -bl | --border-label) 
+        BORDER_LABEL="${2-}"
+        shift
+      ;;
       -c | --commands) 
         if [[ -d "${2-}" ]]; then
           export COMMANDS=$(scan_commands "${2-}")
@@ -173,6 +183,8 @@ parse_params() {
   args=("$@")
 
   TITLE=${TITLE:-Commands}
+  BORDER_LABEL=${BORDER_LABEL:-  Shaunch  }
+  PREVIEW_LABEL=${PREVIEW_LABEL:-  Documentation  }
 }
 
 if [[ $# == 0 ]]; then
@@ -186,8 +198,8 @@ PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # see https://github.com/junegunn/fzf/issues/3089#issuecomment-1353158088 for the $PPID thingie
 cmd=$("$script_dir/fzf" \
   --reverse \
-  --border-label " Launcher " \
-  --preview-label " Documentation " \
+  --border-label "$BORDER_LABEL" \
+  --preview-label "$PREVIEW_LABEL" \
   --no-sort \
   --select-1 \
   --no-multi \

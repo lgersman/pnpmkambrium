@@ -14,4 +14,4 @@ if [[ ! -d /app ]]; then
   exit 1
 fi 
 
-cd /app && $(which shaunch.sh)
+cd /app && bash $(which shaunch.sh) -c . "$@"
