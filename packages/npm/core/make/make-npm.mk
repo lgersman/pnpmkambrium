@@ -25,7 +25,7 @@ packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard pac
 # read .env file from package if exists
 > DOT_ENV="$(@D)/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
-> rm -f dist/*.tgz
+> rm -f $(@D)/dist/*.tgz
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > (cd $(@D) && pnpm pack --pack-destination ./dist 1>/dev/null)
 > cat << EOF | tee $@

@@ -37,10 +37,19 @@ importers:
   packages/docker/fzf:
     specifiers: {}
 
+  packages/docker/gitlog-per-package:
+    specifiers: {}
+
   packages/docker/gum:
     specifiers: {}
 
-  packages/docker/pnpm-gitlog-per-package:
+  packages/docker/mdbook:
+    specifiers: {}
+
+  packages/docker/shaunch:
+    specifiers: {}
+
+  packages/docs/gh-pages:
     specifiers: {}
 
   packages/npm/core:

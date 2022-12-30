@@ -1,13 +1,14 @@
 # make output less verbose
 # MAKEFLAGS += --silent
 
-KAMBRIUM_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-include $(KAMBRIUM_MAKEFILE_DIR)make-common.mk
-include $(KAMBRIUM_MAKEFILE_DIR)make-functions.mk
-include $(KAMBRIUM_MAKEFILE_DIR)make-rules.mk
-include $(KAMBRIUM_MAKEFILE_DIR)make-docker.mk
-include $(KAMBRIUM_MAKEFILE_DIR)make-npm.mk
-include $(KAMBRIUM_MAKEFILE_DIR)make-docs.mk
+# KAMBRIUM_MAKEFILE_DIR points to the directory where this file was loaded from
+KAMBRIUM_MAKEFILE_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+include $(KAMBRIUM_MAKEFILE_DIR)/make-common.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-functions.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-rules.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)

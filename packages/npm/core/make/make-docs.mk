@@ -17,6 +17,7 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 # > @
 # ensure mdbook image is available
 > @$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
+> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a
 # read .env file from package if exists
@@ -30,10 +31,16 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON 1>/dev/null; then
 > 	echo $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
+> 	MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
+			"$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
+			"$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
+			"$$(jq '[.contributors[]? | .name]' package.json)" \
+			"$$(jq '[.author.name | select(.|.!=null)]' package.json)" \
+		)
 >		MDBOOK_BOOK=$$(jq -n --compact-output \
 			--arg title "$$PACKAGE_NAME" \
      	--arg description "$$PACKAGE_DESCRIPTION" \
-			--argjson authors "$$(jq --compact-output -j '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
+			--argjson authors "$$MDBOOK_AUTHORS" \
 			'{title: $$title, description: $$description, authors: $$authors}' \
 		)
 >		# @TODO: add link to github repo
@@ -50,4 +57,6 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > 
 > $$(unzip -l $(@D)/dist/*.zip)
 > EOF
+
+
 

@@ -1,2 +1,2 @@
 
-include packages/npm/core/bin/make.mk
+include packages/npm/core/make/make.mk

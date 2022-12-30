@@ -2,15 +2,12 @@
   "name": "@pnpmkambrium/core",
   "version": "1.0.0",
   "description": "",
-  "bin": {
-    "kambrium-make": "bin/make.mk"
-  },
   "publishConfig": {
     "access": "public"
   },
   "files": [
     "presets/",
-    "bin/"
+    "make/"
   ],
   "author": {
     "email": "lars.gersmann@cm4all.com",
