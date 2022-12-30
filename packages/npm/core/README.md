@@ -14,7 +14,7 @@
 
 # Usage
 
-Calling `pnpm kambrium-make` will show the available targets
+Calling `make` will show the available targets
 
 ## Configuration
 
@@ -27,11 +27,11 @@ Calling `pnpm kambrium-make` will show the available targets
 
   Examples :
 
-  - `DOCKER_TOKEN=xxx pnpm kambrium-make packages/docker/` will deploy all docker sub packages to the default registry (Docker Hub)
+  - `DOCKER_TOKEN=xxx make packages/docker/` will deploy all docker sub packages to the default registry (Docker Hub)
 
-  - `DOCKER_TOKEN=xxx pnpm kambrium-make packages/docker/foo/` will deploy docker sub package `packages/docker/foo/`
+  - `DOCKER_TOKEN=xxx make packages/docker/foo/` will deploy docker sub package `packages/docker/foo/`
 
-Execute `pnpm kambrium-make` for more docker related targets.
+Execute `make` for more docker related targets.
 
 ## npm packages
 
@@ -42,23 +42,23 @@ Execute `pnpm kambrium-make` for more docker related targets.
 
   Examples :
 
-  - `NPM_TOKEN=xxx pnpm kambrium-make packages/npm/` will deploy all docker sub packages to the default registry (Docker Hub)
+  - `NPM_TOKEN=xxx make packages/npm/` will deploy all docker sub packages to the default registry (Docker Hub)
 
-  - `NPM_TOKEN=xxx pnpm kambrium-make packages/npm/foo/` will deploy npm sub package `packages/npm/foo/`
+  - `NPM_TOKEN=xxx make packages/npm/foo/` will deploy npm sub package `packages/npm/foo/`
 
-Execute `pnpm kambrium-make` for more docker related targets.
+Execute `make` for more docker related targets.
 
 # Caveats
 
-- You made changes in your sub package but `pnpm kambrium-make ...` does not rebuild/thinks nothing has changed
+- You made changes in your sub package but `make ...` does not rebuild/thinks nothing has changed
 
-  Your can workaround this issue by simply force rebuilding the package using `pnpm kambrium-make -B ...`
+  Your can workaround this issue by simply force rebuilding the package using `make -B ...`
 
 - Don't use minus (`-`) sign in docker sub package scopes
 
   Suppose you have a sub package `/packages/docker/bar` named `@my-foo/bar`.
 
-  `pnpm kambrium-make docker-build-bar` and `pnpm kambrium-make docker-push-bar` will derive the `DOCKER_USER` environment variable from scope (package scope="`@my-foo`", derived DOCKER_USER="`my-foo`") by default.
+  `make docker-build-bar` and `make docker-push-bar` will derive the `DOCKER_USER` environment variable from scope (package scope="`@my-foo`", derived DOCKER_USER="`my-foo`") by default.
 
   Unfortunately Docker usernames are prohibited to contain the minus (`-`) sign. _NPM package names in contrast allow minus (`-`) sign in package scopes._
 

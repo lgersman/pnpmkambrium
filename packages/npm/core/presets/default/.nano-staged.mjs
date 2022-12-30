@@ -10,5 +10,5 @@
 # You can remove it in case you don't want to lint using nano-staged
 #*/
 export default {
-  '*': 'pnpm kambrium-make lint-fix',
+  '*': 'make lint-fix',
 };

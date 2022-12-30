@@ -21,7 +21,7 @@ export DOCKER_REGISTRY?=registry.hub.docker.com
 packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
 
 
-#HELP: build outdated docker image by name\n\texample: 'pnpm kambrium-make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
+#HELP: build outdated docker image by name\n\texample: 'make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
 packages/docker/%/: packages/docker/%/build-info ;
 
 #
@@ -75,7 +75,7 @@ packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildca
 # see supported environment variables on make target docker-push-%
 #
 .PHONY: docker-push
-#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-token pnpm kambrium-make docker-push' to push all docker sub packages
+#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push' to push all docker sub packages
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
 #
@@ -92,7 +92,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 	- DOCKER_REPOSITORY =xxxx
 # 	- DOCKER_REGISTRY=xxx
 #
-#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token pnpm kambrium-make docker-push-foo' to push docker package 'packages/docker/foo'
+#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$*/
 # > @
 # read .env file from package if exists 

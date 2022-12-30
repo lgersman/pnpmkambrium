@@ -13,7 +13,7 @@ add generic docker package build support
     (if not defined the package scope without leading `@` will be used)
   - `DOCKER_REGISTRY` can be used to publish to another docker compatible registry
 
-- `pnpm kambrium-make packages/docker/` will make all docker packages
-- `pnpm kambrium-make packages/docker/foo/` will build docker package `packages/docker/foo`
+- `make packages/docker/` will make all docker packages
+- `make packages/docker/foo/` will build docker package `packages/docker/foo`
 
 - building a docker image results in a `/package/docker/[package]/build-info` file collecting some metadata about the builded image

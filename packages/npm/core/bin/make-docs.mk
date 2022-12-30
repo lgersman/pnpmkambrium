@@ -4,7 +4,7 @@
 packages/docs/: $(addsuffix build-info,$(wildcard packages/docs/*/)) ;
 
 
-#HELP: build outdated docs package by name\n\texample: 'pnpm kambrium-make packages/docs/gh-pages/' will build 'packages/docs/gh-pages'
+#HELP: build outdated docs package by name\n\texample: 'make packages/docs/gh-pages/' will build 'packages/docs/gh-pages'
 packages/docs/%/: packages/docs/%/build-info ;
 
 #

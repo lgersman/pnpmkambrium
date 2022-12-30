@@ -9,7 +9,7 @@ export NPM_REGISTRY?=https://registry.npmjs.org/
 packages/npm/: $(addsuffix build-info,$(wildcard packages/npm/*/)) ;
 
 
-#HELP: build outdated npm package by name\n\texample: 'pnpm kambrium-make packages/npm/foo/' will build 'packages/npm/foo'
+#HELP: build outdated npm package by name\n\texample: 'make packages/npm/foo/' will build 'packages/npm/foo'
 packages/npm/%/: packages/npm/%/build-info ;
 
 #
@@ -42,7 +42,7 @@ packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard pac
 # see supported environment variables on make target npm-push-%
 #
 .PHONY: npm-push
-#HELP: * push npm packages to registry.\n\texample: 'NPM_TOKEN=your-token pnpm kambrium-make npm-push' to push all npm sub packages
+#HELP: * push npm packages to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push' to push all npm sub packages
 npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(PACKAGE))) ;
 
 #
@@ -57,7 +57,7 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 # 	- NPM_TOKEN (required) can be the npm password (a npm token is preferred for security reasons)
 # 	- NPM_REGISTRY=xxx
 #
-#HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token pnpm kambrium-make npm-push-foo' to push npm package 'packages/npm/foo'
+#HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push-foo' to push npm package 'packages/npm/foo'
 npm-push-%: packages/npm/$*/
 # > @
 # read .env file from package if exists 

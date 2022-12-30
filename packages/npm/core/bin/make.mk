@@ -1,5 +1,3 @@
-#!/usr/bin/env make -f
-
 # make output less verbose
 # MAKEFLAGS += --silent
 
@@ -14,6 +12,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)make-docs.mk
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)
 
+# pnpm env use --global $(grep -oP '(?<=use-node-version=).*' ./.npmrc1)
 # node version to use by pnpm (defined in .npmrc)
 NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc
 

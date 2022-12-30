@@ -79,7 +79,7 @@ docker run -it --rm -v $(pwd):/app pnpmkambrium/shaunch
 
   - by executing a script: `./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-script/commands-by-script`
 
-- build docker image : `pnpm kambrium-make packages/docker/shaunch/`
+- build docker image : `make packages/docker/shaunch/`
 
 - build using the docker-compose file : `docker compose -f packages/docker/shaunch/docker-compose.yml build`
 

@@ -5,6 +5,6 @@
 
 add monospace wide prettier/eslint support
 
-- `pnpm kambrium-make lint` will lint the sources using `eslint`/`prettier`
+- `make lint` will lint the sources using `eslint`/`prettier`
 
-- `pnpm kambrium-make lint-fix` will lint the sources using `eslint`/`prettier`
+- `make lint-fix` will lint the sources using `eslint`/`prettier`

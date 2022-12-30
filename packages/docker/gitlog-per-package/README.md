@@ -60,7 +60,7 @@ docker run -it --rm -e GIT_LOG_OPTIONS="--stat --abbrev-commit"  -v $(pwd):/app 
 
   ```
 
-- build docker image : `pnpm kambrium-make packages/docker/gitlog-per-package/`
+- build docker image : `make packages/docker/gitlog-per-package/`
 
 - build using the docker-compose file : `docker compose -f packages/docker/gitlog-per-package/docker-compose.yml build`
 
