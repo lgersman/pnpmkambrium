@@ -5,7 +5,10 @@
   "scripts": {},
   "keywords": [
     "mdbook",
-    "distroless"
+    "mdbook-toc",
+    "mdbook-mermaid",
+    "documentation",
+    "docker"
   ],
   "license": "MPL-2.0",
   "author": {
