@@ -10,7 +10,6 @@
   ...
   "scripts": {
     "prepare": "npx -y only-allow pnpm && git config core.hookspath packages/npm/core/presets/default/.githooks",
-    "make": "make --include-dir ./packages/npm/core/bin/ -f ./packages/npm/core/bin/kambrium-make.mk --"
   }
   ...
   ```
