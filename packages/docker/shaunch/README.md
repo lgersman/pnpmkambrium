@@ -49,7 +49,7 @@ see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/dev
 # Usage
 
 ```
-docker run -it --rm -v $(pwd):/app pnpmkambrium/shaunch
+docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 ```
 
 - run using a docker-compose file :
@@ -81,9 +81,11 @@ docker run -it --rm -v $(pwd):/app pnpmkambrium/shaunch
 
 - build docker image : `make packages/docker/shaunch/`
 
+- start dockerized shaunch with example app : `docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-directory:/app pnpmkambrium/shaunch`
+
 - build using the docker-compose file : `docker compose -f packages/docker/shaunch/docker-compose.yml build`
 
-- run `docker compose -f packages/docker/shaunch/docker-compose.yml run --rm shaunch`
+- run `docker-compose run --rm main`
 
 # Limitations
 
