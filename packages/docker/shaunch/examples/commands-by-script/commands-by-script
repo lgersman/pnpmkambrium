@@ -17,7 +17,7 @@ cat <<EOF
   {
     "caption" : "Exit",
     "help" : "# Exit\n\nQuits the program",
-    "exec" : "echo 'Good bye'; shaunch exit"
+    "exec" : "echo 'Good bye'; shaunch: exit"
   }
 ]
 EOF

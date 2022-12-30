@@ -97,4 +97,4 @@ docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 
 - How can I exit `shaunch` from a command ?
 
-  Just call `shaunch exit` in your command script (see [dynamic configuration example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script)). The `shaunch` command is a exported function exporting some operations like exiting.
+  Just call `shaunch: exit` in your command script (see [dynamic configuration example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script)). The `shaunch` command is a exported function exporting some operations like exiting.

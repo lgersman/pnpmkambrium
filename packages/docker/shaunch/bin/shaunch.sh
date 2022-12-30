@@ -106,10 +106,8 @@ die() {
   exit "$code"
 }
 
-# export _shaunch_pid=${_shaunch_pid:-$$}
-
 # exported command to make it available to calling scripts
-function shaunch() {
+function shaunch:() {
   while :; do
     case "${1-}" in
       exit)
@@ -126,7 +124,7 @@ function shaunch() {
   done
 }
 
-export -f shaunch
+export -f shaunch:
 
 # parse commandline parameters
 parse_params() {
