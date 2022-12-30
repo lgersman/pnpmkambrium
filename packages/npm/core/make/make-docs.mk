@@ -24,7 +24,6 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 > PACKAGE_DESCRIPTION=$$(jq -r '.description | values' $$PACKAGE_JSON)
 # if package.json has a build script execute package script build. otherwise run mdbook
@@ -43,9 +42,11 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 			--argjson authors "$$MDBOOK_AUTHORS" \
 			'{title: $$title, description: $$description, authors: $$authors}' \
 		)
->		# @TODO: add link to github repo
->		# @TODO: fallback to author if contributors are not available
-> 	docker run --rm -it -e "MDBOOK_BOOK=$$MDBOOK_BOOK" --mount type=bind,source=$$(pwd)/$(@D),target=/data -u $$(id -u):$$(id -g) pnpmkambrium/mdbook mdbook build
+> 	MDBOOK_GITHUB_REPOSITORY_URL="$$(\
+			jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
+			jq --exit-status -r '.repository.url | select(.!=null)' package.json \
+		)"
+> 	docker run --rm -it -e "MDBOOK_BOOK=$$MDBOOK_BOOK" -e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" --mount type=bind,source=$$(pwd)/$(@D),target=/data -u $$(id -u):$$(id -g) pnpmkambrium/mdbook mdbook build
 > fi
 > mkdir -p $(@D)/dist
 # redirecting into the target zip archive frees us from removing an existing archive first
