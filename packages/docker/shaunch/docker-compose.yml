@@ -1,9 +1,21 @@
 version: "3.3"
 services:
-  shaunch:
+  main:
     build:
       dockerfile: packages/docker/shaunch/Dockerfile
       context: ${PWD}
     image: pnpmkambrium/shaunch:latest
     tty: true
     stdin_open: true
+    # optional shaunch arguments
+    command:
+      - "--border-label"
+      - "  my shaunch  "
+      - "--preview-label"
+      - " documentation "
+      - "--title"
+      - " my commands "
+    volumes:
+      - type: bind
+        source: ${PWD}/examples/commands-by-directory
+        target: /app
