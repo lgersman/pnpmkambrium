@@ -1,4 +1,6 @@
 #
+# returns the first parameter which is an not empty array
+#
 # kambrium:jq:first_non_empty_array '' 'null' '[]' '["inge"]' 'null' '["ralf","bert"]' '["sybille"]' '["kurt","fritz"]'
 # => ["inge"]
 #
