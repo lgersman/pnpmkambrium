@@ -9,6 +9,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-rules.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
 
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)
