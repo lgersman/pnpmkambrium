@@ -16,11 +16,13 @@
 #
 #HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
 gh-pages-push-%: packages/docs/$*/
+# # make make a bit mor silent about the undergoing commands 
 # > @
-# read .env file from package if exists 
+> # read .env file from package if exists
 > set -x
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/docs/$*/package.json
+> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > GIT_REMOTE_REPOSITORY_NAME=$${GIT_REMOTE_REPOSITORY_NAME:-origin}
 > GIT_REPOSITORY_URL=$$(git remote get-url --push $$GIT_REMOTE_REPOSITORY_NAME)
 > # ensure we are not in branch gh-pages yet
@@ -29,27 +31,27 @@ gh-pages-push-%: packages/docs/$*/
 # > [[ -z "$(git status --porcelain)" ]] && 1>&2 echo "cannot push gh-pages : current branch contains uncommited changes. commit changes and try again." && exit 1
 > # check if branch gh-pages exists on remote
 > if ! git ls-remote --exit-code --heads "$$GIT_REPOSITORY_URL" gh-pages; then
-
-# git clone /home/lgersman/workspace/pnpmkambrium
-# cd pnpmkambrium/
-# git switch --orphan gh-pages
-# -t, --track           set upstream info for new branch
-# git checkout develop .gitignore
-# git status
-# git reset --hard
-# git commit --allow-empty -m "Initializing gh-pages branch"
-# git log
-# git status
-# ls -la
-# git status
-# git add .
-# git commit
-# git status
-# git branch
-# git push
+> 	# ensure we can clone have empty temp directory to operate on
+> 	rm -rf "$(KAMBRIUM_TMPDIR)/$@" 
+> 	pushd "$(KAMBRIUM_TMPDIR)"
+> 	# clone project repo with minimal git history (--depth 1) and without any checked out contents (-n)
+> 	git clone -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" && cd $$_
+> 	# create a new branch gh-pages with a detached history (--orphan)
+> 	git switch --orphan gh-pages
+>		git commit --allow-empty -m "Initializing gh-pages branch"
+> 	popd	
+> else
+> # TODO: clone gh-pages branch without contents
+> 	git clone -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@"
+> fi
+> pushd "$(KAMBRIUM_TMPDIR)/$@/"
+# > # copy .gitignore from project repo to clone
+# > [ -f "$(CURDIR)/.gitignore" ] && cp "$(CURDIR)/.gitignore" . && git add .
+> cp -r "$(CURDIR)/packages/docs/$*/build/." ./
+> git add . && git commit -m "[skip ci] deploy sub package $* version $$PACKAGE_VERSION"
+> git status
+> git log -n 5
 # git push --set-upstream origin gh-pages
-# git branch
-# xed .gitignore
 
 # > 	PAST_BRANCH=$$(git rev-parse --abbrev-ref HEAD)
 # >		# copy sub package build directory to a tempory directory
@@ -68,7 +70,8 @@ gh-pages-push-%: packages/docs/$*/
 # > 	git push $$GIT_REMOTE_REPOSITORY_NAME gh-pages:gh-pages
 # > 	# switch back to previous branch
 # > 	git switch $$PAST_BRANCH						
-> fi
+
+
 # > GITHUB_REPO_NAME="$$(\
 # 		jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
 # 		jq --exit-status -r '.repository.url | select(.!=null)' package.json \
@@ -85,3 +88,6 @@ gh-pages-push-%: packages/docs/$*/
 # > else
 # > 	echo "[skipped]: package.json is marked as private"
 # > fi
+
+# > # remove our temp directory 
+# > rm -rf "$(KAMBRIUM_TMPDIR)/$@"
