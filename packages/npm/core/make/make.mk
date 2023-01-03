@@ -30,8 +30,8 @@ PRETTIER := $(PNPM) prettier --ignore-path='$(shell git rev-parse --show-topleve
 # always run eslint using ignored files from .lintignore 
 ESLINT := $(PNPM) eslint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --no-error-on-unmatched-pattern
 
-TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $$PWD)")
-$(info $(TMPDIR))
+# project (path) specific temp directory outside of the checked out repository
+KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDIR))")
 
 -include .env
 
@@ -73,9 +73,9 @@ lint-fix: node_modules
 clean:
 # remove everything matching .gitignore entries (-f is force, you can add -q to suppress command output, exclude node_modules and node_modules/**)
 #   => If an untracked directory is managed by a different git repository, it is not removed by default. Use -f option twice if you really want to remove such a directory.
-> git clean -Xfd -e '!/*.env' -e '!/*.code-workspace' -e '!**/node_modules' -e '!**/node_modules/**' -e '!**/.pnpm-store' -e '!**/pnpm-store/**' 
+> git clean -Xfd -e '!.env' -e '!/*.code-workspace' -e '!**/node_modules' -e '!**/node_modules/**' -e '!**/.pnpm-store' -e '!**/pnpm-store/**' 
 # remove temporary files outside repo
-> git rm -rf "$(TMPDIR)/"
+> git rm -rf "$$(dirname $(KAMBRIUM_TMPDIR))/.pnpmkambrium-$$(basename $(CURDIR))"
 
 # delete all files in the current directory (or created by this makefile) that are created by configuring or building the program.
 # see https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html 
