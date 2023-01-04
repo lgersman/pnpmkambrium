@@ -108,3 +108,12 @@ help:
 >   } 
 > } 
 > { lastLine = $$0 }' $(MAKEFILE_LIST)
+
+# print out targets and dependencies before executing if environment variable KAMBRIUM_DEBUG is set to true
+ifeq ($(KAMBRIUM_DEBUG),true)
+	TERMINAL_YELLOW != tput setaf 3
+	TERMINAL_RESET  != tput sgr0
+	# see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make
+	OLD_SHELL := $(SHELL)
+	SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
+endif

@@ -92,3 +92,7 @@ See more here : https://nodejs.org/en/download/
 	endef
 	$(error $(NODEJS_NOT_FOUND))
 endif
+
+ifeq ($(KAMBRIUM_VERBOSE),true)
+	.SHELLFLAGS += -x 
+endif
