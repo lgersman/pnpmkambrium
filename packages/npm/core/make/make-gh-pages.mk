@@ -11,8 +11,11 @@
 #		- sub package `.env` file:
 #		- monorepo `.env` file
 #
+# # supported variables are : 
+# 	- GIT_REMOTE_REPOSITORY_NAME (optional, default=origin) the remote repository to push to
+#
 .PHONY: gh-pages-push-%
-#HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
+#HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
 gh-pages-push-%: packages/docs/$*/
 # make make a bit mor silent about the undergoing commands 
 > @
