@@ -18,7 +18,8 @@ export DOCKER_BUILDKIT:=1
 export DOCKER_REGISTRY?=registry.hub.docker.com
 
 #HELP: build all outdated docker images in packages/docker/ 
-packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
+packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/))
+> touch -m $@
 
 
 #HELP: build outdated docker image by name\n\texample: 'make packages/docker/foo/' will build the docker image for 'packages/docker/foo'

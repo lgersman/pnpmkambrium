@@ -63,7 +63,11 @@ MAKEFLAGS += --warn-undefined-variables
 # alternative would be to mark such targets as non intermediate using 
 # .PRECIOUS: packages/docker/%/build-info 
 #
-.SECONDARY:
+# .SECONDARY:
+# 
+# > You can disable intermediate files completely in your makefile by providing .NOTINTERMEDIATE as a target with no prerequisites: 
+# > in that case it applies to every file in the makefile.
+# .NOTINTERMEDIATE:
 
 # ensure pnpm is available
 ifeq (,$(shell command -v pnpm))

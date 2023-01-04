@@ -1,11 +1,12 @@
 # contains generic docs related make settings and rules
 
-#HELP: build all outdated docker images in packages/docs/ 
+#HELP: build all outdated docs in packages/docs/ 
 packages/docs/: $(addsuffix build-info,$(wildcard packages/docs/*/)) ;
 
 
 #HELP: build outdated docs package by name\n\texample: 'make packages/docs/gh-pages/' will build 'packages/docs/gh-pages'
-packages/docs/%/: packages/docs/%/build-info ;
+packages/docs/%/: packages/docs/%/build-info
+> touch -m $@
 
 #
 # build docs package
@@ -58,6 +59,5 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > 
 > $$(unzip -l $(@D)/dist/*.zip)
 > EOF
-
 
 
