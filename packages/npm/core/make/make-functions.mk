@@ -21,12 +21,12 @@ ensure-commands-exists = $(foreach command,$1,\
 define ensure-docker-images-exists
 	$(foreach image,$1,
 		if ! docker image inspect '$(image)' >/dev/null 2>&1; then
-			if ! pnpm --filter='@$(image)' pwd | grep 'No projects' 1>/dev/null; then
+			if ! pnpm --filter='@$(image)' pwd | grep 'No projects' >/dev/null; then
 				make_target="$$(realpath --relative-to=$$(git rev-parse --show-toplevel) $$(pnpm --filter="@$(image)" exec pwd))/"
-				1>&2 echo "Image '@$(image)' not available : It's available as monorepo sub package(path='$$make_target') - build it and try again."
+				echo "Image '@$(image)' not available : It's available as monorepo sub package(path='$$make_target') - build it and try again." >&2
 				exit -1
 			else 
-				docker pull "$(image)" >/dev/null 2>&1 || 1>&2 echo "Image '@$(image)' not available : could not download image from docker hub"
+				docker pull "$(image)" >/dev/null 2>&1 || echo "Image '@$(image)' not available : could not download image from docker hub" >&2
 				exit -1
 			fi
 		fi

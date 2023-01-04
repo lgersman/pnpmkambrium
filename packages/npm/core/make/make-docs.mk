@@ -27,7 +27,7 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 > PACKAGE_DESCRIPTION=$$(jq -r '.description | values' $$PACKAGE_JSON)
 # if package.json has a build script execute package script build. otherwise run mdbook
-> if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON 1>/dev/null; then
+> if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 > 	echo $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
 > 	MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \

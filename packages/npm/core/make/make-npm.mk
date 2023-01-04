@@ -27,7 +27,7 @@ packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard pac
 > PACKAGE_JSON=$(@D)/package.json
 > rm -f $(@D)/dist/*.tgz
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
-> (cd $(@D) && pnpm pack --pack-destination ./dist 1>/dev/null)
+> (cd $(@D) && pnpm pack --pack-destination ./dist >/dev/null)
 > cat << EOF | tee $@
 > $$(cd $(@D)/dist && ls -1shS *.tgz) 
 > 

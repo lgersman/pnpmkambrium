@@ -102,7 +102,7 @@ function execute() {
 die() {
   local msg=$1
   local code=${2-1} # default exit status 1
-  >&2 echo "$msg"
+  echo "$msg" >&2
   exit "$code"
 }
 
