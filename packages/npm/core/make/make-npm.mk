@@ -10,8 +10,7 @@ packages/npm/: $(addsuffix build-info,$(wildcard packages/npm/*/)) ;
 
 
 #HELP: build outdated npm package by name\n\texample: 'make packages/npm/foo/' will build 'packages/npm/foo'
-packages/npm/%/: packages/npm/%/build-info
-> touch -m $@
+packages/npm/%/: packages/npm/%/build-info ;
 
 #
 # build npm package

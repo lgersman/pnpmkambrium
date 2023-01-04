@@ -5,8 +5,7 @@ packages/docs/: $(addsuffix build-info,$(wildcard packages/docs/*/)) ;
 
 
 #HELP: build outdated docs package by name\n\texample: 'make packages/docs/gh-pages/' will build 'packages/docs/gh-pages'
-packages/docs/%/: packages/docs/%/build-info
-> touch -m $@
+packages/docs/%/: packages/docs/%/build-info ;
 
 #
 # build docs package
