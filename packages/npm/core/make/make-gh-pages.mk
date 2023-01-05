@@ -17,7 +17,7 @@
 .PHONY: gh-pages-push-%
 #HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
 gh-pages-push-%: packages/docs/$*/
-# make make a bit mor silent about the undergoing commands 
+# # make make a bit mor silent about the undergoing commands 
 # > set -x
 > # read .env file from package if exists
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
