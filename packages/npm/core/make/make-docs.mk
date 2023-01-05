@@ -26,7 +26,14 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > PACKAGE_DESCRIPTION=$$(jq -r '.description | values' $$PACKAGE_JSON)
 > # if package.json has a build script execute package script build. otherwise run mdbook
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
-> 	echo $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
+> 	$(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
+>		if jq --exit-status '.scripts | has("dev")' $$PACKAGE_JSON >/dev/null; then
+>			$(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run dev
+>		else
+>			echo 'error: generic build/watch is not implemented yet' >&2
+>			exit 1
+>			# @TODO: add generic build/watch with browser refresh
+>		fi
 > else
 > 	# ensure mdbook image is available
 > 	$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
@@ -46,7 +53,21 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 			jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
 			jq --exit-status -r '.repository.url | select(.!=null)' package.json \
 		)"
-> 	docker run --rm -it -e "MDBOOK_BOOK=$$MDBOOK_BOOK" -e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" --mount type=bind,source=$$(pwd)/$(@D),target=/data -u $$(id -u):$$(id -g) pnpmkambrium/mdbook mdbook build
+>		docker run --rm -it \
+			-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
+			-e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+			--mount type=bind,source=$$(pwd)/$(@D),target=/data \
+			-u $$(id -u):$$(id -g) \
+			pnpmkambrium/mdbook mdbook build
+>		if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then 
+>			docker run --rm -it \
+				-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
+				-e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+				--mount type=bind,source=$$(pwd)/$(@D),target=/data \
+				-u $$(id -u):$$(id -g) \
+				-p 3000:3000 -p 3001:3001 \
+				pnpmkambrium/mdbook mdbook serve -n 0.0.0.0
+>		fi
 > fi
 > mkdir -p $(@D)/dist
 > # redirecting into the target zip archive frees us from removing an existing archive first
@@ -60,15 +81,12 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > EOF
 
 #
-# start docs package in dev mode
+# start a docs package in dev mode
 # 
-# we utilize file "build-info" to track if the package was build/is up to date
-#
-# .PHONY: dev-docs-%
-# dev-docs-% : DEV = true
-dev-docs-% : packages/dev$*
-> echo "start development mode of $* (DEV=$(DEV))"
-# $*/build-info
+.PHONY: dev-docs-%
+dev-docs-%: export KAMBRIUM_DEV_MODE := true
+#HELP: start dev server of docs package by name\n\texample: 'make dev-docs-gh-pages/' will build/watch 'packages/docs/gh-pages'
+dev-docs-%: packages/docs/%/build-info;
 
 
 
