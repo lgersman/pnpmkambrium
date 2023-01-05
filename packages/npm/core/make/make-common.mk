@@ -93,6 +93,6 @@ See more here : https://nodejs.org/en/download/
 	$(error $(NODEJS_NOT_FOUND))
 endif
 
-ifeq ($(KAMBRIUM_VERBOSE),true)
+ifeq ($(KAMBRIUM_DEBUG),true)
 	.SHELLFLAGS += -x 
 endif

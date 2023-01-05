@@ -109,8 +109,8 @@ help:
 > } 
 > { lastLine = $$0 }' $(MAKEFILE_LIST)
 
-# print out targets and dependencies before executing if environment variable KAMBRIUM_DEBUG is set to true
-ifeq ($(KAMBRIUM_DEBUG),true)
+# print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
+ifeq ($(KAMBRIUM_TRACE),true)
 	TERMINAL_YELLOW != tput setaf 3
 	TERMINAL_RESET  != tput sgr0
 	# see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make
