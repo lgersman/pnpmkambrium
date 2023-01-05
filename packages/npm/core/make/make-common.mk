@@ -88,3 +88,7 @@ See more here : https://nodejs.org/en/download/
 	endef
 	$(error $(NODEJS_NOT_FOUND))
 endif
+
+TERMINAL_GREY != tput setaf 2
+TERMINAL_YELLOW != tput setaf 3
+TERMINAL_RESET  != tput sgr0

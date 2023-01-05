@@ -108,8 +108,6 @@ help:
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)
-	TERMINAL_YELLOW != tput setaf 3
-	TERMINAL_RESET  != tput sgr0
 	# see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make
 	OLD_SHELL := $(SHELL)
 	SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
