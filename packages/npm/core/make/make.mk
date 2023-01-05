@@ -25,10 +25,10 @@ NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node
 MONOREPO_SCOPE != jq -r '.name | values' package.json
 
 # always run prettier using ignored files from .lintignore 
-PRETTIER := $(PNPM) prettier --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --cache --check
+PRETTIER := $(PNPM) prettier --ignore-path='$(CURDIR)/.lintignore' --cache --check
 
 # always run eslint using ignored files from .lintignore 
-ESLINT := $(PNPM) eslint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --no-error-on-unmatched-pattern
+ESLINT := $(PNPM) eslint --ignore-path='$(CURDIR)/.lintignore' --no-error-on-unmatched-pattern
 
 # project (path) specific temp directory outside of the checked out repository
 KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDIR))")
@@ -57,7 +57,7 @@ lint: node_modules/
 > $(PRETTIER) --ignore-unknown .
 > $(ESLINT) .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
-> 	$(PNPM) stylelint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
+> 	$(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
 
 .PHONY: lint-fix
 #HELP: *  lint sources and fix them where possible
@@ -66,7 +66,7 @@ lint-fix: node_modules
 > $(PRETTIER) --cache --check --write .
 > $(ESLINT) --fix .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
-> $(PNPM) stylelint --ignore-path='$(shell git rev-parse --show-toplevel)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
+> $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
 
 .PHONY: clean
 #HELP: *  clean up intermediate files
