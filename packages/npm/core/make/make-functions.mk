@@ -15,7 +15,7 @@ ensure-commands-exists = $(foreach command,$1,\
 #
 # example usage : 
 # mytarget: 
-# # ensure images  foo/bar, fedora:latest exists
+# > # ensure images  foo/bar, fedora:latest exists
 # > $(call ensure-docker-images-exists, foo/bar fedora:latest)
 #
 define ensure-docker-images-exists
@@ -31,4 +31,28 @@ define ensure-docker-images-exists
 			fi
 		fi
 	) 
+endef
+
+#
+#	dump make variables 
+# example usage : 
+# mytarget: 
+# > $(call kambrium_dump_vars)
+#
+define kambrium_dump_vars
+	# see https://www.cmcrossroads.com/article/dumping-every-makefile-variable
+	$(foreach \
+		V, \
+		$(filter-out \
+			TERMINAL_GREY TERMINAL_YELLOW TERMINAL_RESET SHELL _ ensure-commands-exists ensure-docker-images-existsdump_vars, \
+			$(sort $(.VARIABLES)), \
+		), \
+		$(if \
+			$(filter-out \
+				environment% default undefined, \
+				$(origin $V)\
+			), \
+			$(info $(TERMINAL_GREY)$V=$($V)$(TERMINAL_RESET) ($(value $V))) \
+		) \
+	)
 endef
