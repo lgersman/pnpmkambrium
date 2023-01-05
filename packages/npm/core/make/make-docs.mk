@@ -55,14 +55,14 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 		)"
 >		docker run --rm -it \
 			-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-			-e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
 			--mount type=bind,source=$$(pwd)/$(@D),target=/data \
 			-u $$(id -u):$$(id -g) \
 			pnpmkambrium/mdbook mdbook build
 >		if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then 
 >			docker run --rm -it \
 				-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-				-e "MDBOOK_OUTPUT_HTML_git__repository__url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+				-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
 				--mount type=bind,source=$$(pwd)/$(@D),target=/data \
 				-u $$(id -u):$$(id -g) \
 				-p 3000:3000 -p 3001:3001 \
