@@ -2,6 +2,10 @@
 
 ## Documentation
 
+## Development
+
+- make functions like `kambrium_dump_vars`
+
 ### Configuration
 
 #### Environment
