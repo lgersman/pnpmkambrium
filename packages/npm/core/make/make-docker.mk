@@ -90,6 +90,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 	- DOCKER_REPOSITORY =xxxx
 # 	- DOCKER_REGISTRY=xxx
 #
+.PHONY: docker-push-%
 #HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$*/
 # read .env file from package if exists 

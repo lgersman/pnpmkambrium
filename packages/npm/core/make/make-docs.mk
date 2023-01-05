@@ -58,4 +58,16 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > $$(unzip -l $(@D)/dist/*.zip)
 > EOF
 
+#
+# start docs package in dev mode
+# 
+# we utilize file "build-info" to track if the package was build/is up to date
+#
+# .PHONY: dev-docs-%
+# dev-docs-% : DEV = true
+dev-docs-% : packages/dev$*
+> echo "start development mode of $* (DEV=$(DEV))"
+# $*/build-info
+
+
 
