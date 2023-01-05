@@ -21,25 +21,21 @@ SHELL != sh -c "command -v bash"
 #
 .SHELLFLAGS := -eu -o pipefail -c
 
-# #
-# # debug make shell execution
-# #
-# .SHELLFLAGS += -vx
-
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)
 #
 MAKEFLAGS += --no-builtin-rules
 
+
+#
+# disable stone age default built-in rule-specific variables enabled by default (yacc, cc and stuff)
+#
+MAKEFLAGS += ----no-builtin-variables
+
 #
 # warn if unused variables in use
 #
 MAKEFLAGS += --warn-undefined-variables
-
-# #
-# # suppress "make[2]: Entering directory" messages
-# #
-# MAKEFLAGS += --no-print-directory
 
 #
 # always execute targets as a single shell script (i.e. : not line by line) 
@@ -91,8 +87,4 @@ node is not installed or not in PATH.
 See more here : https://nodejs.org/en/download/ 
 	endef
 	$(error $(NODEJS_NOT_FOUND))
-endif
-
-ifeq ($(KAMBRIUM_DEBUG),true)
-	.SHELLFLAGS += -x 
 endif
