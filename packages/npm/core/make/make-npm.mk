@@ -56,6 +56,7 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 # 	- NPM_TOKEN (required) can be the npm password (a npm token is preferred for security reasons)
 # 	- NPM_REGISTRY=xxx
 #
+.PHONY: npm-push-%
 #HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push-foo' to push npm package 'packages/npm/foo'
 npm-push-%: packages/npm/$*/
 # read .env file from package if exists 
