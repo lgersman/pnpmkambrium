@@ -14,9 +14,8 @@ packages/docs/%/: packages/docs/%/build-info ;
 #
 packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard packages/docs$*/* packages/docs$*/**/*)) package.json 
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
-# > @
 # ensure mdbook image is available
-> @$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
+> $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a

@@ -19,7 +19,6 @@ packages/npm/%/: packages/npm/%/build-info ;
 #
 packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard packages/npm$*/* packages/npm$*/**/*)) package.json 
 # target depends on root located package.json and every file located in packages/npm/% except build-info 
-# > @
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a
 # read .env file from package if exists
@@ -59,7 +58,6 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 #
 #HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push-foo' to push npm package 'packages/npm/foo'
 npm-push-%: packages/npm/$*/
-# > @
 # read .env file from package if exists 
 > DOT_ENV="packages/npm/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/npm/$*/package.json

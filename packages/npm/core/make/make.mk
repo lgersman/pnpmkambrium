@@ -1,6 +1,3 @@
-# make output less verbose
-# MAKEFLAGS += --silent
-
 # KAMBRIUM_MAKEFILE_DIR points to the directory where this file was loaded from
 KAMBRIUM_MAKEFILE_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 include $(KAMBRIUM_MAKEFILE_DIR)/make-common.mk

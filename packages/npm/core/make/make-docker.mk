@@ -30,7 +30,6 @@ packages/docker/%/: packages/docker/%/build-info ;
 #
 packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildcard packages/docker$*/* packages/docker$*/**/*)) package.json 
 # target depends on root located package.json and every file located in packages/docker/% except build-info
-> @
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a 
 # read .env file from package if exists 
@@ -93,7 +92,6 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 #
 #HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$*/
-# > @
 # read .env file from package if exists 
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/docker/$*/package.json
