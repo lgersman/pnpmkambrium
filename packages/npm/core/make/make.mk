@@ -58,7 +58,7 @@ lint: node_modules/
 
 .PHONY: lint-fix
 #HELP: *  lint sources and fix them where possible
-lint-fix: node_modules
+lint-fix: node_modules/
 > pnpm run -r --if-present lint-fix
 > $(PRETTIER) --cache --check --write .
 > $(ESLINT) --fix .
@@ -114,3 +114,5 @@ ifeq ($(KAMBRIUM_TRACE),true)
 	OLD_SHELL := $(SHELL)
 	SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
 endif
+
+

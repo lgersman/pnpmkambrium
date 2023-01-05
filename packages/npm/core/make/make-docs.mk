@@ -17,7 +17,7 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 # ensure mdbook image is available
 > $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
-# set -a causes variables¹ defined from now on to be automatically exported.
+# set -a causes variables defined from now on to be automatically exported.
 > set -a
 # read .env file from package if exists
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
