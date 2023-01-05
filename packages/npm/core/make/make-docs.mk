@@ -12,10 +12,8 @@ packages/docs/%/: packages/docs/%/build-info ;
 # 
 # we utilize file "build-info" to track if the package was build/is up to date
 #
+# target depends on root located package.json and every file located in packages/docs/% except build-info 
 packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard packages/docs$*/* packages/docs$*/**/*)) package.json 
-> # target depends on root located package.json and every file located in packages/docs/% except build-info 
-> # ensure mdbook image is available
-> $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > # set -a causes variables defined from now on to be automatically exported.
@@ -30,6 +28,8 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 > 	echo $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
+> 	# ensure mdbook image is available
+> 	$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 > 	MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
 			"$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
 			"$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
