@@ -69,13 +69,7 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 		)"
 >		MDBOOK_GIT_URL_TEMPLATE="$${MDBOOK_GIT_URL_TEMPLATE:-}"
 >		MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
->		docker run --rm -it \
-			-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
-			--mount type=bind,source=$$(pwd)/$(@D),target=/data \
-			-u $$(id -u):$$(id -g) \
-			pnpmkambrium/mdbook mdbook build
->		if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then 
+>		if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then
 >			docker run --rm -it \
 				-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
 				-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
@@ -86,6 +80,12 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 				-p 3000:3000 -p 3001:3001 \
 				pnpmkambrium/mdbook mdbook serve -n 0.0.0.0
 >		fi
+>		docker run --rm -it \
+			-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
+			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
+			--mount type=bind,source=$$(pwd)/$(@D),target=/data \
+			-u $$(id -u):$$(id -g) \
+			pnpmkambrium/mdbook mdbook build
 > fi
 > mkdir -p $(@D)/dist
 > # redirecting into the target zip archive frees us from removing an existing archive first
@@ -105,6 +105,3 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 dev-docs-%: export KAMBRIUM_DEV_MODE := true
 #HELP: start dev server of docs package by name\n\texample: 'make dev-docs-gh-pages/' will build/watch 'packages/docs/gh-pages'
 dev-docs-%: packages/docs/%/build-info;
-
-
-
