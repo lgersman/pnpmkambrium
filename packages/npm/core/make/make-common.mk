@@ -18,8 +18,9 @@ SHELL != sh -c "command -v bash"
 
 #
 # use bash strict mode o that make will fail if a bash statement fails
+# -O starglob enables extended globbing (example foo/**/*)
 #
-.SHELLFLAGS := -eu -o pipefail -c
+.SHELLFLAGS := -eu -o pipefail -c -O extglob
 
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)
