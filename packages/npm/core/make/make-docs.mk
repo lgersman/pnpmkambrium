@@ -12,6 +12,18 @@ packages/docs/%/: packages/docs/%/build-info ;
 # 
 # we utilize file "build-info" to track if the package was build/is up to date
 #
+# environment variables can be provided either by 
+# 	- environment
+#		- sub package `.env` file:
+#		- monorepo `.env` file
+#
+# supported variables are : 
+#		(mdbook)
+# 		- MDBOOK_GIT_REPOSITORY_URL (optional, default=repository.url from (sub|root)package.json) 
+# 		- MDBOOK_GIT_REPOSITORY_ICON (optional, default=fa-code-fork) 
+# 		- MDBOOK_GIT_URL_TEMPLATE (optional) can be the docker password (a docker token is preferred for security reasons)
+# 		see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options
+# 
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
 packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard packages/docs$*/* packages/docs$*/**/*)) package.json 
 > # import kambrium bash function library
@@ -37,6 +49,7 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 > else
 > 	# ensure mdbook image is available
 > 	$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
+>		# prepare configuration
 > 	MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
 			"$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
 			"$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
@@ -49,20 +62,25 @@ packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard p
 			--argjson authors "$$MDBOOK_AUTHORS" \
 			'{title: $$title, description: $$description, authors: $$authors}' \
 		)
-> 	MDBOOK_GITHUB_REPOSITORY_URL="$$(\
+> 	MDBOOK_GIT_REPOSITORY_URL="$$(\
+			printenv MDBOOK_GIT_REPOSITORY_URL || \
 			jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
 			jq --exit-status -r '.repository.url | select(.!=null)' package.json \
 		)"
+>		MDBOOK_GIT_URL_TEMPLATE="$${MDBOOK_GIT_URL_TEMPLATE:-}"
+>		MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
 >		docker run --rm -it \
 			-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
 			--mount type=bind,source=$$(pwd)/$(@D),target=/data \
 			-u $$(id -u):$$(id -g) \
 			pnpmkambrium/mdbook mdbook build
 >		if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then 
 >			docker run --rm -it \
 				-e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-				-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GITHUB_REPOSITORY_URL" \
+				-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
+				-e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
+				-e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
 				--mount type=bind,source=$$(pwd)/$(@D),target=/data \
 				-u $$(id -u):$$(id -g) \
 				-p 3000:3000 -p 3001:3001 \
