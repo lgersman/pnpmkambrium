@@ -18,17 +18,17 @@ export DOCKER_BUILDKIT:=1
 export DOCKER_REGISTRY?=registry.hub.docker.com
 
 #HELP: build all outdated docker images in packages/docker/ 
-packages/docker/: $(addsuffix build-info,$(wildcard packages/docker/*/)) ;
+packages/docker/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
 #HELP: build outdated docker image by name\n\texample: 'make packages/docker/foo/' will build the docker image for 'packages/docker/foo'
-packages/docker/%/: packages/docker/%/build-info ;
+packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 #
 # build and tag docker image
 # 
 # we utilize file "build-info" to track if the docker image was build/is up to date
 #
-packages/docker/%/build-info: $(filter-out packages/docker/%/build-info,$(wildcard packages/docker$*/* packages/docker$*/**/*)) package.json 
+packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # target depends on root located package.json and every file located in packages/docker/% except build-info
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a 

@@ -6,18 +6,17 @@
 export NPM_REGISTRY?=https://registry.npmjs.org/
 
 #HELP: build all outdated packages in packages/npm/ 
-packages/npm/: $(addsuffix build-info,$(wildcard packages/npm/*/)) ;
-
+packages/npm/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
 #HELP: build outdated npm package by name\n\texample: 'make packages/npm/foo/' will build 'packages/npm/foo'
-packages/npm/%/: packages/npm/%/build-info ;
+packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 #
 # build npm package
 # 
 # we utilize file "build-info" to track if the package was build/is up to date
 #
-packages/npm/%/build-info: $(filter-out packages/npm/%/build-info,$(wildcard packages/npm$*/* packages/npm$*/**/*)) package.json 
+packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # target depends on root located package.json and every file located in packages/npm/% except build-info 
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a

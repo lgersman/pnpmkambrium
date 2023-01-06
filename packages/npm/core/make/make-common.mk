@@ -18,9 +18,9 @@ SHELL != sh -c "command -v bash"
 
 #
 # use bash strict mode o that make will fail if a bash statement fails
-# -O starglob enables extended globbing (example foo/**/*)
+# (disabled) -O starglob enables extended globbing (example foo/**/*)
 #
-.SHELLFLAGS := -eu -o pipefail -c -O extglob
+.SHELLFLAGS := -eu -o pipefail -c 
 
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)
@@ -93,3 +93,17 @@ endif
 TERMINAL_GREY != tput setaf 2
 TERMINAL_YELLOW != tput setaf 3
 TERMINAL_RESET  != tput sgr0
+
+# enable SECONDEXPANSION feature of make for all following targets
+# see https://www.cmcrossroads.com/article/making-directories-gnu-make
+.SECONDEXPANSION:
+
+# generic dependency for sub package build-info targets (package/*/*/build-info)
+# this variables is dynamic (i.e. evaluated per use) and requires make .SECONDEXPANSION feature to be enabled
+KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) package.json
+
+# generic dependency for sub package targets (package/*/*/)
+KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info
+
+# generic dependency for all sub packages flavors (package/*/)
+KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/))

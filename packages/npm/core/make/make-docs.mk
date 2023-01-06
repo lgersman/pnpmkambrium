@@ -1,11 +1,10 @@
 # contains generic docs related make settings and rules
 
 #HELP: build all outdated docs in packages/docs/ 
-packages/docs/: $(addsuffix build-info,$(wildcard packages/docs/*/)) ;
-
+packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
 #HELP: build outdated docs package by name\n\texample: 'make packages/docs/gh-pages/' will build 'packages/docs/gh-pages'
-packages/docs/%/: packages/docs/%/build-info ;
+packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 #
 # build docs package
@@ -25,7 +24,7 @@ packages/docs/%/: packages/docs/%/build-info ;
 # 		see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options
 # 
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
-packages/docs/%/build-info: $(filter-out packages/docs/%/build-info,$(wildcard packages/docs$*/* packages/docs$*/**/*)) package.json 
+packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > # set -a causes variables defined from now on to be automatically exported.
