@@ -87,8 +87,8 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # supported variables are : 
 # 	- DOCKER_TOKEN (required) can be the docker password (a docker token is preferred for security reasons)
 # 	- DOCKER_USER use the docker identity/username, your docker account email will not work
-# 	- DOCKER_REPOSITORY =xxxx
-# 	- DOCKER_REGISTRY=xxx
+# 	- DOCKER_REPOSITORY (optional,default=sub package name part after slash) 
+# 	- DOCKER_REGISTRY (optional,default=registry.hub.docker.com)
 #
 .PHONY: docker-push-%
 #HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
