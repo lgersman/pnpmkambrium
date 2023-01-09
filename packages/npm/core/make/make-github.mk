@@ -2,9 +2,8 @@
 
 #
 # update informational github repo 
-#		- update repo description from root package.json
-#		- update repo tags
-#		- enable github pages to if a docs sub package 'gh-pages' exists
+#		- update repo description and tags from root package.json
+#		- enable github pages if a docs sub package packages/docs/gh-pages exists and packages/docs/gh-pages/package.json property 'private' is falsy
 # 
 # environment variables can be provided either by 
 # 	- environment
@@ -13,31 +12,53 @@
 #
 # supported variables are : 
 # 	- GITHUB_TOKEN (required) can be the github password (a github token is preferred for security reasons)
-# 	- GITHUB_USER (required) github username 
-# 	- GITHUB_REPOSITORY (optional,default=root package.json name) GitHub repository name
+# 	- GITHUB_OWNER (required) github username 
+# 	- GITHUB_REPO (optional,default=root package.json name) GitHub repository name
+#		- GITHUB_REPO_DESCRIPTION (optional,default=value of root package.json property 'description')
+# 	- GITHUB_REPO_TOPICS (optional,default=value of root package.json property 'keys')
+# 	- GITHUB_REPO_HOMEPAGE (optional,default=value of root package.json property 'homepage')
 #
-# test using `GITHUB_TOKEN="foo" GITHUB_USER="bar" make --silent github-update-docs`
-
+# test using `GITHUB_TOKEN="foo" GITHUB_OWNER="bar" make --silent github-update-docs`
 .PHONY: github-update-docs
 #HELP: * update github repo documentation.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
-github-update-docs: $(wildcard packages/docs/gh-pages/)
-> # $(wildcard packages/docs/gh-pages/) dont fail of packages/docs/gh-pages/ doesnt exist
+# it's tricky - target will depend on 'packages/docs/gh-pages/' if packages/docs/gh-pages/package.json exists and property .private is true
+github-update-docs: $(shell jq --exit-status '.private? | not' packages/docs/gh-pages/package.json >/dev/null 2>&1 && echo 'packages/docs/gh-pages/build-info' || echo "")
 > # https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
 > # https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28
 > # https://gist.github.com/btoone/2288960
 # abort if GITHUB_TOKEN is not defined
 > : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
-# abort if GITHUB_USER is not defined
-> : $${GITHUB_USER:?"GITHUB_USER environment is required but not given"}
+# abort if GITHUB_OWNER is not defined
+> : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
 > # read .env file from package if exists
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
-> GITHUB_REPOSITORY=$${GITHUB_REPOSITORY:-$$(jq -r '.name | values' package.json)}
-> echo "GITHUB_REPOSITORY=$$GITHUB_REPOSITORY"
-> echo "GITHUB_REPOSITORY=$$(printenv GITHUB_TOKEN)"
-> echo "GITHUB_USER=$$(printenv GITHUB_USER)"
-# if sub package gh-pages exists
+> GITHUB_REPO=$${GITHUB_REPO:-$$(jq -r '.name | values' package.json)}
+> echo "GITHUB_REPO=$$GITHUB_REPO"
+> echo "GITHUB_OWNER=$$(printenv GITHUB_OWNER)"
+> GITHUB_REPO_DESCRIPTION=$${GITHUB_REPO_DESCRIPTION:-$$(jq --exit-status -r '.description | values' package.json)}
+> echo "GITHUB_REPO_DESCRIPTION=$$GITHUB_REPO_DESCRIPTION"
+> GITHUB_REPO_TOPICS=$${GITHUB_REPO_TOPICS:-$$(jq --exit-status '.keywords' package.json || echo '[]')}
+> echo "GITHUB_REPO_TOPICS=$$GITHUB_REPO_TOPICS"
+> GITHUB_REPO_HOMEPAGE=$${GITHUB_REPO_HOMEPAGE:-$$(jq -r --exit-status '.homepage | values' package.json)}
+> echo "GITHUB_REPO_HOMEPAGE=$$GITHUB_REPO_HOMEPAGE"
+# if sub package 'gh-pages' exists
 >	if [[ "$^" != '' ]]; then
 >		echo "dependencies are '$^'"
 > else 
 >		echo "sub package gh-pages doenst exist"
 > fi
+> # update description and tags
+> jq -n \
+> 	--arg description "$$GITHUB_REPO_DESCRIPTION" \
+>   --argjson topics "$$GITHUB_REPO_TOPICS" \
+>   --arg homepage "$$GITHUB_REPO_HOMEPAGE" \
+> 	'{description: $$description, homepage: $$homepage, topics: $$topics}' \
+>	| curl -s --show-error \
+>		--fail \
+>  	-X PATCH \
+> 	-H "Accept: application/vnd.github+json" \
+>  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
+>  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO} \
+> 	--data-binary @- \
+> 	| jq .
+
