@@ -2,7 +2,8 @@
   "name": "pnpmkambrium",
   "private": "true",
   "version": "1.0.0",
-  "description": "pnpmkambrium is a monorepo toolchain based on pnpm",
+  "description": "pnpmkambrium is a [opinionated,convention-over-configuration] monorepo toolchain based on pnpm and make",
+  "homepage": "https://lgersman.github.io/pnpmkambrium/",
   "engines": {
     "node": ">= 18.8.0",
     "pnpm": ">= 7.14.0"
@@ -11,7 +12,11 @@
     "prepare": "npx -y only-allow pnpm && git config core.hookspath ./node_modules/@pnpmkambrium/core/presets/default/.githooks"
   },
   "keywords": [
-    "pnpm"
+    "pnpm",
+    "make",
+    "monorepo",
+    "npm",
+    "docker"
   ],
   "author": {
     "email": "lars.gersmann@cm4all.com",
@@ -21,7 +26,7 @@
     "type": "git",
     "url": "https://github.com/lgersman/pnpmkambrium"
   },
-  "license": "MIT",
+  "license": "MIT-2",
   "devDependencies": {
     "@pnpmkambrium/core": "workspace:*",
     "@changesets/cli": "2.25.2",
