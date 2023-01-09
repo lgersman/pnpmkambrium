@@ -7,6 +7,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-github.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-targets.mk
 
 # ensure required utilities are installed
