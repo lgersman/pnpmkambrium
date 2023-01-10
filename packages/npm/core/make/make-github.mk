@@ -15,7 +15,7 @@
 # 	- GITHUB_OWNER (required) github username 
 # 	- GITHUB_REPO (optional,default=root package.json name) GitHub repository name
 #		- GITHUB_REPO_DESCRIPTION (optional,default=value of root package.json property 'description')
-# 	- GITHUB_REPO_TOPICS (optional,default=value of root package.json property 'keys')
+# 	- GITHUB_REPO_TOPICS (optional,default=value of root package.json property 'keys', must be be json array)
 # 	- GITHUB_REPO_HOMEPAGE (optional,default=value of root package.json property 'homepage')
 #
 # test using `GITHUB_TOKEN="foo" GITHUB_OWNER="bar" make --silent github-details-push`
