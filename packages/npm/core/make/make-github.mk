@@ -60,5 +60,5 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
 >  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO} \
 > 	--data-binary @- \
-> 	| jq .
+> 	| jq '{ description, homepage, topics }'
 > echo '[done]'

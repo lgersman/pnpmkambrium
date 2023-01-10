@@ -136,7 +136,7 @@ docker-push-%: packages/docker/$*/
 > 			-X PATCH \
 >				--data-binary @- \
 > 			"https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/" \
-> 		| jq .
+> 		| jq '{ description, full_description }'
 >			echo '[done]'
 > 	fi
 >
