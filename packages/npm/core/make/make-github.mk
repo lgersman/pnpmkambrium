@@ -54,18 +54,17 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > # update topics
 > # Note: To edit a repository's topics, use the Replace all repository topics endpoint.
 > # https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#replace-all-repository-topics
-# > DATA=`jq -n \
-# >   --argjson topics "$$GITHUB_REPO_TOPICS" \
-# > 	'{ names : $$topics}' \
-# > `
-# > jq . <(echo $$DATA)
-# >	echo $$DATA | $(CURL) \
-# >  	-X PUT \
-# > 	-H "Accept: application/vnd.github+json" \
-# >  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
-# >  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO} \
-# > 	--data-binary @- \
-# > 	| jq '{ description, homepage, topics }'
+> DATA=`jq -n \
+>   --argjson topics "$$GITHUB_REPO_TOPICS" \
+> 	'{ names : $$topics}' \
+> `
+> echo "$$DATA" && $(CURL) \
+>  	-X PUT \
+> 	-H "Accept: application/vnd.github+json" \
+>  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
+>  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/topics \
+> 	--data "$$DATA" \
+> 	| jq .
 > echo '[done]'
 # if sub package 'gh-pages' exists
 # >	if [[ "$^" != '' ]]; then
