@@ -53,8 +53,7 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > 	'{description: $$description, homepage: $$homepage, topics: $$topics}' \
 > `
 > jq . <(echo $$DATA)
->	echo $$DATA | curl -s --show-error \
->		--fail \
+>	echo $$DATA | $(CURL) \
 >  	-X PATCH \
 > 	-H "Accept: application/vnd.github+json" \
 >  	-H "Authorization: Bearer $$GITHUB_TOKEN"\

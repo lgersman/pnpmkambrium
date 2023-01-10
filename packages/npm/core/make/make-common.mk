@@ -94,6 +94,10 @@ TERMINAL_GREY != tput setaf 2
 TERMINAL_YELLOW != tput setaf 3
 TERMINAL_RESET  != tput sgr0
 
+# use curl always with these options 
+# if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
+CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
+
 # enable SECONDEXPANSION feature of make for all following targets
 # see https://www.cmcrossroads.com/article/making-directories-gnu-make
 .SECONDEXPANSION:
