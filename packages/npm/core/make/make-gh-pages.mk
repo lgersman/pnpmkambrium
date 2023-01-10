@@ -14,9 +14,14 @@
 # supported variables are : 
 # 	- GIT_REMOTE_REPOSITORY_NAME (optional, default=origin) the remote repository to push to
 #
+#		if the target repo is at GitHub and GitHub pages should be programmatically configured:
+# 	- GITHUB_TOKEN (required) can be the github password (a github token is preferred for security reasons)
+# 	- GITHUB_OWNER (required) github username 
+# 	- GITHUB_REPO (optional,default=root package.json name) GitHub repository name
+# 
 .PHONY: gh-pages-push-%
 #HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
-gh-pages-push-%: packages/docs/$*/
+gh-pages-push-%: packages/docs/$$*/
 > # read .env file from package if exists
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/docs/$*/package.json
@@ -59,9 +64,26 @@ gh-pages-push-%: packages/docs/$*/
 > 	popd >/dev/null 
 >		git push origin gh-pages:gh-pages &> /dev/null
 >		echo '[done]'
+>
+> 	if [[ "$${GITHUB_TOKEN:-}" != '' ]]; then
+> 		# update topics
+> 		# see https://docs.github.com/en/rest/pages?apiVersion=2022-11-28#update-information-about-a-github-pages-site
+> 		GITHUB_REPO=$${GITHUB_REPO:-$$(jq -r '.name | values' package.json)}
+> 		: $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
+> 		echo "GITHUB_TOKEN=$$GITHUB_TOKEN; GITHUB_OWNER=$$GITHUB_OWNER; GITHUB_REPO=$$GITHUB_REPO"
+>			DATA='{"cname": null, "source":{"branch":"gh-pages","path":"/"}}'
+> 		echo "$$DATA" && $(CURL) -v \
+>  			-X PUT \
+> 			-H "Accept: application/vnd.github+json" \
+>  			-H "Authorization: Bearer $$GITHUB_TOKEN"\
+>  			https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
+> 			--data "$$DATA" \
+> 		| jq .
+> 		echo '[done]'
+> 	fi
+>
 > else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
 > # remove our temp directory 
 > rm -rf "$(KAMBRIUM_TMPDIR)/$@"
-
