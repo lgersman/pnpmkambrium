@@ -38,26 +38,39 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > GITHUB_REPO_TOPICS=$${GITHUB_REPO_TOPICS:-$$(jq --exit-status '.keywords' package.json || echo '[]')}
 > GITHUB_REPO_HOMEPAGE=$${GITHUB_REPO_HOMEPAGE:-$$(jq -r --exit-status '.homepage | values' package.json)}
 > echo "push '$$PACKAGE_NAME' github repo details"
-# if sub package 'gh-pages' exists
->	if [[ "$^" != '' ]]; then
->		echo "dependencies are '$^'"
-> else 
->		[ ! -f packages/docs/gh-pages/package.json ] && echo "[skipped]: packages/docs/gh-pages/ is marked as private"
->		echo "sub package gh-pages doenst exist"
-> fi
 > # update description and homepage
 > DATA=`jq -n \
 > 	--arg description "$$GITHUB_REPO_DESCRIPTION" \
->   --argjson topics "$$GITHUB_REPO_TOPICS" \
 >   --arg homepage "$$GITHUB_REPO_HOMEPAGE" \
-> 	'{description: $$description, homepage: $$homepage, topics: $$topics}' \
+> 	'{description: $$description, homepage: $$homepage }' \
 > `
-> jq . <(echo $$DATA)
->	echo $$DATA | $(CURL) \
+> echo "$$DATA" && $(CURL) \
 >  	-X PATCH \
 > 	-H "Accept: application/vnd.github+json" \
 >  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
 >  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO} \
-> 	--data-binary @- \
-> 	| jq '{ description, homepage, topics }'
+> 	--data "$$DATA" \
+> 	| jq '{ description, homepage }'
+> # update topics
+> # Note: To edit a repository's topics, use the Replace all repository topics endpoint.
+> # https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#replace-all-repository-topics
+# > DATA=`jq -n \
+# >   --argjson topics "$$GITHUB_REPO_TOPICS" \
+# > 	'{ names : $$topics}' \
+# > `
+# > jq . <(echo $$DATA)
+# >	echo $$DATA | $(CURL) \
+# >  	-X PUT \
+# > 	-H "Accept: application/vnd.github+json" \
+# >  	-H "Authorization: Bearer $$GITHUB_TOKEN"\
+# >  	https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO} \
+# > 	--data-binary @- \
+# > 	| jq '{ description, homepage, topics }'
 > echo '[done]'
+# if sub package 'gh-pages' exists
+# >	if [[ "$^" != '' ]]; then
+# >		echo "dependencies are '$^'"
+# > else 
+# >		[ ! -f packages/docs/gh-pages/package.json ] && echo "[skipped]: packages/docs/gh-pages/ is marked as private"
+# >		echo "sub package gh-pages doenst exist"
+# > fi

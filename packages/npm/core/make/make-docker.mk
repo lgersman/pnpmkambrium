@@ -128,12 +128,11 @@ docker-push-%: packages/docker/$*/
 >   		--arg description "$$(jq -r '.description | values' $$PACKAGE_JSON)" \
 >   		--arg full_description "$$(cat packages/docker/$*/README.md 2>/dev/null ||:)" '{description: $$description, full_description: $$full_description}' \
 >			`
-> 		jq . <(echo $$DATA)
->			echo $$DATA | $(CURL) \
+> 		echo "$$DATA" && $(CURL) \
 > 			-H "Content-Type: application/json" \
 >				-H "Authorization: JWT $${JWT_TOKEN}" \
 > 			-X PATCH \
->				--data-binary @- \
+>				--data "$$DATA" \
 > 			"https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/" \
 > 		| jq '{ description, full_description }'
 >			echo '[done]'
