@@ -57,7 +57,7 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 #
 .PHONY: npm-push-%
 #HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push-foo' to push npm package 'packages/npm/foo'
-npm-push-%: packages/npm/$*/
+npm-push-%: packages/npm/$$*/
 # read .env file from package if exists 
 > DOT_ENV="packages/npm/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/npm/$*/package.json

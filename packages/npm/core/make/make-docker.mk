@@ -45,7 +45,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-> docker build \
+> docker build $(DOCKER_FLAGS) \
 > 	--progress=plain \
 >		-t $$DOCKER_IMAGE:latest \
 > 	-t $$DOCKER_IMAGE:$$PACKAGE_VERSION \
@@ -92,7 +92,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 #
 .PHONY: docker-push-%
 #HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
-docker-push-%: packages/docker/$*/
+docker-push-%: packages/docker/$$*/
 # read .env file from package if exists 
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/docker/$*/package.json
@@ -108,9 +108,9 @@ docker-push-%: packages/docker/$*/
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
 > 	PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > 	# docker login --username [username] and docker access-token or real password must be initially before push
-> 	echo "$$DOCKER_TOKEN" | docker login --username "$$DOCKER_USER" --password-stdin $$DOCKER_REGISTRY
-> 	docker push $$DOCKER_IMAGE:latest
-> 	docker push $$DOCKER_IMAGE:$$PACKAGE_VERSION
+> 	echo "$$DOCKER_TOKEN" | docker login --username "$$DOCKER_USER" --password-stdin $$DOCKER_REGISTRY >/dev/null 2>&1
+> 	docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:latest
+> 	docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:$$PACKAGE_VERSION
 >		echo '[done]'
 > 
 >		# if DOCKER_REGISTRY == registry.hub.docker.com : update description and README.md

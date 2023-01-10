@@ -33,6 +33,8 @@ MAKEFLAGS += --no-builtin-rules
 #
 MAKEFLAGS += ----no-builtin-variables
 
+export DOCKER_FLAGS := -q
+
 #
 # warn if unused variables in use
 #
@@ -97,6 +99,8 @@ TERMINAL_RESET  != tput sgr0
 # use curl always with these options 
 # if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
 CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
+
+
 
 # enable SECONDEXPANSION feature of make for all following targets
 # see https://www.cmcrossroads.com/article/making-directories-gnu-make

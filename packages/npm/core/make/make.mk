@@ -82,9 +82,9 @@ clean:
 #HELP: cleanup node_modules, package-lock.json and docker container/images
 distclean: clean
 > git clean -Xfd -e '!/*.env' -e '!/*.code-workspace'
-> rm pnpm-lock.yaml
+> rm -f pnpm-lock.yaml
 # remove built docker images
-> docker image rm -f $$(docker images -q $(MONOREPO_SCOPE)/*) 2>/dev/null || true
+> docker image rm -f $$(docker images -q $(MONOREPO_SCOPE)/*) 2>/dev/null ||:
 # clean up unused containers. Container, networks, images, and the build cache
 # > docker system prune -a
 # remove unused volumes

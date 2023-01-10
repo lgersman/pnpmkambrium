@@ -26,7 +26,7 @@ define ensure-docker-images-exists
 				echo "Image '@$(image)' not available : It's available as monorepo sub package(path='$$make_target') - build it and try again." >&2
 				exit -1
 			else 
-				docker pull "$(image)" >/dev/null 2>&1 || echo "Image '@$(image)' not available : could not download image from docker hub" >&2
+				docker pull $$DOCKER_FLAGS $(DOCKER_FLAGS) "$(image)" >/dev/null 2>&1 || echo "Image '@$(image)' not available : could not download image from docker hub" >&2
 				exit -1
 			fi
 		fi
