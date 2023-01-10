@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - pnpmkambrium/gh-pages</title>
+        <title>Todo - pnpmkambrium/gh-pages</title>
 
 
         <!-- Custom HTML head -->
@@ -80,7 +80,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">2.</strong> Todo</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="todo.html" class="active"><strong aria-hidden="true">2.</strong> Todo</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,17 +144,53 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
-<p>foo bar</p>
+                        <h1 id="todo"><a class="header" href="#todo">TODO</a></h1>
+<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
+<h2 id="development"><a class="header" href="#development">Development</a></h2>
+<ul>
+<li>make functions like <code>kambrium_dump_vars</code></li>
+</ul>
+<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
+<h4 id="environment"><a class="header" href="#environment">Environment</a></h4>
+<ul>
+<li>
+<p>KAMBRIUM_* config variables</p>
+</li>
+<li>
+<p><code>*-push-*</code> environment variables and their .env file relation</p>
+</li>
+</ul>
+<h3 id="make-cheatcheat"><a class="header" href="#make-cheatcheat">make cheatcheat</a></h3>
+<ul>
+<li>
+<p>adding <code>.SHELLFLAGS += -x</code> in your Makefile will enable shell execution output :</p>
+<pre><code>include packages/npm/core/make/make.mk
+
+...
+
+.SHELLFLAGS += -x
+</code></pre>
+</li>
+<li>
+<p>adding <code>.MAKEFLAGS += --silent</code> in your Makefile will hide anything except shell output :</p>
+<pre><code>include packages/npm/core/make/make.mk
+
+...
+
+MAKEFLAGS += --silent
+</code></pre>
+<p><em>Alternatively you can start make with option <code>--silent</code>.</em></p>
+</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-
-                            <a rel="next" href="todo.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
+
 
                         <div style="clear: both"></div>
                     </nav>
@@ -162,10 +198,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-
-                    <a rel="next" href="todo.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+
             </nav>
 
         </div>
