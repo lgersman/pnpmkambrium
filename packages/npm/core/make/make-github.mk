@@ -42,6 +42,7 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >	if [[ "$^" != '' ]]; then
 >		echo "dependencies are '$^'"
 > else 
+>		[ ! -f packages/docs/gh-pages/package.json ] && echo "[skipped]: packages/docs/gh-pages/ is marked as private"
 >		echo "sub package gh-pages doenst exist"
 > fi
 > # update description and homepage
