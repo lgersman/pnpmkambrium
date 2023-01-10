@@ -79,7 +79,7 @@ clean:
 # delete all files in the current directory (or created by this makefile) that are created by configuring or building the program.
 # see https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html 
 .PHONY: distclean
-#HELP: cleanup node_modules, package-lock.json and docker container/images
+#HELP: cleanup node_modules, package-lock.json and docker container/images\n\tATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly
 distclean: clean
 > git clean -Xfd -e '!/*.env' -e '!/*.code-workspace'
 > rm -f pnpm-lock.yaml
