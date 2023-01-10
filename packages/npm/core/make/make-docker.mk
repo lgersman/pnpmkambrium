@@ -124,10 +124,12 @@ docker-push-%: packages/docker/$*/
 > 		DESCRIPTION=$$(docker image inspect --format='' $$DOCKER_IMAGE:latest | jq -r '.[0].Config.Labels["org.opencontainers.image.description"] | values')
 # see https://frontbackend.com/linux/how-to-post-a-json-data-using-curl
 # see https://stackoverflow.com/a/48470227/1554103
-> 		jq -n \
+> 		DATA=`jq -n \
 >   		--arg description "$$(jq -r '.description | values' $$PACKAGE_JSON)" \
 >   		--arg full_description "$$(cat packages/docker/$*/README.md 2>/dev/null ||:)" '{description: $$description, full_description: $$full_description}' \
->			| curl -s --show-error \
+>			`
+> 		jq . <(echo $$DATA)
+>			echo $$DATA | curl -s --show-error \
 > 			--fail \
 > 			-H "Content-Type: application/json" \
 >				-H "Authorization: JWT $${JWT_TOKEN}" \
