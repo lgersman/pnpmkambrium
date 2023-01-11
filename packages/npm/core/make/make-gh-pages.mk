@@ -66,20 +66,32 @@ gh-pages-push-%: packages/docs/$$*/
 >		echo '[done]'
 >
 > 	if [[ "$${GITHUB_TOKEN:-}" != '' ]]; then
-> 		# update topics
+> 		# configure/enable GitHub pages 
+> 		echo "configure/enable GitHub Pages to use branch 'gh-pages'"
 > 		# see https://docs.github.com/en/rest/pages?apiVersion=2022-11-28#update-information-about-a-github-pages-site
 > 		GITHUB_REPO=$${GITHUB_REPO:-$$(jq -r '.name | values' package.json)}
 > 		: $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
-> 		echo "GITHUB_TOKEN=$$GITHUB_TOKEN; GITHUB_OWNER=$$GITHUB_OWNER; GITHUB_REPO=$$GITHUB_REPO"
->			DATA='{"cname": null, "source":{"branch":"gh-pages","path":"/"}}'
-> 		echo "$$DATA" && $(CURL) -v \
+>			DATA='{"source":{"branch":"gh-pages","path":"/"}}'
+>			echo "$$DATA"
+> 		HTTP_STATUS=`$(CURL) \
 >  			-X PUT \
 > 			-H "Accept: application/vnd.github+json" \
 >  			-H "Authorization: Bearer $$GITHUB_TOKEN"\
+>				-w '%{http_code}' \
 >  			https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
 > 			--data "$$DATA" \
-> 		| jq .
-> 		echo '[done]'
+>			`
+>			if [[ "$$HTTP_STATUS" == '204' ]]; then 
+> 			$(CURL) \
+> 				-H "Accept: application/vnd.github+json" \
+>  				-H "Authorization: Bearer $$GITHUB_TOKEN"\
+>  				https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
+>				| jq '{ source }'
+> 			echo '[done]'
+>			else 
+>				echo '[error] : Failed to update GitHub Pages configuration (http status=$$HTTP_STATUS)'
+>				exit 1
+>			fi
 > 	fi
 >
 > else
