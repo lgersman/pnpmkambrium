@@ -45,7 +45,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-> docker build $(DOCKER_FLAGS) \
+> docker build \
 > 	--progress=plain \
 >		-t $$DOCKER_IMAGE:latest \
 > 	-t $$DOCKER_IMAGE:$$PACKAGE_VERSION \
