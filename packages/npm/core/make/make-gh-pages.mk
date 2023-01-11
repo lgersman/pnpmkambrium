@@ -33,14 +33,15 @@ gh-pages-push-%: packages/docs/$$*/
 > 	[[ $$(git rev-parse --abbrev-ref HEAD) == 'gh-pages' ]] && echo "cannot push gh-pages : current branch is gh-pages. switch to another branch and try again." >&2 && exit 1
 # > 	# ensure there are no uncommitted changes in current branch
 # > 	[[ -z "$(git status --porcelain)" ]] && echo "cannot push gh-pages : current branch contains uncommited changes. commit changes and try again." >&2 && exit 1
+> 	# ensure our (potential existing) temp directory gets removed after this make target  
+> 	trap 'rm -rf "$(KAMBRIUM_TMPDIR)/$@"; exit' EXIT
+> 
 > 	# fetch gh-pages branch if exists on remote
 > 	git ls-remote --exit-code --heads "$$GIT_REMOTE_REPOSITORY_NAME" gh-pages >/dev/null && git fetch "$$GIT_REMOTE_REPOSITORY_NAME" gh-pages:gh-pages
 > 	if git show-branch gh-pages &> /dev/null; then
 > 		# clone only branch gh-pages without any checked out files (-n) 
 > 		git clone -q -b gh-pages -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" >/dev/null
 > 	else
-> 		# ensure we can clone into empty temp directory to operate on
-> 		rm -rf "$(KAMBRIUM_TMPDIR)/$@"
 >			( 
 >				# cd command will only affect commands in subshell
 > 			cd "$(KAMBRIUM_TMPDIR)"
@@ -51,22 +52,27 @@ gh-pages-push-%: packages/docs/$$*/
 >				git commit --allow-empty -m "Initializing gh-pages branch" >/dev/null
 > 		)
 > 	fi
-> 	SHORT_COMMIT_HASH=$$(git rev-parse --short HEAD)
-> 	pushd "$(KAMBRIUM_TMPDIR)/$@/" >/dev/null
-> 	# copy all (including hidden) files recursive to cloned repo 
-> 	cp -r "$(CURDIR)/packages/docs/$*/build/." ./
-> 	git add .
->		# if commit was empty 
-> 	if ! git commit -m "deploy: #$$SHORT_COMMIT_HASH sub package $* version $$PACKAGE_VERSION" >/dev/null; then 
->			echo "[skipped]: nothing changed"
->			exit 0
->		fi
-> 	# push back changes to project repo
->   git push --set-upstream $$GIT_REMOTE_REPOSITORY_NAME gh-pages &> /dev/null
-> 	popd >/dev/null 
+> 
+> 	# add builded doc output to gh-branch in KAMBRIUM_TMPDIR)/$@ and sync it back to our repo 
+> 	(	
+> 		SHORT_COMMIT_HASH=$$(git rev-parse --short HEAD)
+>   	cd "$(KAMBRIUM_TMPDIR)/$@/"  
+> 		# copy all (including hidden) files recursive to cloned repo 
+> 		cp -r "$(CURDIR)/packages/docs/$*/build/." ./
+> 		git add .
+> 		# git commit will result in exitcode != 0 if nothing to commit but we need to call exit 1 explicitly since the subshell would not abort by default
+> 		git commit -m "deploy: #$$SHORT_COMMIT_HASH sub package $* version $$PACKAGE_VERSION" >/dev/null || exit 1
+> 		# push back changes to project repo
+>   	git push --set-upstream $$GIT_REMOTE_REPOSITORY_NAME gh-pages &> /dev/null
+>		) || { 
+> 		# if commit was empty and exit 1 was executed we will land here 			
+> 		echo "[skipped]: nothing changed" 
+>			exit 
+>		}
+> 	# push local updated gh-pages branch back back to remote repo
 >		git push origin gh-pages:gh-pages &> /dev/null
->		echo '[done]'
->
+> 	echo '[done]'
+> 
 > 	if [[ "$${GITHUB_TOKEN:-}" != '' ]]; then
 > 		# configure/enable GitHub pages 
 > 		echo "configure/enable GitHub Pages to use branch 'gh-pages'"
@@ -99,5 +105,17 @@ gh-pages-push-%: packages/docs/$$*/
 > else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
-> # remove our temp directory 
-> rm -rf "$(KAMBRIUM_TMPDIR)/$@"
+
+.PHONY: foo
+foo:
+> 	trap 'echo "exit trap called"; exit' EXIT
+> 
+> 	(	
+> 		sleep 100
+> 		false || exit 1
+> 		true 
+>		) || { 
+>			echo "[skipped]: nothing changed" 
+>			exit 
+>		}
+>		echo '[done]'
