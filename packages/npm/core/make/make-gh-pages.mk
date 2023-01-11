@@ -40,14 +40,16 @@ gh-pages-push-%: packages/docs/$$*/
 > 		git clone -q -b gh-pages -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" >/dev/null
 > 	else
 > 		# ensure we can clone into empty temp directory to operate on
-> 		rm -rf "$(KAMBRIUM_TMPDIR)/$@" 
-> 		pushd "$(KAMBRIUM_TMPDIR)" >/dev/null
-> 		# clone project repo with minimal git history (--depth 1) and without any checked out contents (-n)
-> 		git clone -q -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" && cd $$_
-> 		# create a new branch gh-pages with a detached history (--orphan)
-> 		git switch --orphan gh-pages  &> /dev/null
->			git commit --allow-empty -m "Initializing gh-pages branch" >/dev/null
-> 		popd >/dev/null
+> 		rm -rf "$(KAMBRIUM_TMPDIR)/$@"
+>			( 
+>				# cd command will only affect commands in subshell
+> 			cd "$(KAMBRIUM_TMPDIR)"
+> 			# clone project repo with minimal git history (--depth 1) and without any checked out contents (-n)
+> 			git clone -q -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" && cd $$_
+> 			# create a new branch gh-pages with a detached history (--orphan)
+> 			git switch --orphan gh-pages  &> /dev/null
+>				git commit --allow-empty -m "Initializing gh-pages branch" >/dev/null
+> 		)
 > 	fi
 > 	SHORT_COMMIT_HASH=$$(git rev-parse --short HEAD)
 > 	pushd "$(KAMBRIUM_TMPDIR)/$@/" >/dev/null
