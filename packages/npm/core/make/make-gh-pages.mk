@@ -105,17 +105,3 @@ gh-pages-push-%: packages/docs/$$*/
 > else
 > 	echo "[skipped]: package.json is marked as private"
 > fi
-
-.PHONY: foo
-foo:
-> 	trap 'echo "exit trap called"; exit' EXIT
-> 
-> 	(	
-> 		sleep 100
-> 		false || exit 1
-> 		true 
->		) || { 
->			echo "[skipped]: nothing changed" 
->			exit 
->		}
->		echo '[done]'
