@@ -4,11 +4,16 @@
 # <<EOD
 # hihi
 # 	huhu
-# hihi
+# haha
 # EOD
 #
 .PHONY: bar
 bar:
+
+#
+# <<EMPTY_:-.HELP
+# EMPTY_:-.HELP
+#
 
 #
 # <<EOF
@@ -18,35 +23,65 @@ bar:
 #
 .PHONY: foo
 foo:
-> (
->		IFS='\n'
->		cat $(MAKEFILE_LIST) | while read line; do
->			if [[ "$$line" =~ ^#[[:blank:]]\<\<([[:print:]]+)$$ ]]; then 
->				echo "'$$line'"
->				HEREDOC_KEY="$${BASH_REMATCH[1]}"
->				echo "$$HEREDOC_KEY"
->				while read line; do
->					if [[ "$$line" =~ ^#[[:blank:]]$$HEREDOC_KEY$$ ]]; then 
->						echo "end of heredoc : '$$line'"
->						break
->					elif [[ "$$line" =~ ^#[[:blank:]](([[:print:]]|[[:space:]])+)$$ ]]; then
->						COMMENT_LINE="$${BASH_REMATCH[1]}"
->						echo "comment line : '$$COMMENT_LINE'"
+>	declare -A HELP_TOPICS=([0-start]=15)
+> IFS='\n'
+>	# pipe all read makefiles into read loop
+>	while read line; do
+>		# if help heredoc marker matches /#\s<<([\w\:\-\_]+)/ current line 
+>		if [[ "$$line" =~ ^#[[:blank:]]\<\<([[:print:]]+)$$ ]]; then 
+>			HEREDOC_KEY="$${BASH_REMATCH[1]}"
+>			declare -a HEREDOC_BODY=()
+>			# read lines starting with '# ' until a line containing just the heredoc token comes in 
+>			while read line; do
+>				if [[ "$$line" =~ ^#[[:blank:]]$$HEREDOC_KEY$$ ]]; then
+>					# join lines separated by \n
+>					HEREDOC_BODY=$$(printf "\n%s" "$${HEREDOC_BODY[@]}")
+>					# strip leading \n
+>					HEREDOC_BODY=$${HEREDOC_BODY:1}
+>					if [[ "$$HEREDOC_BODY" == '' ]]; then
+>						echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : help body is empty"
 >					else 
->						echo "abort comment scanning - line '$$line' doesnt match comment nor HEREDOC end"
->						break
+>						echo "'$$HEREDOC_KEY'='$$HEREDOC_BODY'"
+>						# @TODO: grep next target name 
+>						HELP_TOPICS["$$HEREDOC_KEY"]="$$HEREDOC_BODY"
 >					fi
->				done
->			fi
->		done
-> )
+>					break
+>				elif [[ "$$line" =~ ^#[[:blank:]](([[:print:]]|[[:space:]])+)$$ ]]; then
+>					HEREDOC_BODY+=($${BASH_REMATCH[1]})
+>				else
+>					echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : line '$$line' does not match help line prefix(='# ') nor HereDoc end marker(='$$HEREDOC_KEY')"
+>					break
+>				fi
+>			done
+>		fi
+>	done < <(cat $(MAKEFILE_LIST))
+>
+> if  [[ "$${HELP_MODE:-}" == '' ]]; then
+>		echo "HELP_MODE is undefined"
+>		
+>		for TARGET in "$${!HELP_TOPICS[@]}"; do
+> 		printf "$${TARGET}:\n$${HELP_TOPICS[$$TARGET]}\n\n" | cat
+> 	done
+>		
+> else
+> 	echo "HELP_MODE=$${HELP_MODE:-}"
+> fi
+> # convert HELP associative bash array into json
 
 #
-# <<EOD
+# <<HELP
 # xxx
 # 	yyy
-# xxx
-# EOf
+# zzz
+# HEL
 #
 .PHONY: bar
 bar:
+
+#
+# <<DDD
+# mi
+# 	ka
+# do
+# DDD
+#
