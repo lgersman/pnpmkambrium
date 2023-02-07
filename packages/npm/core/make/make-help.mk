@@ -23,7 +23,7 @@ bar:
 #
 .PHONY: foo
 foo:
->	declare -A HELP_TOPICS=([0-start]=15)
+>	declare -A HELP_TOPICS=()
 > IFS='\n'
 >	# pipe all read makefiles into read loop
 >	while read line; do
@@ -39,25 +39,30 @@ foo:
 >					# strip leading \n
 >					HEREDOC_BODY=$${HEREDOC_BODY:1}
 >					if [[ "$$HEREDOC_BODY" == '' ]]; then
->						echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : help body is empty"
+>						echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : help body is empty" >&2
 >					else 
->						echo "'$$HEREDOC_KEY'='$$HEREDOC_BODY'"
->						# @TODO: grep next target name 
->						HELP_TOPICS["$$HEREDOC_KEY"]="$$HEREDOC_BODY"
+>						echo "'$$HEREDOC_KEY'='$$HEREDOC_BODY'" >&2
+> 					while read line; do
+# line="$(printf '.PHONY bar\t  foo/x.txt') %.cpp :"; [[ "$line" =~ ^((([A-Za-z0-9_/.\%]+)[[:blank:]]*)+): ]] && [[ "${line::1}" != '.' ]]  && echo "matched '${BASH_REMATCH[0]}'"
+> 						if [[ "$$line" =~ ^((([A-Za-z0-9_/.\%]+)[[:blank:]]*)+): ]] && [[ "$${line::1}" != '.' ]]; then
+> 							HELP_TOPICS["$${BASH_REMATCH[1]}"]="$$HEREDOC_BODY"
+> 							break
+> 						fi 
+> 					done
 >					fi
 >					break
 >				elif [[ "$$line" =~ ^#[[:blank:]](([[:print:]]|[[:space:]])+)$$ ]]; then
 >					HEREDOC_BODY+=($${BASH_REMATCH[1]})
 >				else
->					echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : line '$$line' does not match help line prefix(='# ') nor HereDoc end marker(='$$HEREDOC_KEY')"
+>					echo "[skipped] Help HereDoc(='$$HEREDOC_KEY') : line '$$line' does not match help line prefix(='# ') nor HereDoc end marker(='$$HEREDOC_KEY')" >&2
 >					break
 >				fi
 >			done
 >		fi
 >	done < <(cat $(MAKEFILE_LIST))
->
+> 
 > if  [[ "$${HELP_MODE:-}" == '' ]]; then
->		echo "HELP_MODE is undefined"
+>		echo "############## HELP_MODE is undefined"
 >		
 >		for TARGET in "$${!HELP_TOPICS[@]}"; do
 > 		printf "$${TARGET}:\n$${HELP_TOPICS[$$TARGET]}\n\n" | cat
@@ -75,8 +80,8 @@ foo:
 # zzz
 # HEL
 #
-.PHONY: bar
-bar:
+.PHONY: xxxx
+xxxx:
 
 #
 # <<DDD
@@ -85,3 +90,5 @@ bar:
 # do
 # DDD
 #
+.PHONY: yyyy
+yyyy:
