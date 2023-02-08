@@ -1,7 +1,7 @@
 # contains the make help target
 
 #
-# <<EOD
+# HELP<<EOD
 # hihi
 # 	huhu
 # haha
@@ -11,12 +11,12 @@
 bar:
 
 #
-# <<EMPTY_:-.HELP
+# HELP<<EMPTY_:-.HELP
 # EMPTY_:-.HELP
 #
 
 #
-# <<EOF
+# HELP<<EOF
 # whats up ?
 # here we <i>go
 # EOF
@@ -29,7 +29,7 @@ foo:
 > echo -e "$$help"
 
 #
-# <<HELP
+# HELP<<HELP
 # xxx
 # 	yyy
 # zzz
@@ -38,13 +38,19 @@ foo:
 .PHONY: xxxx
 xxxx:
 
+# HELP<<EOF
+# build all outdated dockern images in general packages/docker/
+# EOF
+.PHONY: uuu
+uuu:
+
 #
-# <<DDD
+# HELP<<DDD
 # mi
 # 	ka
 # do
 # DDD
 #
-.PHONY: yyyy
-yyyy:
+.PHONY: yy-%yy
+yy-%yy:
 
