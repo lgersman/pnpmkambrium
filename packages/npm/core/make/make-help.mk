@@ -26,7 +26,7 @@ foo:
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> echo -e "$$help"
+> echo -e "$$help" | less -r
 
 #
 # HELP<<HELP

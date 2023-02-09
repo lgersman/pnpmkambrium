@@ -18,13 +18,19 @@ export DOCKER_BUILDKIT:=1
 export DOCKER_REGISTRY?=registry.hub.docker.com
 
 # HELP<<EOF
-# build all outdated docker images in packages/docker/
+# build and tag all outdated docker images in `'packages/docker/'`
+#
 # EOF
 packages/docker/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
 # HELP<<EOF
-# build outdated docker image by name
-# example: 'make packages/docker/foo/' will build the docker image in sub package 'packages/docker/foo'
+# build and tag outdated docker image sub package by name.
+#
+# image metadata like author/description/version will be taken from sub package file `'package.json'`
+# 
+# example: `make packages/docker/foo/` 
+# 
+# 	will build the docker image in sub package `packages/docker/foo`
 # EOF
 packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
@@ -70,29 +76,41 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > $$(docker image ls $$DOCKER_IMAGE:$$PACKAGE_VERSION)
 > EOF
 
-#
+# HELP<<EOF
 # push docker images to registry
-#
-# see supported environment variables on make target docker-push-%
-#
+# 
+# see supported environment variables on target `docker-push-%`
+# EOF
 .PHONY: docker-push
 #HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push' to push all docker sub packages
 docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
 
-#
-# push docker image to registry
+# HELP<<EOF
+# push docker image to registry. 
 # 
-# environment variables can be provided either by 
+# target will also update 
+#
+# 	- the image short description using the `'description'` property of sub package file `'package.json'`
+# 	- image long description using sub package file `'README.md'` 
+# 
+# at the docker registry using 
+# 
+# supported variables are: 
+# 	- `DOCKER_TOKEN` (required) can be the docker password (a docker token is preferred for security reasons)
+# 	- `DOCKER_USER` use the docker identity/username, your docker account email will not work
+# 	- `DOCKER_REPOSITORY` (optional,default=sub package name part after minus) 
+# 	- `DOCKER_REGISTRY` (optional,default=`registry.hub.docker.com`)
+#
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
 # 	- environment
-#		- sub package `.env` file:
-#		- monorepo `.env` file
-#
-# supported variables are : 
-# 	- DOCKER_TOKEN (required) can be the docker password (a docker token is preferred for security reasons)
-# 	- DOCKER_USER use the docker identity/username, your docker account email will not work
-# 	- DOCKER_REPOSITORY (optional,default=sub package name part after slash) 
-# 	- DOCKER_REGISTRY (optional,default=registry.hub.docker.com)
-#
+# 
+# example: `make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar`
+# 
+#		will build/tag (if outdated) the docker image and 
+# EOF
 .PHONY: docker-push-%
 #HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$$*/
