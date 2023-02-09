@@ -28,7 +28,7 @@ function kambrium:jq:first_non_empty_array() {
 #
 function kambrium:help() {
   declare -A HELP_TOPICS=()
-  IFS='\n'
+  IFS=$'\n'
   # pipe all read makefiles into read loop
   while read line; do
     # if help heredoc marker matches /#\s<<([\w\:\-\_]+)/ current line 
@@ -38,7 +38,7 @@ function kambrium:help() {
       # read lines starting with '# ' until a line containing just the heredoc token comes in 
       while read line; do
         if [[ "$line" =~ ^#[[:blank:]]$HEREDOC_KEY$ ]]; then
-          # join lines separated by \n
+          # join string array
           HEREDOC_BODY=$(printf "\n%s" "${HEREDOC_BODY[@]}")
           # strip leading \n
           HEREDOC_BODY=${HEREDOC_BODY:1}
@@ -56,9 +56,8 @@ function kambrium:help() {
             done
           fi
           break
-        elif [[ "$line" =~ ^#[[:blank:]](([[:print:]]|[[:space:]])+)$ ]]; then
-          # HEREDOC_BODY+=(${BASH_REMATCH[1]})
-          HEREDOC_BODY+="${BASH_REMATCH[1]}"
+        elif [[ "$line" =~ ^#[[:blank:]]?(([[:print:]]|[[:space:]])*)$ ]]; then
+          HEREDOC_BODY+=(${BASH_REMATCH[1]:- })
         else
           [[ "$VERBOSE" != '' ]] && echo "[skipped] Help HereDoc(='$HEREDOC_KEY') : line '$line' does not match help line prefix(='# ') nor HereDoc end marker(='$HEREDOC_KEY')" >&2
           break
@@ -79,7 +78,10 @@ function kambrium:help() {
 
       for TARGET in "${!HELP_TOPICS[@]}"; do
         # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
-        printf "\033[36m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TOPICS[$TARGET]//$'\n'/$'\n\t'}"
+        HELP_TEXT=${HELP_TOPICS[$TARGET]}
+        # highlight text between '`'
+        HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m\1\\033[0m/g' <<< "$HELP_TEXT")
+        printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"
       done
     fi
   fi
