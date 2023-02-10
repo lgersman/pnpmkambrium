@@ -1,26 +1,30 @@
-# contains github related targets
+# contains GitHub related targets
 
-#
-# update informational github repo 
-#		- update repo description and tags from root package.json
-#		- enable github pages if a docs sub package packages/docs/gh-pages exists and packages/docs/gh-pages/package.json property 'private' is falsy
+# HELP<<EOF
+# syncs informational data like description/tags/etc. to GitHub repository metadata  
+#		- sync repo description and tags from root file `package.json`
+#		- enable GitHub pages if a docs sub package `'packages/docs/gh-pages'` exists and `'packages/docs/gh-pages/package.json'` property 'private' is falsy
 # 
-# environment variables can be provided either by 
-# 	- environment
-#		- sub package `.env` file:
-#		- monorepo `.env` file
-#
 # supported variables are : 
-# 	- GITHUB_TOKEN (required) can be the github password (a github token is preferred for security reasons)
-# 	- GITHUB_OWNER (required) github username 
-# 	- GITHUB_REPO (optional,default=root package.json name) GitHub repository name
-#		- GITHUB_REPO_DESCRIPTION (optional,default=value of root package.json property 'description')
-# 	- GITHUB_REPO_TOPICS (optional,default=value of root package.json property 'keys', must be be json array)
-# 	- GITHUB_REPO_HOMEPAGE (optional,default=value of root package.json property 'homepage')
+# 	- `GITHUB_TOKEN` (required) can be the GitHub password (a GitHub token is preferred for security reasons)
+# 	- `GITHUB_OWNER` (required) GitHub username 
+# 	- `GIT_REMOTE_REPOSITORY_NAME` (optional, default=`origin`) the remote repository to push to
+# 	- `GITHUB_REPO` (optional,default=property `'repository.url'` in root file `'package.json'`) GitHub repository name
+#		- `GITHUB_REPO_DESCRIPTION` (optional,default=property `'description'` in root file `'package.json'`)
+# 	- `GITHUB_REPO_TOPICS` (optional,default=property `'keys'` in root file `'package.json'`)
+# 	- `GITHUB_REPO_HOMEPAGE` (optional,default=property `'homepage'` in root file `'package.json'`)
 #
-# test using `GITHUB_TOKEN="foo" GITHUB_OWNER="bar" make --silent github-details-push`
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
+# 	- environment
+#
+# example: `make --silent github-details-push`
+#		
+#		will update the GitHub repository metadata with the provided data
+# EOF
 .PHONY: github-details-push
-#HELP: * update github repo documentation.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
 # it's tricky - target will depend on 'packages/docs/gh-pages/' if packages/docs/gh-pages/package.json exists and property .private is true
 github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh-pages/package.json >/dev/null 2>&1 && echo 'packages/docs/gh-pages/build-info' || echo "")
 > # https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
@@ -66,10 +70,3 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > 	--data "$$DATA" \
 > 	| jq .
 > echo '[done]'
-# if sub package 'gh-pages' exists
-# >	if [[ "$^" != '' ]]; then
-# >		echo "dependencies are '$^'"
-# > else 
-# >		[ ! -f packages/docs/gh-pages/package.json ] && echo "[skipped]: packages/docs/gh-pages/ is marked as private"
-# >		echo "sub package gh-pages doenst exist"
-# > fi

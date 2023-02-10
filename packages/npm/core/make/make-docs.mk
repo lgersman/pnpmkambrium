@@ -113,6 +113,11 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # start dev server for a docs sub package in `'packages/docs/'`
 # 
 # using this target enables you to edit a docs sub package and preview it in the browser at your fingertips
+#
+# example: `make dev-docs-foo`
+#
+#		will start the dev server for docs sub package `foo`. 
+# 	Every change in `'packages/docs/foo'` will result in rebuild/reloading the docs in the browser.
 # EOF
 .PHONY: dev-docs-%
 dev-docs-%: export KAMBRIUM_DEV_MODE := true

@@ -1,8 +1,12 @@
 # contains generic make targets executed across sub packages 
 
-#HELP: build all outdated packages of any flavor
-packages/: $$(wildcard $$(@D)/*/) ;
-
+# HELP<<EOF
+# build all outdated sub packages of any flavor
+# EOF
 .PHONY: build
-#HELP: convenient alias for target "packages/"
 build: packages/
+
+# HELP<<EOF
+# build all outdated sub packages of any flavor
+# EOF
+packages/: $$(wildcard $$(@D)/*/) ;

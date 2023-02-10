@@ -9,7 +9,6 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-github.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-targets.mk
-include $(KAMBRIUM_MAKEFILE_DIR)/make-help.mk
 
 # ensure required utilities are installed
 _ := $(call ensure-commands-exists, node sed git touch jq docker tee awk)
@@ -50,8 +49,10 @@ node_modules/: pnpm-lock.yaml
 >	$(PNPM) install --frozen-lockfile
 > @touch -m node_modules
 
+# HELP<<EOF
+# lint sources
+# EOF
 .PHONY: lint
-#HELP: *  lint sources
 lint: node_modules/
 > pnpm run -r --if-present lint
 > $(PRETTIER) --ignore-unknown .
@@ -59,8 +60,10 @@ lint: node_modules/
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
 > 	$(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
 
+# HELP<<EOF
+# lint the project and apply fixes provided by the linters
+# EOF
 .PHONY: lint-fix
-#HELP: *  lint sources and fix them where possible
 lint-fix: node_modules/
 > pnpm run -r --if-present lint-fix
 > $(PRETTIER) --cache --check --write .
@@ -68,8 +71,14 @@ lint-fix: node_modules/
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
 > $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
 
+# HELP<<EOF
+# delete resources matching `'.gitignore'` entries except 
+#		- `./'.node_modules'`
+#		- any `.env` file (recursive)
+#		- `'./.pnpm-store'`
+#		- `'./*.code-workspace'`
+# EOF
 .PHONY: clean
-#HELP: *  clean up intermediate files
 clean:
 # remove everything matching .gitignore entries (-f is force, you can add -q to suppress command output, exclude node_modules and node_modules/**)
 #   => If an untracked directory is managed by a different git repository, it is not removed by default. Use -f option twice if you really want to remove such a directory.
@@ -77,10 +86,15 @@ clean:
 # remove temporary files outside repo
 > rm -rf -- $$(dirname $(KAMBRIUM_TMPDIR))/*.pnpmkambrium-$$(basename $(CURDIR))
 
-# delete all files in the current directory (or created by this makefile) that are created by configuring or building the program.
+# HELP<<EOF
+# delete any file that are a result of making the project and not matched by `'.gitignore'` except :
+#		- any `.env` file (recursive)
+#		- `'./*.code-workspace'`
+#
+# ATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly
+# EOF
 # see https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html 
 .PHONY: distclean
-#HELP: cleanup node_modules, package-lock.json and docker container/images\n\tATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly
 distclean: clean
 > git clean -Xfd -e '!/*.env' -e '!/*.code-workspace'
 > rm -f pnpm-lock.yaml
@@ -91,23 +105,29 @@ distclean: clean
 # remove unused volumes
 # > docker volumes prune
 
-# see https://gist.github.com/Olshansk/689fc2dee28a44397c6e31a0776ede30
-# @TODO: sort targets alphabetically and primary targets first
-.PHONY: help
-#HELP: *  prints this screen
+# HELP<<EOF
+#	prints the help screen
+#
+# by default the help will be rendered for the terminal using a few ansi escape sequences for highlighting
+#
+# to process the help information in other tools you can use the `format` option to output help in JSON format.
+#
+# supported variables are : 
+# 	- `VERBOSE` (optional, default=`''`) enables verbose help parsing informations 
+# 	- `FORMAT` (optional, default=`'text'`) the output format of the help information
+#
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
+# 	- environment
+# EOF
+.PHONY: help 
 help: 
-> @printf "Available targets\n\n"
-> @awk '/^[a-zA-Z\-_0-9%\/]+:/ { 
->   helpMessage = match(lastLine, /^#HELP: (.*)/); 
->   if (helpMessage) { 
->     helpCommand = substr($$1, 0, index($$1, ":")-1); 
->     helpMessage = substr(lastLine, RSTART + 6, RLENGTH); 
->     gsub(/\\n/, "\n", helpMessage);
->     gsub(/\\t/, "\t", helpMessage);
->     printf "\033[36m%-30s\033[0m %s\n", helpCommand, helpMessage;
->   } 
-> } 
-> { lastLine = $$0 }' $(MAKEFILE_LIST)
+> # import kambrium bash function library
+> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
+> help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
+> echo -e "$$help" | less -r
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)

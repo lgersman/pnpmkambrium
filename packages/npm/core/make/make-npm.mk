@@ -5,10 +5,18 @@
 #
 export NPM_REGISTRY?=https://registry.npmjs.org/
 
-#HELP: build all outdated packages in packages/npm/ 
+# HELP<<EOF
+# build all outdated npm sub packages in `'packages/npm/'`
+# EOF
 packages/npm/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
-#HELP: build outdated npm package by name\n\texample: 'make packages/npm/foo/' will build 'packages/npm/foo'
+# HELP<<EOF
+# build outdated npm package by name
+# 
+# example: `make packages/npm/foo/` 
+# 
+#		will build the npm sub package in `'packages/npm/foo'`
+# EOF
 packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 #
@@ -34,35 +42,43 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > $$(tar -ztf $(@D)/dist/*.tgz)
 > EOF
 
+# HELP<<EOF
+# pushes all npm sub packages to a npm registry
 #
-# push npm packages to registry
-#
-# see supported environment variables on make target npm-push-%
-#
+# see supported environment variables on target `npm-push-%`
+# 
+# example: `make npm-push NPM_TOKEN=your-token' 
+#	
+#		pushes all npm sub packages in `'packages/npm/'` to the npm registry
+# EOF
 .PHONY: npm-push
-#HELP: * push npm packages to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push' to push all npm sub packages
 npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(PACKAGE))) ;
 
-#
+# HELP<<EOF
 # push npm package to registry
 # 
-# environment variables can be provided either by 
-# 	- environment
-#		- sub package `.env` file:
-#		- monorepo `.env` file
-#
 # supported variables are : 
-# 	- NPM_TOKEN (required) can be the npm password (a npm token is preferred for security reasons)
-# 	- NPM_REGISTRY=xxx
+# 	- `NPM_TOKEN` (required) can be the npm password (a npm token is preferred for security reasons)
+# 	- `NPM_REGISTRY` (optional, default is `'https://registry.npmjs.org/'`)
 #
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
+# 	- environment
+#
+# example: `NPM_TOKEN=your-token make npm-push-foo` 
+#
+#		to publish npm sub package `foo` in `'packages/npm/foo'` to the npm registry
+# 
+# EOF
 .PHONY: npm-push-%
-#HELP: * push a single npm package to registry.\n\texample: 'NPM_TOKEN=your-token make npm-push-foo' to push npm package 'packages/npm/foo'
 npm-push-%: packages/npm/$$*/
-# read .env file from package if exists 
+> # read .env file from package if exists 
 > DOT_ENV="packages/npm/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=packages/npm/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON)
-# abort if NPM_TOKEN is not defined 
+> # abort if NPM_TOKEN is not defined 
 > : $${NPM_TOKEN:?"NPM_TOKEN environment is required but not given"}
 > echo "push npm package $$PACKAGE_NAME"
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  

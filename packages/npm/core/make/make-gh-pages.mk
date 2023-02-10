@@ -1,26 +1,35 @@
 #
-# push docs package to git branch "gh-pages"
-# 
-# After initial call to this target ensure the connected github repo remote has github pages properly configured
-# (see https://github.com/lgersman/[your-project]/settings/pages)
-# 	Source: "Deploy from branch"
-# 	Branch: "gh-pages" / "/" (root folder in branch gh-pages)
+# HELP<<EOF
+# pushes a single docs sub package `build` directory output to git branch `gh-pages`. 
 #
-# environment variables can be provided either by 
-# 	- environment
-#		- sub package `.env` file:
-#		- monorepo `.env` file
+#	it the docs package is outdated, it will be rebuild before publishing.
+# 
+# after initial call to this target ensure the connected remote github repo has github pages properly configured
+# (see https://github.com/lgersman/[your-project]/settings/pages)
+# 	Source: `'Deploy from branch'`
+# 	Branch: `'gh-pages'` / `'/'` (root folder in branch `gh-pages`)
 #
 # supported variables are : 
-# 	- GIT_REMOTE_REPOSITORY_NAME (optional, default=origin) the remote repository to push to
+# 	- `GIT_REMOTE_REPOSITORY_NAME` (optional, default=`origin`) the remote repository to push to
 #
-#		if the target repo is at GitHub and GitHub pages should be programmatically configured:
-# 	- GITHUB_TOKEN (required) can be the github password (a github token is preferred for security reasons)
-# 	- GITHUB_OWNER (required) github username 
-# 	- GITHUB_REPO (optional,default=root package.json name) GitHub repository name
-# 
+#		if the target repo is at GitHub: 
+# 	- `GITHUB_TOKEN` (required) can be the github password (a github token is preferred for security reasons)
+# 	- `GITHUB_OWNER` (required) github username 
+# 	- `GITHUB_REPO` (optional,default=property `repository.url` in root file `'package.json'`) GitHub repository name
+#
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
+# 	- environment
+#
+#	example: `make gh-pages-push-gh-pages GITHUB_OWNER=foo GITHUB_TOKEN=bar` 
+#
+#		will publish the build output of docs sub package `gh-pages` located in `'packages/docs/gh-pages'` to 
+# 	the GitHub repository (annotated in property `repository.url` in root file `'package.json'`).
+#
+# EOF
 .PHONY: gh-pages-push-%
-#HELP: * push a single docs package to gh pages branch.\n\texample: 'GIT_REMOTE_REPOSITORY_NAME=my-origin make gh-pages-push-foo' to push 'build' folder contents of docs package 'packages/docs/foo' to git remote repo with name 'my-origin'
 gh-pages-push-%: packages/docs/$$*/
 > # read .env file from package if exists
 > DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
