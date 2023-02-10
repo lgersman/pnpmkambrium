@@ -66,17 +66,20 @@ function kambrium:help() {
     fi
   done
 
+  # sort the HELP_TOPICS keys
+  mapfile -d '' TARGETS < <(printf '%s\0' "${!HELP_TOPICS[@]}" | sort -z)
+
   if [[ "${FORMAT:-}" == 'json' ]]; then
     echo "json output selected"
   else
-    printf "Syntax: make [make-options] [target] ...\n\n" 
+    printf "Syntax: make [make-options] [target] [make-variables] ...\n\n" 
 
     if [[ "${#HELP_TOPICS[@]}" == '0' ]]; then
       echo "No help annotated make targets found"
     else
-      printf "Targets:\n\n" 
+      printf "Targets:\n\n"
 
-      for TARGET in "${!HELP_TOPICS[@]}"; do
+      for TARGET in "${TARGETS[@]}"; do
         # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
         HELP_TEXT=${HELP_TOPICS[$TARGET]}
         # highlight text between '`'
