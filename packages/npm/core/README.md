@@ -1,7 +1,3 @@
-<!-- % SNOWPLOUGH(1)
-% Jérôme Belleman
-% June 2013 -->
-
 # Purpose
 
 @TODO:
@@ -14,7 +10,7 @@
 
 # Usage
 
-Calling `make` will show the available targets
+Calling `make --silent` will show the available targets
 
 ## Configuration
 
