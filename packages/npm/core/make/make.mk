@@ -127,7 +127,31 @@ help:
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> echo -e "$$help" | less -r
+> if [[ "$${FORMAT:-text}" != 'json' ]] && [[ "$${PAGER:-}" != 'false' ]]; then
+> 	echo -e "$$help" | less -r
+>	else 
+>		echo -e "$$help"
+> fi
+
+# HELP<<EOF
+#	opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)
+#
+# supported variables are : 
+# 	- `VERBOSE` (optional, default=`''`) enables verbose help parsing informations 
+# 	- `FORMAT` (optional, default=`'text'`) the output format of the help information
+#
+# environment variables can be provided using:
+# 	- make variables provided at commandline
+#		- `'.env'` file from sub package
+#		- `'.env'` file from monorepo root
+# 	- environment
+# EOF
+.PHONY: interactive
+interactive: 
+> # import kambrium bash function library
+> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
+> help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-json}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
+> ./packages/docker/shaunch/bin/shaunch.sh --border-label make --preview-label "target description" --title "targets" --stdin < <(echo -e $$help)
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)

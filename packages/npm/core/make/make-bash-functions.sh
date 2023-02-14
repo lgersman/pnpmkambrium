@@ -68,9 +68,21 @@ function kambrium:help() {
 
   # sort the HELP_TOPICS keys
   mapfile -d '' TARGETS < <(printf '%s\0' "${!HELP_TOPICS[@]}" | sort -z)
-
   if [[ "${FORMAT:-}" == 'json' ]]; then
-    echo "json output selected"
+    JSON='[]'
+    for TARGET in "${TARGETS[@]}"; do
+      HELP_TEXT=${HELP_TOPICS[$TARGET]}
+      HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
+      HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
+
+      JSON=$(echo "$JSON" | jq -r \
+        --arg caption "$TARGET" \
+        --arg help ${HELP_TEXT} \
+        --arg exec "make $TARGET" \
+        '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
+      )
+    done
+    JSON=$JSON jq -n -r -s 'env.JSON|.'
   else
     printf "Syntax: make [make-options] [target] [make-variables] ...\n\n" 
 
