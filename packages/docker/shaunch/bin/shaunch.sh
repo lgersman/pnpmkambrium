@@ -48,7 +48,8 @@ Available options:
 -bl, --border-label              shaunch label text
 -t,  --title                     Title string above the commands to launch
 -c,  --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
-                                 or executable returning commands 
+                                 or executable returning json command structure
+--stdin                          read json command structure from stdin  
 EOF
   exit
 }
@@ -158,6 +159,11 @@ parse_params() {
         BORDER_LABEL="${2-}"
         shift
       ;;
+      --stdin) 
+        readarray a
+        printf -v a "%s" "${a[*]}"
+        export COMMANDS=$a
+      ;;
       -c | --commands) 
         if [[ -d "${2-}" ]]; then
           export COMMANDS=$(scan_commands "${2-}")
@@ -193,13 +199,13 @@ parse_params "$@"
 
 PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
+# --select-1 \
 # see https://github.com/junegunn/fzf/issues/3089#issuecomment-1353158088 for the $PPID thingie
 cmd=$("$script_dir/fzf" \
   --reverse \
   --border-label "$BORDER_LABEL" \
   --preview-label "$PREVIEW_LABEL" \
   --no-sort \
-  --select-1 \
   --no-multi \
   --border=rounded \
   --no-info \
