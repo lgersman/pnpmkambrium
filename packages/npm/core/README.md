@@ -12,6 +12,8 @@
 
 Calling `make --silent` will show the available targets
 
+`make interactive` will show up an interactive mixture of available targets and documentation
+
 ## Configuration
 
 ## docker packages

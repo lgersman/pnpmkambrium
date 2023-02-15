@@ -36,7 +36,7 @@ I wrote [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages
 
 @TODO: commandine arguments
 
-## Show commands by reading directory
+## Populating commands by reading a directory containing scripts and markdown files
 
 see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory)
 
@@ -45,6 +45,14 @@ see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/dev
 @TODO: json schema for expected output
 
 [dynamic script example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script)
+
+## Reading configuration from stdin
+
+Shaunch can even be configured by providing the json configuration via stdin
+
+- example : `./packages/docker/shaunch/bin/shaunch.sh --stdin < <(./packages/docker/shaunch/examples/commands-by-script/commands-by-script)`
+
+- another example sourcing [https://github.com/lgersman/pnpmkambrium](kambrium) targets into shaunch : ./packages/docker/shaunch/bin/shaunch.sh --stdin < <(make help FORMAT=json)
 
 # Usage
 
