@@ -1,7 +1,7 @@
 # contains generic docs related make settings and rules
 
 # HELP<<EOF
-# build all outdated doc sub packages in `'packages/docs/'`
+# build all outdated doc sub packages in `packages/docs/`
 #
 # see supported environment variables on target `packages/docs/%/`
 # EOF
@@ -10,23 +10,23 @@ packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 # HELP<<EOF
 # build outdated docs sub package by name
 #
-# task utilizes various informations from `'package.json'` like authors/contributors/title/etc.
+# task utilizes various informations from `package.json` like authors/contributors/title/etc.
 #
 # the following mdbook configuration options can be provided by environment variables: 
 # 	- `MDBOOK_GIT_REPOSITORY_URL` (optional, default=repository.url from (sub|root)package.json) 
-# 	- `MDBOOK_GIT_REPOSITORY_ICON` (optional, default=`'fa-code-fork'`) 
+# 	- `MDBOOK_GIT_REPOSITORY_ICON` (optional, default=`fa-code-fork`) 
 # 	- `MDBOOK_GIT_URL_TEMPLATE` (optional), 
 #		(see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)
 #
 # environment variables can be provided using:
 # 	- make variables provided at commandline
-#		- `'.env'` file from sub package
-#		- `'.env'` file from monorepo root
+#		- `.env` file from sub package
+#		- `.env` file from monorepo root
 # 	- environment
 #
 # example: `make packages/docs/gh-pages/`
 #
-#		will rebuild outdated sub package `'packages/docs/gh-pages'`
+#		will rebuild outdated sub package `packages/docs/gh-pages`
 # EOF
 packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
@@ -112,16 +112,15 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > EOF
 
 # HELP<<EOF
-# start dev server for a docs sub package in `'packages/docs/'`
+# start dev server for a docs sub package in `packages/docs/`
 # 
 # using this target enables you to edit a docs sub package and preview it in the browser at your fingertips
 #
 # example: `make dev-docs-foo`
 #
-#		will start the dev server for docs sub package `foo`. 
-# 	Every change in `'packages/docs/foo'` will result in rebuild/reloading the docs in the browser.
+#	    will start the dev server for docs sub package `foo`. 
+#	    Every change in `packages/docs/foo` will result in rebuild/reloading the docs in the browser.
 # EOF
 .PHONY: dev-docs-%
 dev-docs-%: export KAMBRIUM_DEV_MODE := true
-#HELP: start dev server of docs package by name\n\texample: 'make dev-docs-gh-pages/' will build/watch 'packages/docs/gh-pages'
 dev-docs-%: packages/docs/%/build-info;

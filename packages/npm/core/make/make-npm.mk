@@ -6,7 +6,7 @@
 export NPM_REGISTRY?=https://registry.npmjs.org/
 
 # HELP<<EOF
-# build all outdated npm sub packages in `'packages/npm/'`
+# build all outdated npm sub packages in `packages/npm/`
 # EOF
 packages/npm/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 
@@ -15,7 +15,7 @@ packages/npm/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 # 
 # example: `make packages/npm/foo/` 
 # 
-#		will build the npm sub package in `'packages/npm/foo'`
+#		will build the npm sub package in `packages/npm/foo`
 # EOF
 packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
@@ -49,7 +49,7 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # 
 # example: `make npm-push NPM_TOKEN=your-token' 
 #	
-#		pushes all npm sub packages in `'packages/npm/'` to the npm registry
+#		pushes all npm sub packages in `packages/npm/` to the npm registry
 # EOF
 .PHONY: npm-push
 npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(PACKAGE))) ;
@@ -59,17 +59,17 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 # 
 # supported variables are : 
 # 	- `NPM_TOKEN` (required) can be the npm password (a npm token is preferred for security reasons)
-# 	- `NPM_REGISTRY` (optional, default is `'https://registry.npmjs.org/'`)
+# 	- `NPM_REGISTRY` (optional, default is `https://registry.npmjs.org/`)
 #
 # environment variables can be provided using:
 # 	- make variables provided at commandline
-#		- `'.env'` file from sub package
-#		- `'.env'` file from monorepo root
+#		- `.env` file from sub package
+#		- `.env` file from monorepo root
 # 	- environment
 #
 # example: `NPM_TOKEN=your-token make npm-push-foo` 
 #
-#		to publish npm sub package `foo` in `'packages/npm/foo'` to the npm registry
+#		to publish npm sub package `foo` in `packages/npm/foo` to the npm registry
 # 
 # EOF
 .PHONY: npm-push-%

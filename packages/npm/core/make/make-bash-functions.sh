@@ -95,7 +95,7 @@ function kambrium:help() {
         # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
         HELP_TEXT=${HELP_TOPICS[$TARGET]}
         # highlight text between '`'
-        HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m\1\\033[0m/g' <<< "$HELP_TEXT")
+        HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m`\1`\\033[0m/g' <<< "$HELP_TEXT")
         printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"
       done
     fi

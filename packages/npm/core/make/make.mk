@@ -72,11 +72,12 @@ lint-fix: node_modules/
 > $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
 
 # HELP<<EOF
-# delete resources matching `'.gitignore'` entries except 
-#		- `./'.node_modules'`
+# delete resources matching `.gitignore` entries except 
+# 
+#		- `./.node_modules`
 #		- any `.env` file (recursive)
-#		- `'./.pnpm-store'`
-#		- `'./*.code-workspace'`
+#		- `./.pnpm-store`
+#		- `./*.code-workspace`
 # EOF
 .PHONY: clean
 clean:
@@ -87,9 +88,9 @@ clean:
 > rm -rf -- $$(dirname $(KAMBRIUM_TMPDIR))/*.pnpmkambrium-$$(basename $(CURDIR))
 
 # HELP<<EOF
-# delete any file that are a result of making the project and not matched by `'.gitignore'` except :
+# delete any file that are a result of making the project and not matched by `.gitignore` except :
 #		- any `.env` file (recursive)
-#		- `'./*.code-workspace'`
+#		- `./*.code-workspace`
 #
 # ATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly
 # EOF
@@ -113,13 +114,13 @@ distclean: clean
 # to process the help information in other tools you can use the `format` option to output help in JSON format.
 #
 # supported variables are : 
-# 	- `VERBOSE` (optional, default=`''`) enables verbose help parsing informations 
-# 	- `FORMAT` (optional, default=`'text'`) the output format of the help information
+# 	- `VERBOSE` (optional, default=``) enables verbose help parsing informations 
+# 	- `FORMAT` (optional, default=`text`) the output format of the help information
 #
 # environment variables can be provided using:
 # 	- make variables provided at commandline
-#		- `'.env'` file from sub package
-#		- `'.env'` file from monorepo root
+#		- `.env` file from sub package
+#		- `.env` file from monorepo root
 # 	- environment
 # EOF
 .PHONY: help 
@@ -137,13 +138,13 @@ help:
 #	opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)
 #
 # supported variables are : 
-# 	- `VERBOSE` (optional, default=`''`) enables verbose help parsing informations 
-# 	- `FORMAT` (optional, default=`'text'`) the output format of the help information
+# 	- `VERBOSE` (optional, default=``) enables verbose help parsing informations 
+# 	- `FORMAT` (optional, default=`text`) the output format of the help information
 #
 # environment variables can be provided using:
 # 	- make variables provided at commandline
-#		- `'.env'` file from sub package
-#		- `'.env'` file from monorepo root
+#		- `.env` file from sub package
+#		- `.env` file from monorepo root
 # 	- environment
 # EOF
 .PHONY: interactive

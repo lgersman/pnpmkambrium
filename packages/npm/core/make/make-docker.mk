@@ -18,7 +18,7 @@ export DOCKER_BUILDKIT:=1
 export DOCKER_REGISTRY?=registry.hub.docker.com
 
 # HELP<<EOF
-# build and tag all outdated docker images in `'packages/docker/'`
+# build and tag all outdated docker images in `packages/docker/`
 #
 # EOF
 packages/docker/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
@@ -26,7 +26,7 @@ packages/docker/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 # HELP<<EOF
 # build and tag outdated docker image sub package by name.
 #
-# image metadata like author/description/version will be taken from sub package file `'package.json'`
+# image metadata like author/description/version will be taken from sub package file `package.json`
 # 
 # example: `make packages/docker/foo/` 
 # 
@@ -90,8 +90,8 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # target will also update 
 #
-# 	- the image short description using the `'description'` property of sub package file `'package.json'`
-# 	- image long description using sub package file `'README.md'` 
+# 	- the image short description using the `description` property of sub package file `package.json`
+# 	- image long description using sub package file `README.md` 
 # 
 # at the docker registry using 
 # 
@@ -103,8 +103,8 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 #
 # environment variables can be provided using:
 # 	- make variables provided at commandline
-#		- `'.env'` file from sub package
-#		- `'.env'` file from monorepo root
+#		- `.env` file from sub package
+#		- `.env` file from monorepo root
 # 	- environment
 # 
 # example: `make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar`
