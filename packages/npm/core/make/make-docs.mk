@@ -61,6 +61,8 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > 	# ensure mdbook image is available
 > 	$(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 >		# prepare configuration
+>		# @TODO: we could replace the bash function with pure jq using https://stackoverflow.com/questions/19529688/how-to-merge-2-json-objects-from-2-files-using-jq ? 
+> 	# @TODO: enable direct configurable MDBOOK_AUTHORS property and take the json data as fallback
 > 	MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
 			"$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
 			"$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
