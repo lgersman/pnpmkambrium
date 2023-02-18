@@ -15,7 +15,7 @@ packages/npm/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 # 
 # example: `make packages/npm/foo/` 
 # 
-#		will build the npm sub package in `packages/npm/foo`
+#    will build the npm sub package in `packages/npm/foo`
 # EOF
 packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
@@ -48,8 +48,8 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # see supported environment variables on target `npm-push-%`
 # 
 # example: `make npm-push NPM_TOKEN=your-token' 
-#	
-#		pushes all npm sub packages in `packages/npm/` to the npm registry
+#  
+#    pushes all npm sub packages in `packages/npm/` to the npm registry
 # EOF
 .PHONY: npm-push
 npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(PACKAGE))) ;
@@ -58,18 +58,18 @@ npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(
 # push npm package to registry
 # 
 # supported variables are : 
-# 	- `NPM_TOKEN` (required) can be the npm password (a npm token is preferred for security reasons)
-# 	- `NPM_REGISTRY` (optional, default is `https://registry.npmjs.org/`)
+#   - `NPM_TOKEN` (required) can be the npm password (a npm token is preferred for security reasons)
+#   - `NPM_REGISTRY` (optional, default is `https://registry.npmjs.org/`)
 #
 # environment variables can be provided using:
-# 	- make variables provided at commandline
-#		- `.env` file from sub package
-#		- `.env` file from monorepo root
-# 	- environment
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
 #
 # example: `NPM_TOKEN=your-token make npm-push-foo` 
 #
-#		to publish npm sub package `foo` in `packages/npm/foo` to the npm registry
+#    to publish npm sub package `foo` in `packages/npm/foo` to the npm registry
 # 
 # EOF
 .PHONY: npm-push-%
@@ -82,9 +82,9 @@ npm-push-%: packages/npm/$$*/
 > : $${NPM_TOKEN:?"NPM_TOKEN environment is required but not given"}
 > echo "push npm package $$PACKAGE_NAME"
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
-> 	# bash does not allow declaring env variables containing "/" 
-> 	env "npm_config_$$NPM_REGISTRY:_authtoken=$$NPM_TOKEN" $(SHELL) -c "env | grep npm_ && pnpm -r --filter $$PACKAGE_NAME publish --no-git-checks"
->		echo '[done]'
+>   # bash does not allow declaring env variables containing "/" 
+>   env "npm_config_$$NPM_REGISTRY:_authtoken=$$NPM_TOKEN" $(SHELL) -c "env | grep npm_ && pnpm -r --filter $$PACKAGE_NAME publish --no-git-checks"
+>    echo '[done]'
 > else
-> 	echo "[skipped]: package.json is marked as private"
+>   echo "[skipped]: package.json is marked as private"
 > fi

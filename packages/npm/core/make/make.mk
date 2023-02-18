@@ -40,13 +40,13 @@ $(NODE):
 # > touch -m $@
 
 pnpm-lock.yaml: package.json 
->	$(PNPM) install --lockfile-only
+>  $(PNPM) install --lockfile-only
 > @touch -m pnpm-lock.yaml
 
 node_modules/: pnpm-lock.yaml 
 # pnpm bug: "pnpm use env ..." is actually not needed but postinall npx calls fails
 > $(PNPM) env use --global $(NODE_VERSION)
->	$(PNPM) install --frozen-lockfile
+>  $(PNPM) install --frozen-lockfile
 > @touch -m node_modules
 
 # HELP<<EOF
@@ -58,7 +58,7 @@ lint: node_modules/
 > $(PRETTIER) --ignore-unknown .
 > $(ESLINT) .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
-> 	$(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
+>   $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
 
 # HELP<<EOF
 # lint the project and apply fixes provided by the linters
@@ -74,10 +74,10 @@ lint-fix: node_modules/
 # HELP<<EOF
 # delete resources matching `.gitignore` entries except 
 # 
-#		- `./.node_modules`
-#		- any `.env` file (recursive)
-#		- `./.pnpm-store`
-#		- `./*.code-workspace`
+#    - `./.node_modules`
+#    - any `.env` file (recursive)
+#    - `./.pnpm-store`
+#    - `./*.code-workspace`
 # EOF
 .PHONY: clean
 clean:
@@ -89,8 +89,8 @@ clean:
 
 # HELP<<EOF
 # delete any file that are a result of making the project and not matched by `.gitignore` except :
-#		- any `.env` file (recursive)
-#		- `./*.code-workspace`
+#    - any `.env` file (recursive)
+#    - `./*.code-workspace`
 #
 # ATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly
 # EOF
@@ -107,21 +107,21 @@ distclean: clean
 # > docker volumes prune
 
 # HELP<<EOF
-#	prints the help screen
+#  prints the help screen
 #
 # by default the help will be rendered for the terminal using a few ansi escape sequences for highlighting
 #
-# to process the help information in other tools you can use the `format` option to output help in JSON format.
+# to process the help information in other tools you can use the `FORMAT` variable to output help in JSON format.
 #
 # supported variables are : 
-# 	- `VERBOSE` (optional, default=``) enables verbose help parsing informations 
-# 	- `FORMAT` (optional, default=`text`) the output format of the help information
+#   - `VERBOSE` (optional, default=``) enables verbose help parsing informations 
+#   - `FORMAT` (optional, default=`text`) the output format of the help information
 #
 # environment variables can be provided using:
-# 	- make variables provided at commandline
-#		- `.env` file from sub package
-#		- `.env` file from monorepo root
-# 	- environment
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
 # EOF
 .PHONY: help 
 help: 
@@ -129,23 +129,23 @@ help:
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
 > if [[ "$${FORMAT:-text}" != 'json' ]] && [[ "$${PAGER:-}" != 'false' ]]; then
-> 	echo -e "$$help" | less -r
->	else 
->		echo -e "$$help"
+>   echo -e "$$help" | less -r
+>  else 
+>    echo -e "$$help"
 > fi
 
 # HELP<<EOF
-#	opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)
+# opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)
 #
 # supported variables are : 
-# 	- `VERBOSE` (optional, default=``) enables verbose help parsing informations 
-# 	- `FORMAT` (optional, default=`text`) the output format of the help information
+#   - `VERBOSE` (optional, default=``) enables verbose help parsing informations 
+#   - `FORMAT` (optional, default=`text`) the output format of the help information
 #
 # environment variables can be provided using:
-# 	- make variables provided at commandline
-#		- `.env` file from sub package
-#		- `.env` file from monorepo root
-# 	- environment
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
 # EOF
 .PHONY: interactive
 interactive: 
@@ -156,9 +156,9 @@ interactive:
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)
-	# see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make
-	OLD_SHELL := $(SHELL)
-	SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
+  # see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make
+  OLD_SHELL := $(SHELL)
+  SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
 endif
 
 # echo $(make --silent foo) | jq -r '.[] | select(.caption == "help") | .help'

@@ -70,26 +70,26 @@ MAKEFLAGS += --warn-undefined-variables
 
 # ensure pnpm is available
 ifeq (,$(shell command -v pnpm))
-	define PNPM_NOT_FOUND
+  define PNPM_NOT_FOUND
 pnpm is not installed or not in PATH. 
 Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
 (windows : 'iwr https://get.pnpm.io/install.ps1 -useb | iex') 
 
 See more here : https://docs.npmjs.com/getting-started/installing-node 
-	endef
-	$(error $(PNPM_NOT_FOUND))
+  endef
+  $(error $(PNPM_NOT_FOUND))
 else
-	PNPM != command -v pnpm
+  PNPM != command -v pnpm
 endif
 
 # ensure a recent nodejs version is available
 # (required by pnpm)
 ifeq (,$(shell command -v node))
-	define NODEJS_NOT_FOUND
+  define NODEJS_NOT_FOUND
 node is not installed or not in PATH. 
 See more here : https://nodejs.org/en/download/ 
-	endef
-	$(error $(NODEJS_NOT_FOUND))
+  endef
+  $(error $(NODEJS_NOT_FOUND))
 endif
 
 TERMINAL_GREY != tput setaf 2
