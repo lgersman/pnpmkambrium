@@ -72,12 +72,12 @@ function kambrium:help() {
     JSON='[]'
     for TARGET in "${TARGETS[@]}"; do
       HELP_TEXT=${HELP_TOPICS[$TARGET]}
-      HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
-      HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
+      # HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
+      # HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
 
       JSON=$(echo "$JSON" | jq -r \
         --arg caption "$TARGET" \
-        --arg help ${HELP_TEXT} \
+        --arg help "${HELP_TEXT}" \
         --arg exec "make $TARGET" \
         '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
       )

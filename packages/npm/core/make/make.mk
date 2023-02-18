@@ -152,7 +152,7 @@ interactive:
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-json}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> ./packages/docker/shaunch/bin/shaunch.sh --border-label make --preview-label "target description" --title "targets" --stdin < <(echo -e $$help)
+> ./packages/docker/shaunch/bin/shaunch.sh --border-label make --preview-label "target description" --title "targets" --stdin < <(echo $$help)
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)
@@ -161,4 +161,9 @@ ifeq ($(KAMBRIUM_TRACE),true)
 	SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
 endif
 
-
+# echo $(make --silent foo) | jq -r '.[] | select(.caption == "help") | .help'
+# echo $(make --silent foo) | jq -r '.[] | select(.caption == "help") | .help' | ./packages/docker/shaunch/bin/glow -l
+.PHONY: foo
+foo: 
+> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
+> echo $$(FORMAT=json; VERBOSE=; kambrium:help < <(cat $(MAKEFILE_LIST))) | jq .
