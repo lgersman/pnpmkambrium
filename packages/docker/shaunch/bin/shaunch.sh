@@ -23,14 +23,26 @@ if ! (command -v "$script_dir/fzf" 1 > /dev/null); then
   (cd "$script_dir/.." && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin)
 fi
 
-# download latest bat/batcat
-if ! (command -v "$script_dir/bat" 1 > /dev/null); then
-  curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | \
-    grep "browser_download_url.*-i686-unknown-linux-musl.tar.gz" | \
+# # download latest bat/batcat
+# if ! (command -v "$script_dir/bat" 1 > /dev/null); then
+#   curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | \
+#     grep "browser_download_url.*-i686-unknown-linux-musl.tar.gz" | \
+#     cut -d : -f 2,3 | \
+#     tr -d \" | \
+#     wget -i - -qO - | \
+#     tar -zxvf - --strip-components=1 -C $script_dir --wildcards */bat 
+# fi
+
+# download latest glow if not available
+if ! (command -v "$script_dir/glow" 1 > /dev/null); then
+  curl -s https://api.github.com/repos/charmbracelet/glow/releases/latest | \
+    grep "browser_download_url.*_linux_amd64*.deb" | \
     cut -d : -f 2,3 | \
     tr -d \" | \
-    wget -i - -qO - | \
-    tar -zxvf - --strip-components=1 -C $script_dir --wildcards */bat 
+    wget -i - -q && \
+  ar x *.deb data.tar.gz && \
+  tar -zxf data.tar.gz --strip-components=3 -C $script_dir ./usr/bin/glow && \
+  rm -f data.tar.gz *.deb
 fi
 
 help() {
@@ -82,13 +94,16 @@ function render_markdown() {
 
   if (command -v "$help" 1 > /dev/null); then
     # if markdown file is a executable : execute it and interpret its output as markdown
-    $help | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+    # $help | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+    $help | $script_dir/glow -l -s auto -w 120 -
   elif [[ -f "$help" ]]; then
     # if its a regular markdown file 
-    $script_dir/bat --paging=always --style=plain --color=always "$help"
+    # $script_dir/bat --paging=always --style=plain --color=always "$help"
+    $script_dir/glow -l -s auto -w 120 "$help"
   else
     # otherwise interpret content as markdown content
-    echo "$help" | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+    # echo "$help" | $script_dir/bat --language=md --paging=always --style=plain --color=always -
+    echo "$help" | $script_dir/glow -l -s auto -w 120 -
   fi
 }
 

@@ -89,7 +89,11 @@ docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 
 - build docker image : `make packages/docker/shaunch/`
 
-- start dockerized shaunch with example app : `docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-directory:/app pnpmkambrium/shaunch`
+- using dockerized shaunch :
+
+  - by browsing a directory : `docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-directory:/app pnpmkambrium/shaunch`
+
+  - by executing a script: `docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-script:/app pnpmkambrium/shaunch -c /app/commands-by-script`
 
 - build using the docker-compose file : `docker compose -f packages/docker/shaunch/docker-compose.yml build`
 
