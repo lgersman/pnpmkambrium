@@ -1,0 +1,35 @@
+{
+  "$id": "https://json-schema.org/draft/2020-12/output/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "pnpmkambrium/shaunch configuration file specification",
+  "description": "describes the json configuration expected by pnpmkambrium/shaunch",
+  "items": {
+    "type": "object",
+    "properties": {
+      "caption": {
+        "type": "string",
+        "description": "Title of the entry. Will be displayed by fzf to navigate to the help"
+      },
+      "help": {
+        "type": "string",
+        "description": "Expected value can be a existing markdown file, an executable file returning markdown or just markdown contents. Please note that the markdown content will be substituted using bash's built-in echo command (i.e. the markdown can be dynamic !)",
+        "examples": [
+          "# foo bar\n\nCommand 'foo bar' will output 'foo bar' on the terminal",
+          "./scripts/foo.sh",
+          "./docs/foobar.md"
+        ]
+      },
+      "exec": {
+        "type": "string",
+        "description": "When given, the exec value will be executed without leaving shaunch. Property can be a executable file or just bash code"
+      },
+      "prompt": {
+        "type": "string",
+        "description": "When given, shaunch will exit and write the prompt to the next terminal prompt."
+      }
+    },
+    "required": ["caption", "help"]
+  },
+  "additionalItems": false,
+  "type": "array"
+}
