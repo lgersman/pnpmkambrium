@@ -78,8 +78,8 @@ function kambrium:help() {
       JSON=$(echo "$JSON" | jq -r \
         --arg caption "$TARGET" \
         --arg help "${HELP_TEXT}" \
-        --arg exec "make $TARGET" \
-        '. += [ { "caption" : $caption, "help" : $help, "exec" : $exec } ]' \
+        --arg prompt "make $TARGET" \
+        '. += [ { "caption" : $caption, "help" : $help, "prompt" : $prompt } ]' \
       )
     done
     JSON=$JSON jq -n -r -s 'env.JSON|.'

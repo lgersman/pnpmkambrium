@@ -31,6 +31,8 @@ ESLINT := $(PNPM) eslint --ignore-path='$(CURDIR)/.lintignore' --no-error-on-unm
 
 # project (path) specific temp directory outside of the checked out repository
 KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDIR))")
+# delete all KAMBRIUM_TMPDIR's older than one day
+$(shell find $$(dirname $(KAMBRIUM_TMPDIR))/*.pnpmkambrium-$$(basename $(CURDIR)) -type d -ctime +1 -exec echo '{}' \;)
 
 -include .env
 
