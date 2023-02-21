@@ -1,6 +1,6 @@
 [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch) is a launcher for the terminal
 
-It's based on [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat)
+It's based on [fzf](https://github.com/junegunn/fzf) and ~~[batcat](https://github.com/sharkdp/bat)~~[batcat](https://github.com/charmbracelet/glow)
 
 @TODO: add link to docker demo gif
 
@@ -45,14 +45,6 @@ see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/dev
 @TODO: json schema for expected output
 
 [dynamic script example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script)
-
-## Reading configuration from stdin
-
-Shaunch can even be configured by providing the json configuration via stdin
-
-- example : `./packages/docker/shaunch/bin/shaunch.sh --stdin < <(./packages/docker/shaunch/examples/commands-by-script/commands-by-script)`
-
-- another example sourcing [https://github.com/lgersman/pnpmkambrium](kambrium) targets into shaunch : ./packages/docker/shaunch/bin/shaunch.sh --stdin < <(make help FORMAT=json)
 
 # Usage
 
@@ -104,6 +96,8 @@ docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 - The local bash script works right now only on x86 machines.
 
   @TODO: This can be easily fixed by downloading the correct [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat) binaries depending on the platform.
+
+- writing to the next prompt using the `prompt` property will not work when executed from docker
 
 # FAQ
 

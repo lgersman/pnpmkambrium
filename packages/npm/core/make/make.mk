@@ -118,6 +118,10 @@ distclean: clean
 # supported variables are : 
 #   - `VERBOSE` (optional, default=``) enables verbose help parsing informations 
 #   - `FORMAT` (optional, default=`text`) the output format of the help information
+#	    - `text` will print help in text format to terminal
+#	      - addional option `PAGER=false` may be used to output help without pagination
+#     - `json` will print help in json format for further processing
+#	    - `markdown` will print help in markdown format for integrating output in static documentation
 #
 # environment variables can be provided using:
 #   - make variables provided at commandline
@@ -126,22 +130,28 @@ distclean: clean
 #   - environment
 # EOF
 .PHONY: help 
-help: 
+help:
+> @
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> if [[ "$${FORMAT:-text}" != 'json' ]] && [[ "$${PAGER:-}" != 'false' ]]; then
->   echo -e "$$help" | less -r
->  else 
->    echo -e "$$help"
+> if [[ "$${FORMAT:-text}" == 'text' ]]; then
+> 	if [[ "$${PAGER:-}" != 'false' ]]; then
+> 		echo -e "$$help" | less -r
+> 	else 
+>   	echo -e "$$help" 
+> 	fi
+> elif [[ "$${FORMAT:-text}" == 'json' ]]; then 
+> 	echo $$help | jq .
+> elif [[ "$${FORMAT:-text}" == 'markdown' ]]; then
+>   echo "not yet implemented" >&2
+> else 
+>		echo "unknown FORMAT option(='$$FORMAT')" >&2
+> 	exit 1
 > fi
 
 # HELP<<EOF
 # opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)
-#
-# supported variables are : 
-#   - `VERBOSE` (optional, default=``) enables verbose help parsing informations 
-#   - `FORMAT` (optional, default=`text`) the output format of the help information
 #
 # environment variables can be provided using:
 #   - make variables provided at commandline
@@ -150,11 +160,15 @@ help:
 #   - environment
 # EOF
 .PHONY: interactive
-interactive: 
+interactive:
+> @ 
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-json}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> ./packages/docker/shaunch/bin/shaunch.sh --border-label make --preview-label "target description" --title "targets" --stdin < <(echo $$help)
+> HELP_FILE="$$(mktemp)"
+> echo "$$help" > $$HELP_FILE
+> ./packages/docker/shaunch/bin/shaunch.sh -c "$$HELP_FILE" ||:
+> trap "rm -f -- $$HELP_FILE" EXIT
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)
@@ -162,10 +176,3 @@ ifeq ($(KAMBRIUM_TRACE),true)
   OLD_SHELL := $(SHELL)
   SHELL = $(warning $(TERMINAL_YELLOW)Building $@$(if $<, (from $<))$(if $?, ($? newer))$(TERMINAL_RESET))$(OLD_SHELL)
 endif
-
-# echo $(make --silent foo) | jq -r '.[] | select(.caption == "help") | .help'
-# echo $(make --silent foo) | jq -r '.[] | select(.caption == "help") | .help' | ./packages/docker/shaunch/bin/glow -l
-.PHONY: foo
-foo: 
-> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
-> echo $$(FORMAT=json; VERBOSE=; kambrium:help < <(cat $(MAKEFILE_LIST))) | jq .

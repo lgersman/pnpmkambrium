@@ -11,13 +11,17 @@ cat <<EOF
   },
   {
     "caption" : "Status",
-    "help" : "$script_dir/status.md",
-    "exec" : ":"
+    "help" : "$script_dir/status.md"
   },
   {
     "caption" : "Exit",
     "help" : "# Exit\n\nQuits the program",
-    "exec" : "echo 'Good bye'; shaunch: exit"
+    "exec" : "shaunch: exit"
+  },
+  {
+    "caption" : "'Foo bar'",
+    "help" : "# 'Prompt' Example\n\nQuits the program\n\nand writes 'hello world' to next prompt input",
+    "prompt" : "hello world"
   }
 ]
 EOF

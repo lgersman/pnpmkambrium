@@ -60,8 +60,7 @@ Available options:
 -bl, --border-label              shaunch label text
 -t,  --title                     Title string above the commands to launch
 -c,  --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
-                                 or executable returning json command structure
---stdin                          read json command structure from stdin  
+                                 or executable returning json command structure  
 EOF
   exit
 }
@@ -111,8 +110,30 @@ function render_markdown() {
 function execute() {
   local command_caption="$1"
 
-  local exec=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).exec')
-  bash -c "$exec"
+  # query "prompt" property for current command (fallback value "" returned if not found) 
+  local prompt=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).prompt |  select(.!=null)')
+  # if prompt is not empty : write to shaunch communication channel
+  if [[ "$prompt" != '' ]]; then 
+    printf "%s" "$prompt" > "$SHAUNCH_EXEC_FILE"
+
+    $(printenv SHAUNCH_DOCKERIZED >/dev/null) && printf "
+Shaunch was runned from within a docker container : Cannot write to next prompt. Please execute
+
+'%s'
+      
+on next prompt.
+" "$prompt" >&2
+  fi
+
+  # query "exec" property for current command (fallback value "" returned if not found) 
+  local exec=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).exec  | select(.!=null)')
+  if [[ "$exec" != '' ]]; then     
+    # if exec is not empty execute it in a sub shell
+    bash -c "$exec"  
+  elif [[ "$prompt" != '' ]]; then
+    # if no exec but prompt trigger exit
+    shaunch: exit
+  fi
 }
 
 die() {
@@ -174,18 +195,14 @@ parse_params() {
         BORDER_LABEL="${2-}"
         shift
       ;;
-      --stdin) 
-        readarray a
-        printf -v a "%s" "${a[*]}"
-        export COMMANDS=$a
-      ;;
       -c | --commands) 
         if [[ -d "${2-}" ]]; then
           export COMMANDS=$(scan_commands "${2-}")
         elif [[ -x "${2-}" ]]; then
           export COMMANDS=$("${2-}")
-        else 
-          die "given option commands(=${2-}) expected to be a directory or executable"
+        else
+          export COMMANDS=$(cat "${2-}")
+          # die "given option commands(=${2-}) expected to be a directory or executable"
         fi
         shift
       ;;
@@ -211,6 +228,20 @@ if [[ $# == 0 ]]; then
 fi
 
 parse_params "$@"
+
+export SHAUNCH_EXEC_FILE="$(mktemp)"
+
+function onExit() {
+  SHAUNCH_EXEC=$(cat "$SHAUNCH_EXEC_FILE")
+  rm -rf -- "$SHAUNCH_EXEC_FILE"
+  perl -e 'ioctl(STDIN, 0x5412, $_) for split "", join " ", @ARGV' "$SHAUNCH_EXEC" 
+  stty "$saved_settings" 
+}
+
+# see https://unix.stackexchange.com/questions/213799/can-bash-write-to-its-own-input-stream
+saved_settings=$(stty -g)
+stty -echo -icanon min 1 time 0
+trap "onExit" EXIT
 
 PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
 # --bind 'esc:execute(echo "$1" && exit)' \
