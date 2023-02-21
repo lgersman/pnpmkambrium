@@ -74,6 +74,7 @@ function kambrium:help() {
       HELP_TEXT=${HELP_TOPICS[$TARGET]}
       # HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
       # HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
+      HELP_TEXT=$(printf "# %s\n\n%s" "$TARGET" $HELP_TEXT)
 
       JSON=$(echo "$JSON" | jq -r \
         --arg caption "$TARGET" \
