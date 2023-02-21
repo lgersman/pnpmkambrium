@@ -19,8 +19,8 @@ cat <<EOF
     "exec" : "shaunch: exit"
   },
   {
-    "caption" : "'Foo bar'",
-    "help" : "# 'Prompt' Example\n\nQuits the program\n\nand writes 'hello world' to next prompt input",
+    "caption" : "Prompt example",
+    "help" : "# Prompt Example\n\nQuits the program\n\nand writes 'hello world' to next prompt input",
     "prompt" : "hello world"
   }
 ]

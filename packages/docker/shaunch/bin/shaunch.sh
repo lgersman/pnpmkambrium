@@ -109,7 +109,7 @@ function render_markdown() {
 # executed on enter key from fzf
 function execute() {
   local command_caption="$1"
-
+  
   # query "prompt" property for current command (fallback value "" returned if not found) 
   local prompt=$(echo "$COMMANDS" | jq --arg caption "$command_caption" -r '.[] | select(.caption==$caption).prompt |  select(.!=null)')
   # if prompt is not empty : write to shaunch communication channel
@@ -243,7 +243,7 @@ saved_settings=$(stty -g)
 stty -echo -icanon min 1 time 0
 trap "onExit" EXIT
 
-PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown '{}'"
+PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown {}"
 # --bind 'esc:execute(echo "$1" && exit)' \
 # --select-1 \
 # see https://github.com/junegunn/fzf/issues/3089#issuecomment-1353158088 for the $PPID thingie
@@ -256,7 +256,7 @@ cmd=$("$script_dir/fzf" \
   --border=rounded \
   --no-info \
   --exit-0 \
-  --bind "Enter:execute(export _shaunch_pid=\$PPID; '${BASH_SOURCE[0]}' execute '{}' >/dev/tty)" \
+  --bind "Enter:execute(export _shaunch_pid=\$PPID; '${BASH_SOURCE[0]}' execute {} >/dev/tty)" \
   --prompt='filter: ' \
   --header-lines=3 \
   --ansi \

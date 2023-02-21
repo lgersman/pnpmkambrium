@@ -22,9 +22,11 @@ I wrote [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages
   - [self contained bash script](https://github.com/lgersman/pnpmkambrium/blob/develop/packages/docker/shaunch/bin/shaunch.sh)
     - [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat) will be downloaded/installed on demand to a [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch) private directory
 
-- when started with `-c <directory>` the contained scripts and documentation files will be out of the box presented to the user (see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory))
+- when started with `-c <directory>` the contained scripts and documentation files will be out of the box presented to the user (see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory)). Output will be assumed to be JSON according to the shaunch json schema definition
 
-- when started with `-c <executable>` the executable is executed and its output is consumed to gather the available scripts and documentation (see [dynamic script example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script))
+- when started with `-c <executable>` the executable is executed and its output is consumed to gather the available scripts and documentation (see [dynamic script example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script)). Output will be assumed to be JSON according to the shaunch json schema definition.
+
+- when started with a regular file the file will be assumed to be JSON according to the shaunch json schema definition
 
 # Installation
 
