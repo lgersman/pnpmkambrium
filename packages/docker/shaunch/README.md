@@ -170,7 +170,7 @@ docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 
 # Limitations
 
-- The local bash script works right now only on amd64 linux machines becaise i did not figured out a way to install it's dependencies in a cross platform manner.
+- The local bash script works right now only on amd64 linux machines because i did not figured out a way to install it's dependencies in a cross platform manner.
 
   @TODO: This can be easily fixed by downloading the correct [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat) binaries depending on the platform.
 

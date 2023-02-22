@@ -1,7 +1,7 @@
 {
   "name": "@pnpmkambrium/shaunch",
   "version": "1.0.0",
-  "description": "provides a fzf based launcher for shell script integrating markdown documentation",
+  "description": "provides a fzf based launcher for shell scripts integrating markdown documentation",
   "scripts": {},
   "keywords": [
     "pnpm",
