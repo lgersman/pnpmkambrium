@@ -74,7 +74,11 @@ function kambrium:help() {
       HELP_TEXT=${HELP_TOPICS[$TARGET]}
       # HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
       # HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
-      HELP_TEXT=$(printf "# %s\n\n%s" "$TARGET" $HELP_TEXT)
+      if [[ "$TARGET" =~ % ]]; then 
+        printf -v HELP_TEXT_PREFACE '_(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)_\n\n' "%" 
+        HELP_TEXT="${HELP_TEXT_PREFACE}${HELP_TEXT}"
+      fi
+      HELP_TEXT=$(printf '# %s\n\n%s' "$TARGET" "$HELP_TEXT")
 
       JSON=$(echo "$JSON" | jq -r \
         --arg caption "$TARGET" \
@@ -84,6 +88,34 @@ function kambrium:help() {
       )
     done
     JSON=$JSON jq -n -r -s 'env.JSON|.'
+  elif [[ "${FORMAT:-}" == 'markdown' ]]; then
+    cat <<'EOL'
+# Syntax
+
+`make [make-options] [target] [make-variables] ...`
+
+# Targets
+
+EOL
+    if [[ "${#HELP_TOPICS[@]}" == '0' ]]; then
+      echo "No help annotated make targets found"
+    else
+      for TARGET in "${TARGETS[@]}"; do
+        printf '## %s\n\nSyntax: `make %s`%s' "${TARGET}" "${TARGET}"
+
+        [[ "$TARGET" =~ % ]] && printf '\n_(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)_' "%" 
+      
+        printf "\n\n"
+
+        HELP_TEXT=${HELP_TOPICS[$TARGET]}
+        printf '%s\n\n' "$HELP_TEXT"
+        # # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
+        # HELP_TEXT=${HELP_TOPICS[$TARGET]}
+        # # highlight text between '`'
+        # HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m`\1`\\033[0m/g' <<< "$HELP_TEXT")
+        # printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"
+      done
+    fi    
   else
     printf "Syntax: make [make-options] [target] [make-variables] ...\n\n" 
 
@@ -95,6 +127,12 @@ function kambrium:help() {
       for TARGET in "${TARGETS[@]}"; do
         # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
         HELP_TEXT=${HELP_TOPICS[$TARGET]}
+
+        if [[ "$TARGET" =~ % ]]; then 
+          printf -v HELP_TEXT_PREFACE '(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)\n\n' "%" 
+          HELP_TEXT="${HELP_TEXT_PREFACE}${HELP_TEXT}"
+        fi
+
         # highlight text between '`'
         HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m`\1`\\033[0m/g' <<< "$HELP_TEXT")
         printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"

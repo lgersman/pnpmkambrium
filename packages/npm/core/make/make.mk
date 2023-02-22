@@ -144,10 +144,9 @@ help:
 > elif [[ "$${FORMAT:-text}" == 'json' ]]; then 
 > 	echo $$help | jq .
 > elif [[ "$${FORMAT:-text}" == 'markdown' ]]; then
->   echo "not yet implemented" >&2
+>   echo "$$help"
 > else 
->		echo "unknown FORMAT option(='$$FORMAT')" >&2
-> 	exit 1
+>		echo "unknown FORMAT option(='$$FORMAT')" >&2 && false
 > fi
 
 # HELP<<EOF
