@@ -1,8 +1,8 @@
-# about
+# About
 
 @TODO: add link to docker demo gif
 
-# usage
+# Usage
 
 - basic usage:
 
@@ -40,7 +40,7 @@ docker run -it --rm -e GIT_LOG_OPTIONS="--stat --abbrev-commit"  -v $(pwd):/app 
 
 - execute with customized `git log` output : `docker compose -f gitlog-per-package.yml run --rm -e GIT_LOG_OPTIONS="--stat --abbrev-commit" main`
 
-# development
+# Development
 
 - execute script locally using `./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh`
 
