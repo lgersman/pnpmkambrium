@@ -16,6 +16,10 @@ packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 #   - `MDBOOK_GIT_REPOSITORY_URL` (optional, default=repository.url from (sub|root)package.json) 
 #   - `MDBOOK_GIT_REPOSITORY_ICON` (optional, default=`fa-code-fork`) 
 #   - `MDBOOK_GIT_URL_TEMPLATE` (optional), 
+#   - `MDBOOK_NO_SECTION_LABEL` (optional, default=`true`) set to `false` to enable numeric section labels in the table of contents column
+#   - `MDBOOK_AUTHORS` (optional) json array of author names. falling back to package.json properties `authors.name` / `contributors`
+#   - `MDBOOK_TITLE` (optional, defaults to `package.json` property `name`)
+#   - `MDBOOK_DESCRIPION` (optional, defaults to `package.json` property `description`) 
 #    (see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)
 #
 # environment variables can be provided using:
@@ -24,7 +28,7 @@ packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 #   - `.env` file from monorepo root
 #   - environment
 #
-# example: `make packages/docs/gh-pages/`
+# example: `MDBOOK_AUTHORS='["foo bar"]' make packages/docs/gh-pages/`
 #
 #    will rebuild outdated sub package `packages/docs/gh-pages`
 # EOF
@@ -64,17 +68,19 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >    # @TODO: we could replace the bash function with pure jq using https://stackoverflow.com/questions/19529688/how-to-merge-2-json-objects-from-2-files-using-jq ? 
 >   # @TODO: enable direct configurable MDBOOK_AUTHORS property and take the json data as fallback
 >   MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
+      "$${MDBOOK_AUTHORS:-[]}" \
       "$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
       "$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
       "$$(jq '[.contributors[]? | .name]' package.json)" \
       "$$(jq '[.author.name | select(.|.!=null)]' package.json)" \
     )
 >    MDBOOK_BOOK=$$(jq -n --compact-output \
-      --arg title "$$PACKAGE_NAME" \
-       --arg description "$$PACKAGE_DESCRIPTION" \
+      --arg title "$${MDBOOK_TITLE:-$$PACKAGE_NAME}" \
+      --arg description "$${MDBOOK_DESCRIPTION:-$$PACKAGE_DESCRIPTION}" \
       --argjson authors "$$MDBOOK_AUTHORS" \
       '{title: $$title, description: $$description, authors: $$authors}' \
     )
+> echo "$$MDBOOK_BOOK"
 >   MDBOOK_GIT_REPOSITORY_URL="$$(\
       printenv MDBOOK_GIT_REPOSITORY_URL || \
       jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
@@ -82,12 +88,14 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
     )"
 >    MDBOOK_GIT_URL_TEMPLATE="$${MDBOOK_GIT_URL_TEMPLATE:-}"
 >    MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
+>    MDBOOK_NO_SECTION_LABEL="$${MDBOOK_NO_SECTION_LABEL:-true}"
 >    if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then
 >      docker run --rm -it \
         -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
         -e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
+				-e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
         --mount type=bind,source=$$(pwd)/$(@D),target=/data \
         -u $$(id -u):$$(id -g) \
         -p 3000:3000 -p 3001:3001 \
@@ -95,7 +103,10 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >    fi
 >    docker run --rm -it \
       -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-      -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
+			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
+			-e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
+			-e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
+			-e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
       --mount type=bind,source=$$(pwd)/$(@D),target=/data \
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build
