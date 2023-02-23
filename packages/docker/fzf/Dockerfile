@@ -3,9 +3,7 @@
 # -------------------------------------
 FROM debian:bullseye-slim as builder
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-  apt-get install -y ca-certificates wget && \
-  rm -rf /var/lib/apt/lists/*
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y ca-certificates wget 
 
 RUN cd /usr/local && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | bash -s -- --bin
 
