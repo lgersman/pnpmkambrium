@@ -56,13 +56,13 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \
 >   --progress=plain \
->    -t $$DOCKER_IMAGE:latest \
+>   -t $$DOCKER_IMAGE:latest \
 >   -t $$DOCKER_IMAGE:$$PACKAGE_VERSION \
->    --label "maintainer=$$PACKAGE_AUTHOR" \
+>   --label "maintainer=$$PACKAGE_AUTHOR" \
 >   --label "org.opencontainers.image.title=$$DOCKER_IMAGE" \
 >   --label "org.opencontainers.image.description=$$(jq -r '.description | values' $$PACKAGE_JSON)" \
 >   --label "org.opencontainers.image.authors=$$PACKAGE_AUTHOR" \
->    --label "org.opencontainers.image.source=$$(jq -r -e '.repository.url | values' $$PACKAGE_JSON || jq -r '.repository.url | values' package.json)" \
+>   --label "org.opencontainers.image.source=$$(jq -r -e '.repository.url | values' $$PACKAGE_JSON || jq -r '.repository.url | values' package.json)" \
 >   --label "org.opencontainers.image.url=$$(jq -r -e '.homepage | values' $$PACKAGE_JSON || jq -r '.homepage | values' package.json)" \
 >   --label "org.opencontainers.image.vendor=https://cm4all.com" \
 >   --label "org.opencontainers.image.licenses=$$(jq -r -e '.license | values' $$PACKAGE_JSON || jq -r '.license | values' package.json)" \
@@ -73,7 +73,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > 
 > $$(echo -n "---")
 > 
-> $$(docker image ls $$DOCKER_IMAGE:$$PACKAGE_VERSION)
+> $$(docker image ls --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedAt}}\t{{.Size}}" $$DOCKER_IMAGE:$$PACKAGE_VERSION)
 > EOF
 
 # HELP<<EOF
@@ -151,9 +151,9 @@ docker-push-%: packages/docker/$$*/
 >      `
 >     echo "$$DATA" && $(CURL) \
 >       -H "Content-Type: application/json" \
->        -H "Authorization: JWT $${JWT_TOKEN}" \
+>       -H "Authorization: JWT $${JWT_TOKEN}" \
 >       -X PATCH \
->        --data "$$DATA" \
+>       --data "$$DATA" \
 >       "https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/" \
 >     | jq '{ description, full_description }'
 >      echo '[done]'
