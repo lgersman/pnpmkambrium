@@ -94,16 +94,18 @@ function render_markdown() {
   if (command -v "$help" 1 > /dev/null); then
     # if markdown file is a executable : execute it and interpret its output as markdown
     # $help | $script_dir/bat --language=md --paging=always --style=plain --color=always -
-    $help | $script_dir/glow -l -s auto -w 120 -
+    help=$($help)
   elif [[ -f "$help" ]]; then
     # if its a regular markdown file 
     # $script_dir/bat --paging=always --style=plain --color=always "$help"
-    $script_dir/glow -l -s auto -w 120 "$help"
+    help=$(cat $help)
   else
     # otherwise interpret content as markdown content
     # echo "$help" | $script_dir/bat --language=md --paging=always --style=plain --color=always -
-    echo "$help" | $script_dir/glow -l -s auto -w 120 -
+    :
   fi
+
+  echo "$help" | $script_dir/glow -l -s auto -w 120 -
 }
 
 # executed on enter key from fzf
