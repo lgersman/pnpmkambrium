@@ -95,7 +95,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
         -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
         -e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
-				-e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
+        -e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
         --mount type=bind,source=$$(pwd),target=/data \
         -u $$(id -u):$$(id -g) \
         -p 3000:3000 -p 3001:3001 \
@@ -103,10 +103,10 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >    fi
 >    docker run --rm -it \
       -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
-			-e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
-			-e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
-			-e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
-			-e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
+      -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
+      -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
+      -e "MDBOOK_OUTPUT__HTML__edit_url_template=$$MDBOOK_GIT_URL_TEMPLATE" \
+      -e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
       --mount type=bind,source=$$(pwd),target=/data \
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build $(@D)
