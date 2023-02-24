@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+make help FORMAT=markdown

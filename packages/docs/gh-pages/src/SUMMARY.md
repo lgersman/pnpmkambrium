@@ -6,6 +6,8 @@
 
 [Quickstart](./quickstart.md)
 
+[Targets](./targets.md)
+
 # Docker images
 
 - [pnpmkambrium/fzf](./packages/docker/fzf/index.md)
