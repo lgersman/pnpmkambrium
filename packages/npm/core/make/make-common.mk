@@ -41,6 +41,11 @@ export DOCKER_FLAGS := -q
 MAKEFLAGS += --warn-undefined-variables
 
 #
+# suppress "entering directory ..." messages
+#
+MAKEFLAGS += --no-print-directory
+
+#
 # always execute targets as a single shell script (i.e. : not line by line) 
 #
 .ONESHELL:
@@ -111,7 +116,7 @@ CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 
 KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) package.json
 
 # generic dependency for sub package targets (package/*/*/)
-KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info
+KAMBRIUM_SUB_PACKAGE_DEPS = $(TEMPLATE_TARGETS) $$(@D)/build-info 
 
 # generic dependency for all sub packages flavors (package/*/)
 KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/))
