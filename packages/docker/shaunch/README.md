@@ -1,6 +1,6 @@
 [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch) is a launcher for the terminal
 
-It's based on [fzf](https://github.com/junegunn/fzf) and ~~[batcat](https://github.com/sharkdp/bat)~~[batcat](https://github.com/charmbracelet/glow)
+It's based on [fzf](https://github.com/junegunn/fzf) and bash/jq :-)
 
 @TODO: add link to docker demo gif
 
