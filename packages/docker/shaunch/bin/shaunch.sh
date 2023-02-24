@@ -8,7 +8,7 @@
 # Example: 
 # @TODO:
 #
-# Requires: wget, jq, bat/batcat (will be installed if not present), fzf >= 0.29.0 (will be installed if not present)
+# Requires: wget, jq, fzf >= 0.29.0 (will be installed if not present)
 #
 # Author: Lars Gersmann<lars.gersmann@cm4all.com>
 # Created: 2022-12-02
@@ -21,28 +21,6 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 # download latest fzf 
 if ! (command -v "$script_dir/fzf" 1 > /dev/null); then
   (cd "$script_dir/.." && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin)
-fi
-
-# # download latest bat/batcat
-# if ! (command -v "$script_dir/bat" 1 > /dev/null); then
-#   curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | \
-#     grep "browser_download_url.*-i686-unknown-linux-musl.tar.gz" | \
-#     cut -d : -f 2,3 | \
-#     tr -d \" | \
-#     wget -i - -qO - | \
-#     tar -zxvf - --strip-components=1 -C $script_dir --wildcards */bat 
-# fi
-
-# download latest glow if not available
-if ! (command -v "$script_dir/glow" 1 > /dev/null); then
-  curl -s https://api.github.com/repos/charmbracelet/glow/releases/latest | \
-    grep "browser_download_url.*_linux_amd64*.deb" | \
-    cut -d : -f 2,3 | \
-    tr -d \" | \
-    wget -i - -q && \
-  ar x *.deb data.tar.gz && \
-  tar -zxf data.tar.gz --strip-components=3 -C $script_dir ./usr/bin/glow && \
-  rm -f data.tar.gz *.deb
 fi
 
 help() {
@@ -87,25 +65,49 @@ function scan_commands() {
   echo $json | jq .
 }
 
+# function duplicated from @pnpmkambrium/core
+function kambrium:render_markdown() {
+  local text=$1
+
+  # highlight text between '`'
+  text=$(sed -E 's/(^|[^[:alnum:]_])`([^`]+)`([^[:alnum:]_]|$)/\1\\e[36m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '__' bold "\e[1mbold\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])__([^_]+)__([^[:alnum:]_]|$)/\1\\e[1m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '-' italic "\e[3mitalic\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])_([^_]+)_([^[:alnum:]_]|$)/\1\\e[3m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '~~' strike through  "\e[9mstrikethrough\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])~~([^_]+)~~([^[:alnum:]_]|$)/\1\\e[9m\2\\e[0m\3/g' <<< "$text")
+
+  # highlight markdown links and pure links between '[...]()' underline "\e[4munderline\e[0m"
+  #  `(\[.*\])(\((http)(?:s)?(\:\/\/).*\))` 
+  text=$(sed -E 's/(^|[^[:alnum:]_])(\[[^]]+\])?\((https?:[^)]+)\)([^[:alnum:]_]|$)/\1\\e[33m\2(\\e[0;4m\3\\e[33m)\\e[0m\4/g' <<< "$text")
+
+  # highlight headings (#-#####) "\e[1bold\e[0m"
+  text=$(sed -E 's/^(#{1,5})[[:space:]]([^$]+)$/\\e[1;34m\1 \2\\e[0m/g' <<< "$text")
+
+  printf "%s" "$text"
+}
+
 # executed on preview by markdown
 function render_markdown() {
   local help=$(echo "$COMMANDS" | jq --arg caption "$1" -r '.[] | select(.caption==$caption).help')
 
   if (command -v "$help" 1 > /dev/null); then
     # if markdown file is a executable : execute it and interpret its output as markdown
-    # $help | $script_dir/bat --language=md --paging=always --style=plain --color=always -
     help=$($help)
   elif [[ -f "$help" ]]; then
     # if its a regular markdown file 
-    # $script_dir/bat --paging=always --style=plain --color=always "$help"
     help=$(cat $help)
   else
     # otherwise interpret content as markdown content
-    # echo "$help" | $script_dir/bat --language=md --paging=always --style=plain --color=always -
     :
   fi
 
-  echo "$help" | $script_dir/glow -l -s auto -w 120 -
+  help=$(kambrium:render_markdown "$help")
+  echo -e "$help"
 }
 
 # executed on enter key from fzf
@@ -251,6 +253,7 @@ PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown {}"
 # see https://github.com/junegunn/fzf/issues/3089#issuecomment-1353158088 for the $PPID thingie
 cmd=$("$script_dir/fzf" \
   --reverse \
+  --preview-window wrap \
   --border-label "$BORDER_LABEL" \
   --preview-label "$PREVIEW_LABEL" \
   --no-sort \
@@ -259,7 +262,7 @@ cmd=$("$script_dir/fzf" \
   --no-info \
   --exit-0 \
   --bind "Enter:execute(export _shaunch_pid=\$PPID; '${BASH_SOURCE[0]}' execute {} >/dev/tty)" \
-  --prompt='filter: ' \
+  --prompt='Filter: ' \
   --header-lines=3 \
   --ansi \
   --preview-window=80% \

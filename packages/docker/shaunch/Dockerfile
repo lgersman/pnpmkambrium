@@ -17,22 +17,6 @@ RUN apt update && \
 
 RUN cd /usr/local && wget -qO- https://raw.githubusercontent.com/junegunn/fzf/master/install | $SHELL -s -- --bin
 
-# RUN wget -qO- https://api.github.com/repos/sharkdp/bat/releases/latest | \
-#   grep "browser_download_url.*-i686-unknown-linux-musl.tar.gz" | \
-#   cut -d : -f 2,3 | \
-#   tr -d \" | \
-#   wget -i - -qO - | \
-#   tar -zxvf - --strip-components=1 -C /usr/local/bin --wildcards */bat
-
-RUN wget -qO- https://api.github.com/repos/charmbracelet/glow/releases/latest | \
-  grep "browser_download_url.*_linux_amd64*.deb" | \
-  cut -d : -f 2,3 | \
-  tr -d \" | \
-  wget -i - -q && \
-  ar x *.deb data.tar.gz && \
-  tar -zxf data.tar.gz --strip-components=3 -C /usr/local/bin ./usr/bin/glow && \
-  rm -f data.tar.gz *.deb
-
 # environment variable acts as marker for shaunch to detect if running inside a docker container
 ENV SHAUNCH_DOCKERIZED=true
 
