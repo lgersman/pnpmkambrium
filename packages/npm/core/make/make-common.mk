@@ -116,7 +116,7 @@ CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 
 KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) package.json
 
 # generic dependency for sub package targets (package/*/*/)
-KAMBRIUM_SUB_PACKAGE_DEPS = $(TEMPLATE_TARGETS) $$(@D)/build-info 
+KAMBRIUM_SUB_PACKAGE_DEPS = $(KAMBRIUM_TEMPLATE_TARGETS) $$(@D)/build-info 
 
 # generic dependency for all sub packages flavors (package/*/)
 KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/))

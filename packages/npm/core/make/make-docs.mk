@@ -32,7 +32,7 @@ packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 #
 #    will rebuild outdated sub package `packages/docs/gh-pages`
 # EOF
-packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
+packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 
 #
 # build docs package
