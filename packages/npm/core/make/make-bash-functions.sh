@@ -18,6 +18,37 @@ function kambrium:jq:first_non_empty_array() {
 }
 
 #
+# renders the given markdown text into escape sequence'd text suitable for the terminal
+# 
+# @param $1 string markdown text 
+# @return escape sequenced markdown text suitable for terminals   
+#
+function kambrium:render_markdown() {
+  local text=$1
+
+  # highlight text between '`'
+  text=$(sed -E 's/(^|[^[:alnum:]_])`([^`]+)`([^[:alnum:]_]|$)/\1\\e[36m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '__' bold "\e[1mbold\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])__([^_]+)__([^[:alnum:]_]|$)/\1\\e[1m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '-' italic "\e[3mitalic\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])_([^_]+)_([^[:alnum:]_]|$)/\1\\e[3m\2\\e[0m\3/g' <<< "$text")
+
+  # make text between '~~' strike through  "\e[9mstrikethrough\e[0m"
+  text=$(sed -E 's/(^|[^[:alnum:]_])~~([^_]+)~~([^[:alnum:]_]|$)/\1\\e[9m\2\\e[0m\3/g' <<< "$text")
+
+  # highlight markdown links and pure links between '[...]()' underline "\e[4munderline\e[0m"
+  #  `(\[.*\])(\((http)(?:s)?(\:\/\/).*\))` 
+  text=$(sed -E 's/(^|[^[:alnum:]_])(\[[^]]+\])?\((https?:[^)]+)\)([^[:alnum:]_]|$)/\1\\e[33m\2(\\e[0;4m\3\\e[33m)\\e[0m\4/g' <<< "$text")
+
+  # highlight headings (#-#####) "\e[1bold\e[0m"
+  text=$(sed -E 's/^(#{1,5})[[:space:]]([^$]+)$/\\e[1;34m\1 \2\\e[0m/g' <<< "$text")
+
+  printf "%s" "$text"
+}
+
+#
 # computes help for the Makefile
 # 
 # required environment variables:
@@ -71,14 +102,14 @@ function kambrium:help() {
   if [[ "${FORMAT:-}" == 'json' ]]; then
     JSON='[]'
     for TARGET in "${TARGETS[@]}"; do
-      HELP_TEXT=${HELP_TOPICS[$TARGET]}
       # HELP_TEXT=${HELP_TEXT//$'\n'/$'\\n'}
       # HELP_TEXT=${HELP_TEXT//$'\t'/$'\\t'}
-      if [[ "$TARGET" =~ % ]]; then 
-        printf -v HELP_TEXT_PREFACE '_(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)_\n\n' "%" 
-        HELP_TEXT="${HELP_TEXT_PREFACE}${HELP_TEXT}"
-      fi
-      HELP_TEXT=$(printf '# %s\n\n%s' "$TARGET" "$HELP_TEXT")
+
+      printf -v HELP_TEXT '# %s\n\nSyntax: `make [make-options] %s [make-variables]`' "$TARGET" "$TARGET"
+
+      [[ "$TARGET" =~ % ]] && printf -v HELP_TEXT '%s\n\n_(This is a generic target. You need to replace the %s wildcard with a existing package name.)_' "$HELP_TEXT" '`%`'
+
+      printf -v HELP_TEXT '%s\n\n%s' "$HELP_TEXT" "${HELP_TOPICS[$TARGET]}"
 
       JSON=$(echo "$JSON" | jq -r \
         --arg caption "$TARGET" \
@@ -88,55 +119,25 @@ function kambrium:help() {
       )
     done
     JSON=$JSON jq -n -r -s 'env.JSON|.'
-  elif [[ "${FORMAT:-}" == 'markdown' ]]; then
-    cat <<'EOL'
-# Syntax
-
-`make [make-options] [target] [make-variables] ...`
-
-# Targets
-
-EOL
-    if [[ "${#HELP_TOPICS[@]}" == '0' ]]; then
-      echo "No help annotated make targets found"
-    else
-      for TARGET in "${TARGETS[@]}"; do
-        printf '## %s\n\nSyntax: `make %s`%s' "${TARGET}" "${TARGET}"
-
-        [[ "$TARGET" =~ % ]] && printf '\n_(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)_' "%" 
-      
-        printf "\n\n"
-
-        HELP_TEXT=${HELP_TOPICS[$TARGET]}
-        printf '%s\n\n' "$HELP_TEXT"
-        # # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
-        # HELP_TEXT=${HELP_TOPICS[$TARGET]}
-        # # highlight text between '`'
-        # HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m`\1`\\033[0m/g' <<< "$HELP_TEXT")
-        # printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"
-      done
-    fi    
-  else
-    printf "Syntax: make [make-options] [target] [make-variables] ...\n\n" 
+  else 
+    printf -v text '# Syntax\n\n`make [make-options] [target] [make-variables] ...`\n\n# Targets\n\n'
 
     if [[ "${#HELP_TOPICS[@]}" == '0' ]]; then
-      echo "No help annotated make targets found"
+      printf -v text "%s_No help annotated make targets found._" "$text"
     else
-      printf "Targets:\n\n"
-
       for TARGET in "${TARGETS[@]}"; do
-        # printf "${TARGET}:\n${HELP_TOPICS[$TARGET]}\n\n" | cat
-        HELP_TEXT=${HELP_TOPICS[$TARGET]}
+        printf -v text '%s## %s\n\nSyntax: `make [make-options] %s [make-variables]`%s' "$text" "$TARGET" "$TARGET"
 
-        if [[ "$TARGET" =~ % ]]; then 
-          printf -v HELP_TEXT_PREFACE '(This is a generic target. You need to replace the "%s" wildcard with a existing package name.)\n\n' "%" 
-          HELP_TEXT="${HELP_TEXT_PREFACE}${HELP_TEXT}"
-        fi
+        [[ "$TARGET" =~ % ]] && printf -v text '%s\n\n_(This is a generic target. You need to replace the %s wildcard with a existing package name.)_' "$text" '`%`'
 
-        # highlight text between '`'
-        HELP_TEXT=$(sed -E 's/`([^`]+)`/\\033[36m`\1`\\033[0m/g' <<< "$HELP_TEXT")
-        printf "\033[1m%s\033[0m\n\n%s\n\n" "${TARGET}" "\t${HELP_TEXT//$'\n'/$'\n\t'}"
+        printf -v text "%s\n\n%s\n\n" "$text" "${HELP_TOPICS[$TARGET]}"
       done
     fi
+
+    if [[ "${FORMAT:-}" != 'markdown' ]]; then
+      text=$(kambrium:render_markdown "$text")
+    fi
+
+    printf "%s" "$text"
   fi
 }

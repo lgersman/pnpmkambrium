@@ -32,7 +32,7 @@ ESLINT := $(PNPM) eslint --ignore-path='$(CURDIR)/.lintignore' --no-error-on-unm
 # project (path) specific temp directory outside of the checked out repository
 KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDIR))")
 # delete all KAMBRIUM_TMPDIR's older than one day
-$(shell find $$(dirname $(KAMBRIUM_TMPDIR))/*.pnpmkambrium-$$(basename $(CURDIR)) -type d -ctime +1 -exec echo '{}' \;)
+# doesnt work yet : $(shell find $$(dirname $(KAMBRIUM_TMPDIR))/*.pnpmkambrium-$$(basename $(CURDIR)) -type d -ctime +1 -exec echo '{}' \;)
 
 -include .env
 
@@ -134,16 +134,16 @@ help:
 > @
 > # import kambrium bash function library
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
-> help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-text}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
-> if [[ "$${FORMAT:-text}" == 'text' ]]; then
+> help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
+> if [[ "$${FORMAT:-}" == '' ]]; then
 > 	if [[ "$${PAGER:-}" != 'false' ]]; then
 > 		echo -e "$$help" | less -r
 > 	else 
 >   	echo -e "$$help" 
 > 	fi
-> elif [[ "$${FORMAT:-text}" == 'json' ]]; then 
+> elif [[ "$${FORMAT:-}" == 'json' ]]; then 
 > 	echo $$help | jq .
-> elif [[ "$${FORMAT:-text}" == 'markdown' ]]; then
+> elif [[ "$${FORMAT:-}" == 'markdown' ]]; then
 >   echo "$$help"
 > else 
 >		echo "unknown FORMAT option(='$$FORMAT')" >&2 && false
@@ -166,7 +166,7 @@ interactive:
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-json}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
 > HELP_FILE="$$(mktemp)"
 > echo "$$help" > $$HELP_FILE
-> ./packages/docker/shaunch/bin/shaunch.sh -c "$$HELP_FILE" ||:
+> ./packages/docker/shaunch/bin/shaunch.sh --border-label " Make " --preview-label " Info " --title "Targets" -c "$$HELP_FILE" ||:
 > trap "rm -f -- $$HELP_FILE" EXIT
 
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
