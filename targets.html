@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Targets - pnpmkambrium</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="documentation of the pnpmkambrium project">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="about.html">About</a></li><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="quickstart.html">Quickstart</a></li><li class="chapter-item expanded affix "><a href="targets.html" class="active">Targets</a></li><li class="chapter-item expanded affix "><li class="part-title">Docker images</li><li class="chapter-item expanded "><a href="packages/docker/fzf/index.html">pnpmkambrium/fzf</a></li><li class="chapter-item expanded "><a href="packages/docker/gitlog-per-package/index.html">pnpmkambrium/gitlog-per-package</a></li><li class="chapter-item expanded "><a href="packages/docker/glow/index.html">pnpmkambrium/glow</a></li><li class="chapter-item expanded "><a href="packages/docker/gum/index.html">pnpmkambrium/gum</a></li><li class="chapter-item expanded "><a href="packages/docker/mdbook/index.html">pnpmkambrium/mdbook</a></li><li class="chapter-item expanded "><a href="packages/docker/shaunch/index.html">pnpmkambrium/shaunch</a></li><li class="chapter-item expanded affix "><li class="part-title">NPM packages</li><li class="chapter-item expanded "><a href="packages/npm/core/index.html">@pnpmkambrium/core</a></li><li class="chapter-item expanded "><a href="packages/npm/create/index.html">@pnpmkambrium/create</a></li><li class="spacer"></li><li class="chapter-item expanded "><div>Appendix</div></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pnpmkambrium</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/lgersman/pnpmkambrium" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docs/gh-pages/src/targets.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
+<p><code>make [make-options] [target] [make-variables] ...</code></p>
+<h1 id="targets"><a class="header" href="#targets">Targets</a></h1>
+<h2 id="build"><a class="header" href="#build">build</a></h2>
+<p>Syntax: <code>make [make-options] build [make-variables]</code></p>
+<p>convenience alias for target <code>packages/</code></p>
+<h2 id="clean"><a class="header" href="#clean">clean</a></h2>
+<p>Syntax: <code>make [make-options] clean [make-variables]</code></p>
+<p>delete resources matching <code>.gitignore</code> entries except</p>
+<ul>
+<li><code>./.node_modules</code></li>
+<li>any <code>.env</code> file (recursive)</li>
+<li><code>./.pnpm-store</code></li>
+<li><code>./*.code-workspace</code></li>
+</ul>
+<h2 id="dev-docs-"><a class="header" href="#dev-docs-">dev-docs-%</a></h2>
+<p>Syntax: <code>make [make-options] dev-docs-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>start dev server for a docs sub package in <code>packages/docs/</code></p>
+<p>please note that this target <strong>MUST</strong> be called with make option <code>-b</code>.</p>
+<p>using this target enables you to edit a docs sub package and preview it in the browser at your fingertips</p>
+<p>example: <code>make -B dev-docs-foo</code></p>
+<pre><code> will start the dev server for docs sub package `foo`.
+ Every change in `packages/docs/foo` will result in rebuild/reloading the docs in the browser.
+</code></pre>
+<h2 id="distclean"><a class="header" href="#distclean">distclean</a></h2>
+<p>Syntax: <code>make [make-options] distclean [make-variables]</code></p>
+<p>delete any file that are a result of making the project and not matched by <code>.gitignore</code> except :</p>
+<ul>
+<li>any <code>.env</code> file (recursive)</li>
+<li><code>./*.code-workspace</code></li>
+</ul>
+<p>ATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly</p>
+<h2 id="docker-push"><a class="header" href="#docker-push">docker-push</a></h2>
+<p>Syntax: <code>make [make-options] docker-push [make-variables]</code></p>
+<p>push docker images to registry</p>
+<p>see supported environment variables on target <code>docker-push-%</code></p>
+<h2 id="docker-push-"><a class="header" href="#docker-push-">docker-push-%</a></h2>
+<p>Syntax: <code>make [make-options] docker-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>push docker image to registry.</p>
+<p>target will also update</p>
+<ul>
+<li>the image short description using the <code>description</code> property of sub package file <code>package.json</code></li>
+<li>image long description using sub package file <code>README.md</code></li>
+</ul>
+<p>at the docker registry using</p>
+<p>supported variables are:</p>
+<ul>
+<li><code>DOCKER_TOKEN</code> (required) can be the docker password (a docker token is preferred for security reasons)</li>
+<li><code>DOCKER_USER</code> use the docker identity/username, your docker account email will not work</li>
+<li><code>DOCKER_REPOSITORY</code> (optional,default=sub package name part after minus)</li>
+<li><code>DOCKER_REGISTRY</code> (optional,default=<code>registry.hub.docker.com</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar</code></p>
+<p>will build/tag (if outdated) the docker image and</p>
+<h2 id="gh-pages-push-"><a class="header" href="#gh-pages-push-">gh-pages-push-%</a></h2>
+<p>Syntax: <code>make [make-options] gh-pages-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>pushes a single docs sub package <code>build</code> directory output to git branch <code>gh-pages</code>.</p>
+<p>it the docs package is outdated, it will be rebuild before publishing.</p>
+<p>after initial call to this target ensure the connected remote github repo has github pages properly configured
+(see https://github.com/lgersman/[your-project]/settings/pages)
+Source: <code>Deploy from branch</code>
+Branch: <code>gh-pages</code> / <code>/</code> (root folder in branch <code>gh-pages</code>)</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>GIT_REMOTE_REPOSITORY_NAME</code> (optional, default=<code>origin</code>) the remote repository to push to</li>
+</ul>
+<p>if the target repo is at GitHub: - <code>GITHUB_TOKEN</code> (required) can be the github password (a github token is preferred for security reasons) - <code>GITHUB_OWNER</code> (required) github username - <code>GITHUB_REPO</code> (optional,default=property <code>repository.url</code> in root file <code>package.json</code>) GitHub repository name</p>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make gh-pages-push-gh-pages GITHUB_OWNER=foo GITHUB_TOKEN=bar</code></p>
+<p>will publish the build output of docs sub package <code>gh-pages</code> located in <code>packages/docs/gh-pages</code> to
+the GitHub repository (annotated in property <code>repository.url</code> in root file <code>package.json</code>).</p>
+<h2 id="github-details-push"><a class="header" href="#github-details-push">github-details-push</a></h2>
+<p>Syntax: <code>make [make-options] github-details-push [make-variables]</code></p>
+<p>syncs informational data like description/tags/etc. to GitHub repository metadata</p>
+<ul>
+<li>sync repo description and tags from root file <code>package.json</code></li>
+<li>enable GitHub pages if a docs sub package <code>packages/docs/gh-pages</code> exists and <code>packages/docs/gh-pages/package.json</code> property 'private' is falsy</li>
+</ul>
+<p>supported variables are :</p>
+<ul>
+<li><code>GITHUB_TOKEN</code> (required) can be the GitHub password (a GitHub token is preferred for security reasons)</li>
+<li><code>GITHUB_OWNER</code> (required) GitHub username</li>
+<li><code>GIT_REMOTE_REPOSITORY_NAME</code> (optional, default=<code>origin</code>) the remote repository to push to</li>
+<li><code>GITHUB_REPO</code> (optional,default=property <code>repository.url</code> in root file <code>package.json</code>) GitHub repository name</li>
+<li><code>GITHUB_REPO_DESCRIPTION</code> (optional,default=property <code>description</code> in root file <code>package.json</code>)</li>
+<li><code>GITHUB_REPO_TOPICS</code> (optional,default=property <code>keys</code> in root file <code>package.json</code>)</li>
+<li><code>GITHUB_REPO_HOMEPAGE</code> (optional,default=property <code>homepage</code> in root file <code>package.json</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make --silent github-details-push</code></p>
+<p>will update the GitHub repository metadata with the provided data</p>
+<h2 id="help"><a class="header" href="#help">help</a></h2>
+<p>Syntax: <code>make [make-options] help [make-variables]</code></p>
+<p>prints the help screen</p>
+<p>by default the help will be rendered for the terminal using a few ansi escape sequences for highlighting</p>
+<p>to process the help information in other tools you can use the <code>FORMAT</code> variable to output help in JSON format.</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>VERBOSE</code> (optional, default=``) enables verbose help parsing informations</li>
+<li><code>FORMAT</code> (optional, default=<code>text</code>) the output format of the help information
+<ul>
+<li><code>text</code> will print help in text format to terminal
+<ul>
+<li>addional option <code>PAGER=false</code> may be used to output help without pagination</li>
+</ul>
+</li>
+<li><code>json</code> will print help in json format for further processing</li>
+<li><code>markdown</code> will print help in markdown format for integrating output in static documentation</li>
+</ul>
+</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<h2 id="interactive"><a class="header" href="#interactive">interactive</a></h2>
+<p>Syntax: <code>make [make-options] interactive [make-variables]</code></p>
+<p>opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)</p>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<h2 id="lint"><a class="header" href="#lint">lint</a></h2>
+<p>Syntax: <code>make [make-options] lint [make-variables]</code></p>
+<p>lint sources</p>
+<h2 id="lint-fix"><a class="header" href="#lint-fix">lint-fix</a></h2>
+<p>Syntax: <code>make [make-options] lint-fix [make-variables]</code></p>
+<p>lint the project and apply fixes provided by the linters</p>
+<h2 id="npm-push"><a class="header" href="#npm-push">npm-push</a></h2>
+<p>Syntax: <code>make [make-options] npm-push [make-variables]</code></p>
+<p>pushes all npm sub packages to a npm registry</p>
+<p>see supported environment variables on target <code>npm-push-%</code></p>
+<p>example: `make npm-push NPM_TOKEN=your-token'</p>
+<p>pushes all npm sub packages in <code>packages/npm/</code> to the npm registry</p>
+<h2 id="npm-push-"><a class="header" href="#npm-push-">npm-push-%</a></h2>
+<p>Syntax: <code>make [make-options] npm-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>push npm package to registry</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>NPM_TOKEN</code> (required) can be the npm password (a npm token is preferred for security reasons)</li>
+<li><code>NPM_REGISTRY</code> (optional, default is <code>https://registry.npmjs.org/</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>NPM_TOKEN=your-token make npm-push-foo</code></p>
+<p>to publish npm sub package <code>foo</code> in <code>packages/npm/foo</code> to the npm registry</p>
+<h2 id="packages"><a class="header" href="#packages">packages/</a></h2>
+<p>Syntax: <code>make [make-options] packages/ [make-variables]</code></p>
+<p>build all outdated sub packages of any flavor</p>
+<h2 id="packagesdocker"><a class="header" href="#packagesdocker">packages/docker/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docker/ [make-variables]</code></p>
+<p>build and tag all outdated docker images in <code>packages/docker/</code></p>
+<h2 id="packagesdocker-1"><a class="header" href="#packagesdocker-1">packages/docker/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docker/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build and tag outdated docker image sub package by name.</p>
+<p>image metadata like author/description/version will be taken from sub package file <code>package.json</code></p>
+<p>example: <code>make packages/docker/foo/</code></p>
+<p>will build the docker image in sub package <code>packages/docker/foo</code></p>
+<h2 id="packagesdocs"><a class="header" href="#packagesdocs">packages/docs/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docs/ [make-variables]</code></p>
+<p>build all outdated doc sub packages in <code>packages/docs/</code></p>
+<p>see supported environment variables on target <code>packages/docs/%/</code></p>
+<h2 id="packagesdocs-1"><a class="header" href="#packagesdocs-1">packages/docs/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docs/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build outdated docs sub package by name</p>
+<p>task utilizes various informations from <code>package.json</code> like authors/contributors/title/etc.</p>
+<p>the following mdbook configuration options can be provided by environment variables:</p>
+<ul>
+<li><code>MDBOOK_GIT_REPOSITORY_URL</code> (optional, default=repository.url from (sub|root)package.json)</li>
+<li><code>MDBOOK_GIT_REPOSITORY_ICON</code> (optional, default=<code>fa-code-fork</code>)</li>
+<li><code>MDBOOK_GIT_URL_TEMPLATE</code> (optional),</li>
+<li><code>MDBOOK_NO_SECTION_LABEL</code> (optional, default=<code>true</code>) set to <code>false</code> to enable numeric section labels in the table of contents column</li>
+<li><code>MDBOOK_AUTHORS</code> (optional) json array of author names. falling back to package.json properties <code>authors.name</code> / <code>contributors</code></li>
+<li><code>MDBOOK_TITLE</code> (optional, defaults to <code>package.json</code> property <code>name</code>)</li>
+<li><code>MDBOOK_DESCRIPION</code> (optional, defaults to <code>package.json</code> property <code>description</code>)
+(see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>MDBOOK_AUTHORS='[&quot;foo bar&quot;]' make packages/docs/gh-pages/</code></p>
+<p>will rebuild outdated sub package <code>packages/docs/gh-pages</code></p>
+<h2 id="packagesnpm"><a class="header" href="#packagesnpm">packages/npm/</a></h2>
+<p>Syntax: <code>make [make-options] packages/npm/ [make-variables]</code></p>
+<p>build all outdated npm sub packages in <code>packages/npm/</code></p>
+<h2 id="packagesnpm-1"><a class="header" href="#packagesnpm-1">packages/npm/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/npm/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build outdated npm package by name</p>
+<p>example: <code>make packages/npm/foo/</code></p>
+<p>will build the npm sub package in <code>packages/npm/foo</code></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="quickstart.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="packages/docker/fzf/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="quickstart.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="packages/docker/fzf/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </body>
+</html>

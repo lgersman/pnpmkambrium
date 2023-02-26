@@ -1,0 +1,447 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>pnpmkambrium/shaunch - pnpmkambrium</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="documentation of the pnpmkambrium project">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../../../favicon.svg">
+        <link rel="shortcut icon" href="../../../favicon.png">
+        <link rel="stylesheet" href="../../../css/variables.css">
+        <link rel="stylesheet" href="../../../css/general.css">
+        <link rel="stylesheet" href="../../../css/chrome.css">
+        <link rel="stylesheet" href="../../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../../highlight.css">
+        <link rel="stylesheet" href="../../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../../about.html">About</a></li><li class="chapter-item expanded affix "><a href="../../../introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../../quickstart.html">Quickstart</a></li><li class="chapter-item expanded affix "><a href="../../../targets.html">Targets</a></li><li class="chapter-item expanded affix "><li class="part-title">Docker images</li><li class="chapter-item expanded "><a href="../../../packages/docker/fzf/index.html">pnpmkambrium/fzf</a></li><li class="chapter-item expanded "><a href="../../../packages/docker/gitlog-per-package/index.html">pnpmkambrium/gitlog-per-package</a></li><li class="chapter-item expanded "><a href="../../../packages/docker/glow/index.html">pnpmkambrium/glow</a></li><li class="chapter-item expanded "><a href="../../../packages/docker/gum/index.html">pnpmkambrium/gum</a></li><li class="chapter-item expanded "><a href="../../../packages/docker/mdbook/index.html">pnpmkambrium/mdbook</a></li><li class="chapter-item expanded "><a href="../../../packages/docker/shaunch/index.html" class="active">pnpmkambrium/shaunch</a></li><li class="chapter-item expanded affix "><li class="part-title">NPM packages</li><li class="chapter-item expanded "><a href="../../../packages/npm/core/index.html">@pnpmkambrium/core</a></li><li class="chapter-item expanded "><a href="../../../packages/npm/create/index.html">@pnpmkambrium/create</a></li><li class="spacer"></li><li class="chapter-item expanded "><div>Appendix</div></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pnpmkambrium</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/lgersman/pnpmkambrium" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docs/gh-pages/src/packages/docker/shaunch/index.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="pnpmkambriumshaunch"><a class="header" href="#pnpmkambriumshaunch">pnpmkambrium/shaunch</a></h1>
+<ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#installation">Installation</a>
+<ul>
+<li><a href="#local">Local</a></li>
+</ul>
+</li>
+<li><a href="#configuration">Configuration</a>
+<ul>
+<li><a href="#static-configuration">Static configuration</a></li>
+<li><a href="#populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files">Populating commands by reading a directory containing scripts and markdown files</a></li>
+<li><a href="#dynamic-commands-evaluation">Dynamic commands evaluation</a>
+<ul>
+<li><a href="#exec-property"><code>exec</code> property</a></li>
+</ul>
+</li>
+<li><a href="#prompt-property"><code>prompt</code> property</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#development">Development</a></li>
+<li><a href="#limitations">Limitations</a></li>
+<li><a href="#faq">FAQ</a></li>
+</ul>
+<p><a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> is a launcher for the terminal</p>
+<p>It's based on <a href="https://github.com/junegunn/fzf">fzf</a> and bash/jq :-)</p>
+<p>@TODO: add link to docker demo gif</p>
+<p>I wrote <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> because i needed a tool make terminal commands available in a user friendly manner.</p>
+<h1 id="features"><a class="header" href="#features">Features</a></h1>
+<ul>
+<li>
+<p>shows both the available commands and their documentation in the terminal</p>
+</li>
+<li>
+<p>commands can be started by just pressing <code>enter</code></p>
+</li>
+<li>
+<p>command documentation supports <a href="https://www.markdownguide.org/">markdown</a> rendered to the terminal</p>
+</li>
+<li>
+<p>documentation can be provided as static markdown files or even as executables outputting <a href="https://www.markdownguide.org/">markdown</a>. The latter enables you to display dynamic markdown files containing a status or whatever.</p>
+</li>
+<li>
+<p>can be used as :</p>
+<ul>
+<li>pre-packaged docker image</li>
+<li><a href="https://github.com/lgersman/pnpmkambrium/blob/develop/packages/docker/shaunch/bin/shaunch.sh">self contained bash script</a>
+<ul>
+<li><a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> will be downloaded/installed on demand to a <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> private directory</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>when started with <code>-c &lt;directory&gt;</code> the contained scripts and documentation files will be out of the box presented to the user (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory">static directory example</a>). Output will be assumed to be JSON according to the shaunch json schema definition</p>
+</li>
+<li>
+<p>when started with <code>-c &lt;executable&gt;</code> the executable is executed and its output is consumed to gather the available scripts and documentation (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic script example</a>). Output will be assumed to be JSON according to the shaunch json schema definition.</p>
+</li>
+<li>
+<p>when started with a regular file the file will be assumed to be JSON according to the shaunch json schema definition</p>
+</li>
+</ul>
+<h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<p>Shaunch is available</p>
+<ul>
+<li>
+<p>as self contained Bash script</p>
+</li>
+<li>
+<p>as preinstalled docker image <code>pnpmkambrium/shaunch</code> containing Shaunch and its dependencies</p>
+</li>
+</ul>
+<h2 id="local"><a class="header" href="#local">Local</a></h2>
+<p>Shaunch can be executed locally by just executing the shaunch script. Any dependencies will be downloaded on demand.</p>
+<h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>The software can be configured using JSON.</p>
+<p>The JSON format is described <a href="./docs/shaunch.schema.json">here</a></p>
+<pre><code class="language-json">{
+  &quot;$id&quot;: &quot;https://json-schema.org/draft/2020-12/output/schema&quot;,
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema&quot;,
+  &quot;title&quot;: &quot;pnpmkambrium/shaunch configuration file specification&quot;,
+  &quot;description&quot;: &quot;describes the json configuration expected by pnpmkambrium/shaunch&quot;,
+  &quot;items&quot;: {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+      &quot;caption&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;Title of the entry. Will be displayed by fzf to navigate to the help&quot;
+      },
+      &quot;help&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;Expected value can be a existing markdown file, an executable file returning markdown or just markdown contents. Please note that the markdown content will be substituted using bash's built-in echo command (i.e. the markdown can be dynamic !)&quot;,
+        &quot;examples&quot;: [
+          &quot;# foo bar\n\nCommand 'foo bar' will output 'foo bar' on the terminal&quot;,
+          &quot;./scripts/foo.sh&quot;,
+          &quot;./docs/foobar.md&quot;
+        ]
+      },
+      &quot;exec&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;When given, the exec value will be executed without leaving shaunch. Property can be a executable file or just bash code&quot;
+      },
+      &quot;prompt&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;When given, shaunch will exit and write the prompt to the next terminal prompt.&quot;
+      }
+    },
+    &quot;required&quot;: [&quot;caption&quot;, &quot;help&quot;]
+  },
+  &quot;additionalItems&quot;: false,
+  &quot;type&quot;: &quot;array&quot;
+}
+</code></pre>
+<h2 id="static-configuration"><a class="header" href="#static-configuration">Static configuration</a></h2>
+<p>Providing a file with the following contents using the <code>-c</code> option to <code>shaunch</code> will open up a terminal ui (utilizing <code>fzf</code>) showing all commands.</p>
+<p>By selecting a command, its markdown help will be rendered in the terminal.</p>
+<p>By htting <code>Enter</code> the <code>exec</code> and <code>prompt</code> parameters will be executed/displayed if given.</p>
+<pre><code class="language-json">[
+  {
+    // caption is what will be shown as command title
+    &quot;caption&quot;: &quot;Mount&quot;,
+    // help for this command will be evaluated by executing script ./docs/mount.md.sh
+    // the script is expected to return markdown
+    &quot;help&quot;: &quot;./docs/mount.md.sh&quot;,
+    // the exec content will be executed within shaunch. after exiting the script the shaunch ui will appear again
+    &quot;exec&quot;: &quot;echo 'mounted'\nPress any key to continue ...'; read  -n 1&quot;
+  },
+  {
+    &quot;caption&quot;: &quot;Status&quot;,
+    // help for this command will be rendered from a markdown file
+    &quot;help&quot;: &quot;./docs/status.md&quot;
+    // this command looks nonsense without `exec` nor `prompt` but ... the markdown will be subsituted by bash before rendering
+    // that means any `$(...)`/$VARIABLE expression will be replaced by the computed value
+    // example : if your markdown contains `$(uname -a)` it will be rendered as whatever `uname -a` returns on your machine
+  },
+  {
+    &quot;caption&quot;: &quot;Exit&quot;,
+    // help for this command is inline markdown
+    &quot;help&quot;: &quot;# Exit\n\nQuits the program&quot;,
+    // exec contains a function call exported by shaunch forcing shaunch to exit when this command gets trigged (by hitting `Enter`)
+    &quot;exec&quot;: &quot;shaunch: exit&quot;
+  },
+  {
+    &quot;caption&quot;: &quot;Backup&quot;,
+    &quot;help&quot;: &quot;# Backup\n\nstarts the backup.\n\nHit enter to copy the command to the next prompt&quot;,
+    // if this action gets trigegred, the prompt value will be written after the next terminal prompt so that the user can decide if he wahts to execute the command by manually confirm with `Enter` in the terminal
+    &quot;prompt&quot;: &quot;./backup.sh&quot;
+  }
+]
+</code></pre>
+<h2 id="populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files"><a class="header" href="#populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files">Populating commands by reading a directory containing scripts and markdown files</a></h2>
+<p>If the path provided by option <code>-c</code> points to an directory shaunch will populate all executables and same named markdown files into JSON and render them.</p>
+<p>see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory">static directory example</a></p>
+<h2 id="dynamic-commands-evaluation"><a class="header" href="#dynamic-commands-evaluation">Dynamic commands evaluation</a></h2>
+<p>If the path provided by option <code>-c</code> points to an executable file, it will be executed. Shaunch expects that the script returns the Shaunch JSON configuration.</p>
+<p>Using this feature you can provide dynamic command configurations generated by a script.</p>
+<p>see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic script example</a></p>
+<h3 id="exec-property"><a class="header" href="#exec-property"><code>exec</code> property</a></h3>
+<p>Shaunch exposes some Bash functions callable in scripts/code of the <code>exec</code> command property using <code>shaunch: [operation]</code></p>
+<p>Available operations :</p>
+<ul>
+<li>
+<p><code>exit</code> will exit shaunch</p>
+<p>example: <code>shaunch: exit</code></p>
+</li>
+</ul>
+<h2 id="prompt-property"><a class="header" href="#prompt-property"><code>prompt</code> property</a></h2>
+<p>The prompt property allows you to define a command placed at the next prompt after shaunch exited.</p>
+<p>If <code>prompt</code> is given, hitting <code>Enter</code> will exit Shaunch and place the <code>prompt</code> value at your next prompt.</p>
+<h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<pre><code>docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
+</code></pre>
+<ul>
+<li>
+<p>run using a docker-compose file :</p>
+<ul>
+<li>create docker-compose file :</li>
+</ul>
+<pre><code>version: '3.3'
+services:
+  main:
+    image: pnpmkambrium/shaunch:latest
+    stdin_open: true
+    tty:true
+    volumes:
+      - type: bind
+        source: ${PWD}
+        target: /app
+</code></pre>
+<p>execute : <code>docker compose -f shaunch.yml run --rm main</code></p>
+</li>
+</ul>
+<h1 id="development"><a class="header" href="#development">Development</a></h1>
+<ul>
+<li>
+<p>execute script locally</p>
+<ul>
+<li>
+<p>by browsing a directory : <code>./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-directory/</code></p>
+</li>
+<li>
+<p>by executing a script: <code>./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-script/commands-by-script</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>build docker image : <code>make packages/docker/shaunch/</code></p>
+</li>
+<li>
+<p>using dockerized shaunch :</p>
+<ul>
+<li>
+<p>by browsing a directory : <code>docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-directory:/app pnpmkambrium/shaunch</code></p>
+</li>
+<li>
+<p>by executing a script: <code>docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-script:/app pnpmkambrium/shaunch -c /app/commands-by-script</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>build using the docker-compose file : <code>docker compose -f packages/docker/shaunch/docker-compose.yml build</code></p>
+</li>
+<li>
+<p>run <code>docker-compose run --rm main</code></p>
+</li>
+</ul>
+<h1 id="limitations"><a class="header" href="#limitations">Limitations</a></h1>
+<ul>
+<li>
+<p>The local bash script works right now only on amd64 linux machines because i did not figured out a way to install it's dependencies in a cross platform manner.</p>
+<p>@TODO: This can be easily fixed by downloading the correct <a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> binaries depending on the platform.</p>
+</li>
+<li>
+<p>writing to the next prompt using the <code>prompt</code> property will not work when executed from docker</p>
+</li>
+</ul>
+<h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<ul>
+<li>
+<p>How can I exit <code>shaunch</code> from a command ?</p>
+<p>Just call <code>shaunch: exit</code> in your command script (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic configuration example</a>). The <code>shaunch</code> command is a exported function exporting some operations like exiting.</p>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../../packages/docker/mdbook/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../../packages/npm/core/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../../packages/docker/mdbook/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../../packages/npm/core/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../../elasticlunr.min.js"></script>
+        <script src="../../../mark.min.js"></script>
+        <script src="../../../searcher.js"></script>
+
+        <script src="../../../clipboard.min.js"></script>
+        <script src="../../../highlight.js"></script>
+        <script src="../../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../../mermaid.min.js"></script>
+        <script src="../../../mermaid-init.js"></script>
+
+
+    </body>
+</html>

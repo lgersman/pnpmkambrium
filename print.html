@@ -3,13 +3,13 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>pnpmkambrium/gh-pages</title>
+        <title>pnpmkambrium</title>
         <meta name="robots" content="noindex" />
 
 
         <!-- Custom HTML head -->
         
-        <meta name="description" content="Website of pnpmkambrium project">
+        <meta name="description" content="documentation of the pnpmkambrium project">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">2.</strong> Todo</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="about.html">About</a></li><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="quickstart.html">Quickstart</a></li><li class="chapter-item expanded affix "><a href="targets.html">Targets</a></li><li class="chapter-item expanded affix "><li class="part-title">Docker images</li><li class="chapter-item expanded "><a href="packages/docker/fzf/index.html">pnpmkambrium/fzf</a></li><li class="chapter-item expanded "><a href="packages/docker/gitlog-per-package/index.html">pnpmkambrium/gitlog-per-package</a></li><li class="chapter-item expanded "><a href="packages/docker/glow/index.html">pnpmkambrium/glow</a></li><li class="chapter-item expanded "><a href="packages/docker/gum/index.html">pnpmkambrium/gum</a></li><li class="chapter-item expanded "><a href="packages/docker/mdbook/index.html">pnpmkambrium/mdbook</a></li><li class="chapter-item expanded "><a href="packages/docker/shaunch/index.html">pnpmkambrium/shaunch</a></li><li class="chapter-item expanded affix "><li class="part-title">NPM packages</li><li class="chapter-item expanded "><a href="packages/npm/core/index.html">@pnpmkambrium/core</a></li><li class="chapter-item expanded "><a href="packages/npm/create/index.html">@pnpmkambrium/create</a></li><li class="spacer"></li><li class="chapter-item expanded "><div>Appendix</div></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -110,7 +110,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">pnpmkambrium/gh-pages</h1>
+                    <h1 class="menu-title">pnpmkambrium</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -145,46 +145,851 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
-<p>foo bar</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="todo"><a class="header" href="#todo">TODO</a></h1>
-<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
-<h2 id="development"><a class="header" href="#development">Development</a></h2>
+                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="syntax"><a class="header" href="#syntax">Syntax</a></h1>
+<p><code>make [make-options] [target] [make-variables] ...</code></p>
+<h1 id="targets"><a class="header" href="#targets">Targets</a></h1>
+<h2 id="build"><a class="header" href="#build">build</a></h2>
+<p>Syntax: <code>make [make-options] build [make-variables]</code></p>
+<p>convenience alias for target <code>packages/</code></p>
+<h2 id="clean"><a class="header" href="#clean">clean</a></h2>
+<p>Syntax: <code>make [make-options] clean [make-variables]</code></p>
+<p>delete resources matching <code>.gitignore</code> entries except</p>
 <ul>
-<li>make functions like <code>kambrium_dump_vars</code></li>
+<li><code>./.node_modules</code></li>
+<li>any <code>.env</code> file (recursive)</li>
+<li><code>./.pnpm-store</code></li>
+<li><code>./*.code-workspace</code></li>
 </ul>
-<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
-<h4 id="environment"><a class="header" href="#environment">Environment</a></h4>
+<h2 id="dev-docs-"><a class="header" href="#dev-docs-">dev-docs-%</a></h2>
+<p>Syntax: <code>make [make-options] dev-docs-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>start dev server for a docs sub package in <code>packages/docs/</code></p>
+<p>please note that this target <strong>MUST</strong> be called with make option <code>-b</code>.</p>
+<p>using this target enables you to edit a docs sub package and preview it in the browser at your fingertips</p>
+<p>example: <code>make -B dev-docs-foo</code></p>
+<pre><code> will start the dev server for docs sub package `foo`.
+ Every change in `packages/docs/foo` will result in rebuild/reloading the docs in the browser.
+</code></pre>
+<h2 id="distclean"><a class="header" href="#distclean">distclean</a></h2>
+<p>Syntax: <code>make [make-options] distclean [make-variables]</code></p>
+<p>delete any file that are a result of making the project and not matched by <code>.gitignore</code> except :</p>
+<ul>
+<li>any <code>.env</code> file (recursive)</li>
+<li><code>./*.code-workspace</code></li>
+</ul>
+<p>ATTENTION: You have to call 'make node_modules/' afterwards to make your environment again work properly</p>
+<h2 id="docker-push"><a class="header" href="#docker-push">docker-push</a></h2>
+<p>Syntax: <code>make [make-options] docker-push [make-variables]</code></p>
+<p>push docker images to registry</p>
+<p>see supported environment variables on target <code>docker-push-%</code></p>
+<h2 id="docker-push-"><a class="header" href="#docker-push-">docker-push-%</a></h2>
+<p>Syntax: <code>make [make-options] docker-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>push docker image to registry.</p>
+<p>target will also update</p>
+<ul>
+<li>the image short description using the <code>description</code> property of sub package file <code>package.json</code></li>
+<li>image long description using sub package file <code>README.md</code></li>
+</ul>
+<p>at the docker registry using</p>
+<p>supported variables are:</p>
+<ul>
+<li><code>DOCKER_TOKEN</code> (required) can be the docker password (a docker token is preferred for security reasons)</li>
+<li><code>DOCKER_USER</code> use the docker identity/username, your docker account email will not work</li>
+<li><code>DOCKER_REPOSITORY</code> (optional,default=sub package name part after minus)</li>
+<li><code>DOCKER_REGISTRY</code> (optional,default=<code>registry.hub.docker.com</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar</code></p>
+<p>will build/tag (if outdated) the docker image and</p>
+<h2 id="gh-pages-push-"><a class="header" href="#gh-pages-push-">gh-pages-push-%</a></h2>
+<p>Syntax: <code>make [make-options] gh-pages-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>pushes a single docs sub package <code>build</code> directory output to git branch <code>gh-pages</code>.</p>
+<p>it the docs package is outdated, it will be rebuild before publishing.</p>
+<p>after initial call to this target ensure the connected remote github repo has github pages properly configured
+(see https://github.com/lgersman/[your-project]/settings/pages)
+Source: <code>Deploy from branch</code>
+Branch: <code>gh-pages</code> / <code>/</code> (root folder in branch <code>gh-pages</code>)</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>GIT_REMOTE_REPOSITORY_NAME</code> (optional, default=<code>origin</code>) the remote repository to push to</li>
+</ul>
+<p>if the target repo is at GitHub: - <code>GITHUB_TOKEN</code> (required) can be the github password (a github token is preferred for security reasons) - <code>GITHUB_OWNER</code> (required) github username - <code>GITHUB_REPO</code> (optional,default=property <code>repository.url</code> in root file <code>package.json</code>) GitHub repository name</p>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make gh-pages-push-gh-pages GITHUB_OWNER=foo GITHUB_TOKEN=bar</code></p>
+<p>will publish the build output of docs sub package <code>gh-pages</code> located in <code>packages/docs/gh-pages</code> to
+the GitHub repository (annotated in property <code>repository.url</code> in root file <code>package.json</code>).</p>
+<h2 id="github-details-push"><a class="header" href="#github-details-push">github-details-push</a></h2>
+<p>Syntax: <code>make [make-options] github-details-push [make-variables]</code></p>
+<p>syncs informational data like description/tags/etc. to GitHub repository metadata</p>
+<ul>
+<li>sync repo description and tags from root file <code>package.json</code></li>
+<li>enable GitHub pages if a docs sub package <code>packages/docs/gh-pages</code> exists and <code>packages/docs/gh-pages/package.json</code> property 'private' is falsy</li>
+</ul>
+<p>supported variables are :</p>
+<ul>
+<li><code>GITHUB_TOKEN</code> (required) can be the GitHub password (a GitHub token is preferred for security reasons)</li>
+<li><code>GITHUB_OWNER</code> (required) GitHub username</li>
+<li><code>GIT_REMOTE_REPOSITORY_NAME</code> (optional, default=<code>origin</code>) the remote repository to push to</li>
+<li><code>GITHUB_REPO</code> (optional,default=property <code>repository.url</code> in root file <code>package.json</code>) GitHub repository name</li>
+<li><code>GITHUB_REPO_DESCRIPTION</code> (optional,default=property <code>description</code> in root file <code>package.json</code>)</li>
+<li><code>GITHUB_REPO_TOPICS</code> (optional,default=property <code>keys</code> in root file <code>package.json</code>)</li>
+<li><code>GITHUB_REPO_HOMEPAGE</code> (optional,default=property <code>homepage</code> in root file <code>package.json</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>make --silent github-details-push</code></p>
+<p>will update the GitHub repository metadata with the provided data</p>
+<h2 id="help"><a class="header" href="#help">help</a></h2>
+<p>Syntax: <code>make [make-options] help [make-variables]</code></p>
+<p>prints the help screen</p>
+<p>by default the help will be rendered for the terminal using a few ansi escape sequences for highlighting</p>
+<p>to process the help information in other tools you can use the <code>FORMAT</code> variable to output help in JSON format.</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>VERBOSE</code> (optional, default=``) enables verbose help parsing informations</li>
+<li><code>FORMAT</code> (optional, default=<code>text</code>) the output format of the help information
+<ul>
+<li><code>text</code> will print help in text format to terminal
+<ul>
+<li>addional option <code>PAGER=false</code> may be used to output help without pagination</li>
+</ul>
+</li>
+<li><code>json</code> will print help in json format for further processing</li>
+<li><code>markdown</code> will print help in markdown format for integrating output in static documentation</li>
+</ul>
+</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<h2 id="interactive"><a class="header" href="#interactive">interactive</a></h2>
+<p>Syntax: <code>make [make-options] interactive [make-variables]</code></p>
+<p>opens a interactive help menu utilizing fzf (https://github.com/junegunn/fzf)</p>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<h2 id="lint"><a class="header" href="#lint">lint</a></h2>
+<p>Syntax: <code>make [make-options] lint [make-variables]</code></p>
+<p>lint sources</p>
+<h2 id="lint-fix"><a class="header" href="#lint-fix">lint-fix</a></h2>
+<p>Syntax: <code>make [make-options] lint-fix [make-variables]</code></p>
+<p>lint the project and apply fixes provided by the linters</p>
+<h2 id="npm-push"><a class="header" href="#npm-push">npm-push</a></h2>
+<p>Syntax: <code>make [make-options] npm-push [make-variables]</code></p>
+<p>pushes all npm sub packages to a npm registry</p>
+<p>see supported environment variables on target <code>npm-push-%</code></p>
+<p>example: `make npm-push NPM_TOKEN=your-token'</p>
+<p>pushes all npm sub packages in <code>packages/npm/</code> to the npm registry</p>
+<h2 id="npm-push-"><a class="header" href="#npm-push-">npm-push-%</a></h2>
+<p>Syntax: <code>make [make-options] npm-push-% [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>push npm package to registry</p>
+<p>supported variables are :</p>
+<ul>
+<li><code>NPM_TOKEN</code> (required) can be the npm password (a npm token is preferred for security reasons)</li>
+<li><code>NPM_REGISTRY</code> (optional, default is <code>https://registry.npmjs.org/</code>)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>NPM_TOKEN=your-token make npm-push-foo</code></p>
+<p>to publish npm sub package <code>foo</code> in <code>packages/npm/foo</code> to the npm registry</p>
+<h2 id="packages"><a class="header" href="#packages">packages/</a></h2>
+<p>Syntax: <code>make [make-options] packages/ [make-variables]</code></p>
+<p>build all outdated sub packages of any flavor</p>
+<h2 id="packagesdocker"><a class="header" href="#packagesdocker">packages/docker/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docker/ [make-variables]</code></p>
+<p>build and tag all outdated docker images in <code>packages/docker/</code></p>
+<h2 id="packagesdocker-1"><a class="header" href="#packagesdocker-1">packages/docker/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docker/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build and tag outdated docker image sub package by name.</p>
+<p>image metadata like author/description/version will be taken from sub package file <code>package.json</code></p>
+<p>example: <code>make packages/docker/foo/</code></p>
+<p>will build the docker image in sub package <code>packages/docker/foo</code></p>
+<h2 id="packagesdocs"><a class="header" href="#packagesdocs">packages/docs/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docs/ [make-variables]</code></p>
+<p>build all outdated doc sub packages in <code>packages/docs/</code></p>
+<p>see supported environment variables on target <code>packages/docs/%/</code></p>
+<h2 id="packagesdocs-1"><a class="header" href="#packagesdocs-1">packages/docs/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/docs/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build outdated docs sub package by name</p>
+<p>task utilizes various informations from <code>package.json</code> like authors/contributors/title/etc.</p>
+<p>the following mdbook configuration options can be provided by environment variables:</p>
+<ul>
+<li><code>MDBOOK_GIT_REPOSITORY_URL</code> (optional, default=repository.url from (sub|root)package.json)</li>
+<li><code>MDBOOK_GIT_REPOSITORY_ICON</code> (optional, default=<code>fa-code-fork</code>)</li>
+<li><code>MDBOOK_GIT_URL_TEMPLATE</code> (optional),</li>
+<li><code>MDBOOK_NO_SECTION_LABEL</code> (optional, default=<code>true</code>) set to <code>false</code> to enable numeric section labels in the table of contents column</li>
+<li><code>MDBOOK_AUTHORS</code> (optional) json array of author names. falling back to package.json properties <code>authors.name</code> / <code>contributors</code></li>
+<li><code>MDBOOK_TITLE</code> (optional, defaults to <code>package.json</code> property <code>name</code>)</li>
+<li><code>MDBOOK_DESCRIPION</code> (optional, defaults to <code>package.json</code> property <code>description</code>)
+(see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)</li>
+</ul>
+<p>environment variables can be provided using:</p>
+<ul>
+<li>make variables provided at commandline</li>
+<li><code>.env</code> file from sub package</li>
+<li><code>.env</code> file from monorepo root</li>
+<li>environment</li>
+</ul>
+<p>example: <code>MDBOOK_AUTHORS='[&quot;foo bar&quot;]' make packages/docs/gh-pages/</code></p>
+<p>will rebuild outdated sub package <code>packages/docs/gh-pages</code></p>
+<h2 id="packagesnpm"><a class="header" href="#packagesnpm">packages/npm/</a></h2>
+<p>Syntax: <code>make [make-options] packages/npm/ [make-variables]</code></p>
+<p>build all outdated npm sub packages in <code>packages/npm/</code></p>
+<h2 id="packagesnpm-1"><a class="header" href="#packagesnpm-1">packages/npm/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/npm/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build outdated npm package by name</p>
+<p>example: <code>make packages/npm/foo/</code></p>
+<p>will build the npm sub package in <code>packages/npm/foo</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumfzf"><a class="header" href="#pnpmkambriumfzf">pnpmkambrium/fzf</a></h1>
+<ul>
+<li><a href="packages/docker/fzf/index.html#about">About</a>
+<ul>
+<li><a href="packages/docker/fzf/index.html#why-">Why ?</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/fzf/index.html#usage">Usage</a>
+<ul>
+<li><a href="packages/docker/fzf/index.html#fzf-input"><code>fzf</code> Input</a></li>
+<li><a href="packages/docker/fzf/index.html#fzf-options"><code>fzf</code> options</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="about-1"><a class="header" href="#about-1">About</a></h1>
+<p>This image provides the most recent <a href="https://github.com/junegunn/fzf">fzf</a> in a <a href="https://github.com/GoogleContainerTools/distroless">distroless</a> image (~24MB)</p>
+<h2 id="why-"><a class="header" href="#why-">Why ?</a></h2>
+<p>I needed a way to provide <a href="https://github.com/junegunn/fzf">fzf</a> on demand and cross platform (Linux/maxOS/Windows).</p>
+<p>=&gt; That's exactly what a Docker image can do :-)</p>
+<h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<p>Since <a href="https://github.com/junegunn/fzf">fzf</a> needs a TTY AND interactive STDIN we cannot provide input via STDIN when running in Docker.</p>
+<h2 id="fzf-input"><a class="header" href="#fzf-input"><code>fzf</code> Input</a></h2>
+<p>You can provide <a href="https://github.com/junegunn/fzf">fzf</a> input using</p>
 <ul>
 <li>
-<p>KAMBRIUM_* config variables</p>
+<p>environment variable <code>FZF_INPUT</code>.</p>
+<p>Example : <code>docker run -it -e FZF_INPUT=&quot;$(ls /)&quot; --rm pnpmkambrium/fzf'</code></p>
 </li>
 <li>
-<p><code>*-push-*</code> environment variables and their .env file relation</p>
+<p>or by providing a file <code>/FZF_INPUT</code></p>
+<p>Example : <code>docker run -it -v $(ls / &gt; FZF_INPUT &amp;&amp; echo $(pwd)/FZF_INPUT):/FZF_INPUT --rm pnpmkambrium/fzf</code></p>
 </li>
 </ul>
-<h3 id="make-cheatcheat"><a class="header" href="#make-cheatcheat">make cheatcheat</a></h3>
+<h2 id="fzf-options"><a class="header" href="#fzf-options"><code>fzf</code> options</a></h2>
+<p>All options provided to the container will be delegated to <a href="https://github.com/junegunn/fzf">fzf</a>.</p>
+<p>Example: <code>docker run -it -e FZF_INPUT=&quot;$(ls $(pwd)/foo)&quot; -v $(pwd)/foo:/foo --rm pnpmkambrium/fzf --preview='ls -la /foo/{}'</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumgitlog-per-package"><a class="header" href="#pnpmkambriumgitlog-per-package">pnpmkambrium/gitlog-per-package</a></h1>
+<ul>
+<li><a href="packages/docker/gitlog-per-package/index.html#about">About</a></li>
+<li><a href="packages/docker/gitlog-per-package/index.html#usage">Usage</a></li>
+<li><a href="packages/docker/gitlog-per-package/index.html#development">Development</a></li>
+</ul>
+<h1 id="about-2"><a class="header" href="#about-2">About</a></h1>
+<p>@TODO: add link to docker demo gif</p>
+<h1 id="usage-1"><a class="header" href="#usage-1">Usage</a></h1>
+<ul>
+<li>basic usage:</li>
+</ul>
+<pre><code>docker run -it --rm -v $(pwd):/app pnpmkambrium/gitlog-per-package
+</code></pre>
+<ul>
+<li>run with customized git log format</li>
+</ul>
+<pre><code>docker run -it --rm -e GIT_LOG_OPTIONS=&quot;--stat --abbrev-commit&quot;  -v $(pwd):/app pnpmkambrium/gitlog-per-package
+</code></pre>
 <ul>
 <li>
-<p>adding <code>.SHELLFLAGS += -x</code> in your Makefile will enable shell execution output :</p>
-<pre><code>include packages/npm/core/make/make.mk
+<p>run using a docker-compose file :</p>
+<ul>
+<li>create docker-compose file :</li>
+</ul>
+<pre><code>version: '3.3'
+services:
+  main:
+    image: pnpmkambrium/gitlog-per-package:latest
+    stdin_open: true
+    tty:true
+    # optional : customize git log options
+    #    environment:
+    #      GIT_LOG_OPTIONS: &quot;--stat --abbrev-commit&quot;
+    volumes:
+      - type: bind
+        source: ${PWD}
+        target: /app
+</code></pre>
+<p>execute : <code>docker compose -f gitlog-per-package.yml run --rm main</code></p>
+</li>
+<li>
+<p>execute with customized <code>git log</code> output : <code>docker compose -f gitlog-per-package.yml run --rm -e GIT_LOG_OPTIONS=&quot;--stat --abbrev-commit&quot; main</code></p>
+</li>
+</ul>
+<h1 id="development"><a class="header" href="#development">Development</a></h1>
+<ul>
+<li>
+<p>execute script locally using <code>./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh</code></p>
+</li>
+<li>
+<p><code>git log</code> command can be customized using environment variable <code>GIT_LOG_OPTIONS</code>.</p>
+<p>Examples:</p>
+<pre><code>GIT_LOG_OPTIONS=&quot;--stat --abbrev-commit&quot; ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh
 
-...
+# see https://stackoverflow.com/questions/12082981/get-all-git-commits-since-last-tag
+# (note that git describe will fail if tag was not found)
 
-.SHELLFLAGS += -x
+`GIT_LOG_OPTIONS=&quot;git log 1.2.0..$(git describe --tags --abbrev=0)&quot; ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh`
+
+`GIT_LOG_OPTIONS=&quot;git log $(git describe --tags --abbrev=0 @^)..@&quot; ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh`
+
 </code></pre>
 </li>
 <li>
-<p>adding <code>.MAKEFLAGS += --silent</code> in your Makefile will hide anything except shell output :</p>
-<pre><code>include packages/npm/core/make/make.mk
-
-...
-
-MAKEFLAGS += --silent
-</code></pre>
-<p><em>Alternatively you can start make with option <code>--silent</code>.</em></p>
+<p>build docker image : <code>make packages/docker/gitlog-per-package/</code></p>
+</li>
+<li>
+<p>build using the docker-compose file : <code>docker compose -f packages/docker/gitlog-per-package/docker-compose.yml build</code></p>
+</li>
+<li>
+<p>run <code>docker compose -f packages/docker/gitlog-per-package/docker-compose.yml run --rm gitlog-per-package</code></p>
 </li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumglow"><a class="header" href="#pnpmkambriumglow">pnpmkambrium/glow</a></h1>
+<ul>
+<li><a href="packages/docker/glow/index.html#about">About</a>
+<ul>
+<li><a href="packages/docker/glow/index.html#why-">Why ?</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/glow/index.html#usage">Usage</a></li>
+</ul>
+<h1 id="about-3"><a class="header" href="#about-3">About</a></h1>
+<p>This image provides the most recent <a href="https://github.com/charmbracelet/glow">glow</a> in a <a href="https://github.com/GoogleContainerTools/distroless">distroless</a> docker image under 30MB</p>
+<h2 id="why--1"><a class="header" href="#why--1">Why ?</a></h2>
+<p>I needed a way to provide <a href="https://github.com/charmbracelet/glow">glow</a> on demand and cross platform (Linux/maxOS/Windows).</p>
+<p>=&gt; That's exactly what a Docker image can do :-)</p>
+<h1 id="usage-2"><a class="header" href="#usage-2">Usage</a></h1>
+<p>You can use the image just like the native <a href="https://github.com/charmbracelet/glow">glow</a> command :</p>
+<pre><code>docker run -ti --rm pnpmkambrium/glow [glow-options]
+</code></pre>
+<p>Example: <code>cat README.md | docker run -i --rm pnpmkambrium/glow -l -s auto -w 120 -</code></p>
+<p>see <a href="https://github.com/charmbracelet/glow">glow</a> homepage for all options.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumgum"><a class="header" href="#pnpmkambriumgum">pnpmkambrium/gum</a></h1>
+<ul>
+<li><a href="packages/docker/gum/index.html#about">About</a>
+<ul>
+<li><a href="packages/docker/gum/index.html#why-">Why ?</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/gum/index.html#usage">Usage</a></li>
+</ul>
+<h1 id="about-4"><a class="header" href="#about-4">About</a></h1>
+<p>This image provides the most recent <a href="https://github.com/charmbracelet/gum">gum</a> in a <a href="https://github.com/GoogleContainerTools/distroless">distroless</a> docker image under 30MB</p>
+<h2 id="why--2"><a class="header" href="#why--2">Why ?</a></h2>
+<p>I needed a way to provide <a href="https://github.com/charmbracelet/gum">gum</a> on demand and cross platform (Linux/maxOS/Windows).</p>
+<p>=&gt; That's exactly what a Docker image can do :-)</p>
+<h1 id="usage-3"><a class="header" href="#usage-3">Usage</a></h1>
+<p>You can use the image just like the native <a href="https://github.com/charmbracelet/gum">gum</a> command :</p>
+<pre><code>docker run -ti --rm pnpmkambrium/gum [gum-command] [gum-command-options]
+</code></pre>
+<p>Example: <code>docker run -ti --rm pnpmkambrium/gum choose &quot;fix&quot; &quot;feat&quot; &quot;docs&quot; &quot;style&quot; &quot;refactor&quot; &quot;test&quot; &quot;chore&quot; &quot;revert&quot;</code></p>
+<p>see <a href="https://github.com/charmbracelet/gum">gum</a> homepage for all options.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriummdbook"><a class="header" href="#pnpmkambriummdbook">pnpmkambrium/mdbook</a></h1>
+<ul>
+<li><a href="packages/docker/mdbook/index.html#usage">Usage</a>
+<ul>
+<li><a href="packages/docker/mdbook/index.html#initialization">Initialization</a></li>
+<li><a href="packages/docker/mdbook/index.html#syntax">Syntax</a>
+<ul>
+<li><a href="packages/docker/mdbook/index.html#commands">Commands</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/mdbook/index.html#links">Links</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/mdbook/index.html#showcases">Showcases</a></li>
+</ul>
+<p>The purpose of this image is documentation generation out of markdown files using <a href="https://rust-lang.github.io/mdBook/">mdbook</a> :</p>
+<blockquote>
+<p><a href="https://rust-lang.github.io/mdBook/">mdbook</a> is a command line tool to create books with Markdown. It is ideal for creating product or API documentation, tutorials, course materials or anything that requires a clean, easily navigable and customizable presentation.</p>
+<ul>
+<li>Lightweight Markdown syntax helps you focus more on your content</li>
+<li>Integrated search support</li>
+<li>Color syntax highlighting for code blocks for many different languages</li>
+<li>Theme files allow customizing the formatting of the output</li>
+<li>Preprocessors can provide extensions for custom syntax and modifying content</li>
+<li>Backends can render the output to multiple formats</li>
+</ul>
+</blockquote>
+<p>It provides <a href="https://rust-lang.github.io/mdBook/">mdbook</a> including</p>
+<ul>
+<li>
+<p><a href="https://github.com/badboy/mdbook-toc">mdbook-toc</a></p>
+<p>for supporting table of contents generation in pages</p>
+</li>
+<li>
+<p><a href="https://github.com/badboy/mdbook-mermaid">mdbook-mermaid</a></p>
+<p>adding support for diagrams using <a href="https://mermaid-js.github.io/mermaid/#/">mermaid</a></p>
+</li>
+<li>
+<p><a href="https://github.com/FreeMasen/mdbook-presentation-preprocessor">mdbook-presentation-preprocessor</a></p>
+<p>adding support for presentations/slides</p>
+</li>
+</ul>
+<p>plugins.</p>
+<h1 id="usage-4"><a class="header" href="#usage-4">Usage</a></h1>
+<h2 id="initialization"><a class="header" href="#initialization">Initialization</a></h2>
+<ul>
+<li>
+<p>Open a terminal and change into the directory where you want to work on your documentation</p>
+</li>
+<li>
+<p>Generate configuration and boilerplate content :</p>
+<p><code>docker run --rm -it --mount type=bind,source=$(pwd),target=/data -u $(id -u):$(id -g) pnpmkambrium/mdbook init</code></p>
+<p>The image will create a minimal preconfigured documentation layout</p>
+<pre><code>├── book
+├── book.toml
+├── mermaid-init.js
+├── mermaid.min.js
+└── src
+    ├── chapter_1.md
+    └── SUMMARY.md
+</code></pre>
+<ul>
+<li>
+<p><code>book/</code></p>
+<p>The output directory for the generated html</p>
+</li>
+<li>
+<p><code>book.toml</code></p>
+<p>the mdbook configuration (see https://rust-lang.github.io/mdBook/format/configuration/index.html)</p>
+</li>
+<li>
+<p><code>mermaid*.js</code></p>
+<p>the <a href="https://github.com/badboy/mdbook-mermaid">mdbook-mermaid</a> resources injected into the generated documentation</p>
+</li>
+<li>
+<p><code>src/</code></p>
+<p>the directory expected to contain markdown files to render to html.</p>
+<p><em>(In case of an existing <code>./src</code> folder it will not being overwritten)</em></p>
+<ul>
+<li><code>src/SUMMARY.md</code></li>
+</ul>
+<p>The summary file is used by mdBook to know what chapters to include, in what order they should appear, what their hierarchy is and where the source files are. Without this file, there is no book.</p>
+<p>See https://rust-lang.github.io/mdBook/format/summary.html</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Now you can start editing your documentation</p>
+</li>
+</ul>
+<h2 id="syntax-1"><a class="header" href="#syntax-1">Syntax</a></h2>
+<p>All commands are executes within the docker container.</p>
+<p>Syntax : <code>docker run --rm -it &lt;options&gt; --mount type=bind,source=&lt;documentation-directory&gt;,target=/data -u $(id -u):$(id -g) pnpmkambrium/mdbook &lt;command&gt;</code></p>
+<ul>
+<li>
+<p><code>&lt;documentation-directory&gt;</code></p>
+<p>(required) must be replaced by the documentation directory.</p>
+<p>In case it is your working directory you can set it to <code>$(pwd)</code></p>
+</li>
+<li>
+<p><code>&lt;command&gt;</code></p>
+<p>(required) must be replace by the actual command</p>
+</li>
+<li>
+<p><code>&lt;options&gt;</code></p>
+<p>(optional) here you can set some docker options required by a few commands like <code>serve</code></p>
+</li>
+</ul>
+<h3 id="commands"><a class="header" href="#commands">Commands</a></h3>
+<ul>
+<li>
+<p><code>mdbook init</code></p>
+<p>When using the init command for the first time, a couple of files will be set up for you.</p>
+<p>See see https://rust-lang.github.io/mdBook/cli/init.html for further options</p>
+</li>
+<li>
+<p><code>mdbook build</code></p>
+<p>Generates the html documentation in the <code>book/</code> folder</p>
+<p>See https://rust-lang.github.io/mdBook/cli/build.html for further options</p>
+</li>
+<li>
+<p><code>mdbook serve</code></p>
+<p>The serve command is used to preview a book by serving it via HTTP at <code>http://localhost:3000</code> by default</p>
+<p>When using <code>mdbook serve</code> you need to apply a few additional <code>docker</code> options in the commandline :</p>
+<p><code>docker run --rm -it -p 3000:3000 -p 3001:3001 --mount type=bind,source=$(pwd),target=/data -u $(id -u):$(id -g) pnpmkambrium/mdbook mdbook serve -n 0.0.0.0</code></p>
+<p>Now you can open the documentation in your browser at http://0.0.0.0:3000</p>
+<p>Whenever you change/save a markdown file (or any other resource used by <a href="https://rust-lang.github.io/mdBook/">mdbook</a> the generated documentation will be updated and reloaded in the browser.</p>
+<p>See https://rust-lang.github.io/mdBook/cli/serve.html for further options</p>
+</li>
+</ul>
+<h2 id="links"><a class="header" href="#links">Links</a></h2>
+<p>See https://rust-lang.github.io/mdBook/guide/reading.html for further commands and options of <a href="https://rust-lang.github.io/mdBook/">mdbook</a></p>
+<h1 id="showcases"><a class="header" href="#showcases">Showcases</a></h1>
+<ul>
+<li>
+<p>An example website created with this image is https://ionos-wordpress.github.io/cm4all-wp-impex/</p>
+<p>The sources including <a href="https://rust-lang.github.io/mdBook/">mdbook</a> customization can be found here : https://github.com/IONOS-WordPress/cm4all-wp-impex/tree/develop/docs/gh-pages</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumshaunch"><a class="header" href="#pnpmkambriumshaunch">pnpmkambrium/shaunch</a></h1>
+<ul>
+<li><a href="packages/docker/shaunch/index.html#features">Features</a></li>
+<li><a href="packages/docker/shaunch/index.html#installation">Installation</a>
+<ul>
+<li><a href="packages/docker/shaunch/index.html#local">Local</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/shaunch/index.html#configuration">Configuration</a>
+<ul>
+<li><a href="packages/docker/shaunch/index.html#static-configuration">Static configuration</a></li>
+<li><a href="packages/docker/shaunch/index.html#populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files">Populating commands by reading a directory containing scripts and markdown files</a></li>
+<li><a href="packages/docker/shaunch/index.html#dynamic-commands-evaluation">Dynamic commands evaluation</a>
+<ul>
+<li><a href="packages/docker/shaunch/index.html#exec-property"><code>exec</code> property</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/shaunch/index.html#prompt-property"><code>prompt</code> property</a></li>
+</ul>
+</li>
+<li><a href="packages/docker/shaunch/index.html#usage">Usage</a></li>
+<li><a href="packages/docker/shaunch/index.html#development">Development</a></li>
+<li><a href="packages/docker/shaunch/index.html#limitations">Limitations</a></li>
+<li><a href="packages/docker/shaunch/index.html#faq">FAQ</a></li>
+</ul>
+<p><a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> is a launcher for the terminal</p>
+<p>It's based on <a href="https://github.com/junegunn/fzf">fzf</a> and bash/jq :-)</p>
+<p>@TODO: add link to docker demo gif</p>
+<p>I wrote <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> because i needed a tool make terminal commands available in a user friendly manner.</p>
+<h1 id="features"><a class="header" href="#features">Features</a></h1>
+<ul>
+<li>
+<p>shows both the available commands and their documentation in the terminal</p>
+</li>
+<li>
+<p>commands can be started by just pressing <code>enter</code></p>
+</li>
+<li>
+<p>command documentation supports <a href="https://www.markdownguide.org/">markdown</a> rendered to the terminal</p>
+</li>
+<li>
+<p>documentation can be provided as static markdown files or even as executables outputting <a href="https://www.markdownguide.org/">markdown</a>. The latter enables you to display dynamic markdown files containing a status or whatever.</p>
+</li>
+<li>
+<p>can be used as :</p>
+<ul>
+<li>pre-packaged docker image</li>
+<li><a href="https://github.com/lgersman/pnpmkambrium/blob/develop/packages/docker/shaunch/bin/shaunch.sh">self contained bash script</a>
+<ul>
+<li><a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> will be downloaded/installed on demand to a <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> private directory</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>when started with <code>-c &lt;directory&gt;</code> the contained scripts and documentation files will be out of the box presented to the user (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory">static directory example</a>). Output will be assumed to be JSON according to the shaunch json schema definition</p>
+</li>
+<li>
+<p>when started with <code>-c &lt;executable&gt;</code> the executable is executed and its output is consumed to gather the available scripts and documentation (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic script example</a>). Output will be assumed to be JSON according to the shaunch json schema definition.</p>
+</li>
+<li>
+<p>when started with a regular file the file will be assumed to be JSON according to the shaunch json schema definition</p>
+</li>
+</ul>
+<h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<p>Shaunch is available</p>
+<ul>
+<li>
+<p>as self contained Bash script</p>
+</li>
+<li>
+<p>as preinstalled docker image <code>pnpmkambrium/shaunch</code> containing Shaunch and its dependencies</p>
+</li>
+</ul>
+<h2 id="local"><a class="header" href="#local">Local</a></h2>
+<p>Shaunch can be executed locally by just executing the shaunch script. Any dependencies will be downloaded on demand.</p>
+<h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>The software can be configured using JSON.</p>
+<p>The JSON format is described <a href="packages/docker/shaunch/./docs/shaunch.schema.json">here</a></p>
+<pre><code class="language-json">{
+  &quot;$id&quot;: &quot;https://json-schema.org/draft/2020-12/output/schema&quot;,
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema&quot;,
+  &quot;title&quot;: &quot;pnpmkambrium/shaunch configuration file specification&quot;,
+  &quot;description&quot;: &quot;describes the json configuration expected by pnpmkambrium/shaunch&quot;,
+  &quot;items&quot;: {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+      &quot;caption&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;Title of the entry. Will be displayed by fzf to navigate to the help&quot;
+      },
+      &quot;help&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;Expected value can be a existing markdown file, an executable file returning markdown or just markdown contents. Please note that the markdown content will be substituted using bash's built-in echo command (i.e. the markdown can be dynamic !)&quot;,
+        &quot;examples&quot;: [
+          &quot;# foo bar\n\nCommand 'foo bar' will output 'foo bar' on the terminal&quot;,
+          &quot;./scripts/foo.sh&quot;,
+          &quot;./docs/foobar.md&quot;
+        ]
+      },
+      &quot;exec&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;When given, the exec value will be executed without leaving shaunch. Property can be a executable file or just bash code&quot;
+      },
+      &quot;prompt&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;description&quot;: &quot;When given, shaunch will exit and write the prompt to the next terminal prompt.&quot;
+      }
+    },
+    &quot;required&quot;: [&quot;caption&quot;, &quot;help&quot;]
+  },
+  &quot;additionalItems&quot;: false,
+  &quot;type&quot;: &quot;array&quot;
+}
+</code></pre>
+<h2 id="static-configuration"><a class="header" href="#static-configuration">Static configuration</a></h2>
+<p>Providing a file with the following contents using the <code>-c</code> option to <code>shaunch</code> will open up a terminal ui (utilizing <code>fzf</code>) showing all commands.</p>
+<p>By selecting a command, its markdown help will be rendered in the terminal.</p>
+<p>By htting <code>Enter</code> the <code>exec</code> and <code>prompt</code> parameters will be executed/displayed if given.</p>
+<pre><code class="language-json">[
+  {
+    // caption is what will be shown as command title
+    &quot;caption&quot;: &quot;Mount&quot;,
+    // help for this command will be evaluated by executing script ./docs/mount.md.sh
+    // the script is expected to return markdown
+    &quot;help&quot;: &quot;./docs/mount.md.sh&quot;,
+    // the exec content will be executed within shaunch. after exiting the script the shaunch ui will appear again
+    &quot;exec&quot;: &quot;echo 'mounted'\nPress any key to continue ...'; read  -n 1&quot;
+  },
+  {
+    &quot;caption&quot;: &quot;Status&quot;,
+    // help for this command will be rendered from a markdown file
+    &quot;help&quot;: &quot;./docs/status.md&quot;
+    // this command looks nonsense without `exec` nor `prompt` but ... the markdown will be subsituted by bash before rendering
+    // that means any `$(...)`/$VARIABLE expression will be replaced by the computed value
+    // example : if your markdown contains `$(uname -a)` it will be rendered as whatever `uname -a` returns on your machine
+  },
+  {
+    &quot;caption&quot;: &quot;Exit&quot;,
+    // help for this command is inline markdown
+    &quot;help&quot;: &quot;# Exit\n\nQuits the program&quot;,
+    // exec contains a function call exported by shaunch forcing shaunch to exit when this command gets trigged (by hitting `Enter`)
+    &quot;exec&quot;: &quot;shaunch: exit&quot;
+  },
+  {
+    &quot;caption&quot;: &quot;Backup&quot;,
+    &quot;help&quot;: &quot;# Backup\n\nstarts the backup.\n\nHit enter to copy the command to the next prompt&quot;,
+    // if this action gets trigegred, the prompt value will be written after the next terminal prompt so that the user can decide if he wahts to execute the command by manually confirm with `Enter` in the terminal
+    &quot;prompt&quot;: &quot;./backup.sh&quot;
+  }
+]
+</code></pre>
+<h2 id="populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files"><a class="header" href="#populating-commands-by-reading-a-directory-containing-scripts-and-markdown-files">Populating commands by reading a directory containing scripts and markdown files</a></h2>
+<p>If the path provided by option <code>-c</code> points to an directory shaunch will populate all executables and same named markdown files into JSON and render them.</p>
+<p>see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory">static directory example</a></p>
+<h2 id="dynamic-commands-evaluation"><a class="header" href="#dynamic-commands-evaluation">Dynamic commands evaluation</a></h2>
+<p>If the path provided by option <code>-c</code> points to an executable file, it will be executed. Shaunch expects that the script returns the Shaunch JSON configuration.</p>
+<p>Using this feature you can provide dynamic command configurations generated by a script.</p>
+<p>see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic script example</a></p>
+<h3 id="exec-property"><a class="header" href="#exec-property"><code>exec</code> property</a></h3>
+<p>Shaunch exposes some Bash functions callable in scripts/code of the <code>exec</code> command property using <code>shaunch: [operation]</code></p>
+<p>Available operations :</p>
+<ul>
+<li>
+<p><code>exit</code> will exit shaunch</p>
+<p>example: <code>shaunch: exit</code></p>
+</li>
+</ul>
+<h2 id="prompt-property"><a class="header" href="#prompt-property"><code>prompt</code> property</a></h2>
+<p>The prompt property allows you to define a command placed at the next prompt after shaunch exited.</p>
+<p>If <code>prompt</code> is given, hitting <code>Enter</code> will exit Shaunch and place the <code>prompt</code> value at your next prompt.</p>
+<h1 id="usage-5"><a class="header" href="#usage-5">Usage</a></h1>
+<pre><code>docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
+</code></pre>
+<ul>
+<li>
+<p>run using a docker-compose file :</p>
+<ul>
+<li>create docker-compose file :</li>
+</ul>
+<pre><code>version: '3.3'
+services:
+  main:
+    image: pnpmkambrium/shaunch:latest
+    stdin_open: true
+    tty:true
+    volumes:
+      - type: bind
+        source: ${PWD}
+        target: /app
+</code></pre>
+<p>execute : <code>docker compose -f shaunch.yml run --rm main</code></p>
+</li>
+</ul>
+<h1 id="development-1"><a class="header" href="#development-1">Development</a></h1>
+<ul>
+<li>
+<p>execute script locally</p>
+<ul>
+<li>
+<p>by browsing a directory : <code>./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-directory/</code></p>
+</li>
+<li>
+<p>by executing a script: <code>./packages/docker/shaunch/bin/shaunch.sh -c ./packages/docker/shaunch/examples/commands-by-script/commands-by-script</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>build docker image : <code>make packages/docker/shaunch/</code></p>
+</li>
+<li>
+<p>using dockerized shaunch :</p>
+<ul>
+<li>
+<p>by browsing a directory : <code>docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-directory:/app pnpmkambrium/shaunch</code></p>
+</li>
+<li>
+<p>by executing a script: <code>docker run -it --rm -v $(pwd)/packages/docker/shaunch/examples/commands-by-script:/app pnpmkambrium/shaunch -c /app/commands-by-script</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>build using the docker-compose file : <code>docker compose -f packages/docker/shaunch/docker-compose.yml build</code></p>
+</li>
+<li>
+<p>run <code>docker-compose run --rm main</code></p>
+</li>
+</ul>
+<h1 id="limitations"><a class="header" href="#limitations">Limitations</a></h1>
+<ul>
+<li>
+<p>The local bash script works right now only on amd64 linux machines because i did not figured out a way to install it's dependencies in a cross platform manner.</p>
+<p>@TODO: This can be easily fixed by downloading the correct <a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> binaries depending on the platform.</p>
+</li>
+<li>
+<p>writing to the next prompt using the <code>prompt</code> property will not work when executed from docker</p>
+</li>
+</ul>
+<h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<ul>
+<li>
+<p>How can I exit <code>shaunch</code> from a command ?</p>
+<p>Just call <code>shaunch: exit</code> in your command script (see <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-script">dynamic configuration example</a>). The <code>shaunch</code> command is a exported function exporting some operations like exiting.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumcore"><a class="header" href="#pnpmkambriumcore">@pnpmkambrium/core</a></h1>
+<ul>
+<li><a href="packages/npm/core/index.html#purpose">Purpose</a></li>
+<li><a href="packages/npm/core/index.html#how-it-works">How it works</a></li>
+<li><a href="packages/npm/core/index.html#configuration">Configuration</a></li>
+<li><a href="packages/npm/core/index.html#directory-layout">Directory layout</a></li>
+<li><a href="packages/npm/core/index.html#usage">Usage</a>
+<ul>
+<li><a href="packages/npm/core/index.html#configuration-1">Configuration</a></li>
+<li><a href="packages/npm/core/index.html#docker-packages">docker packages</a></li>
+<li><a href="packages/npm/core/index.html#npm-packages">npm packages</a></li>
+</ul>
+</li>
+<li><a href="packages/npm/core/index.html#caveats">Caveats</a></li>
+</ul>
+<h1 id="purpose"><a class="header" href="#purpose">Purpose</a></h1>
+<p>@TODO:</p>
+<h1 id="how-it-works"><a class="header" href="#how-it-works">How it works</a></h1>
+<h1 id="configuration-1"><a class="header" href="#configuration-1">Configuration</a></h1>
+<h1 id="directory-layout"><a class="header" href="#directory-layout">Directory layout</a></h1>
+<h1 id="usage-6"><a class="header" href="#usage-6">Usage</a></h1>
+<p>Calling <code>make --silent</code> will show the available targets</p>
+<p><code>make interactive</code> will show up an interactive mixture of available targets and documentation</p>
+<h2 id="configuration-2"><a class="header" href="#configuration-2">Configuration</a></h2>
+<h2 id="docker-packages"><a class="header" href="#docker-packages">docker packages</a></h2>
+<ul>
+<li>
+<p>deploy/push docker image</p>
+<p>Deploying a docker image to a Docker registry like Docker Hub requires at least a docker access token.
+The <a href="https://docs.docker.com/docker-hub/access-tokens/">access token</a> can be provided using a <code>.env</code> file or as environment variable.</p>
+<p>Examples :</p>
+<ul>
+<li>
+<p><code>DOCKER_TOKEN=xxx make packages/docker/</code> will deploy all docker sub packages to the default registry (Docker Hub)</p>
+</li>
+<li>
+<p><code>DOCKER_TOKEN=xxx make packages/docker/foo/</code> will deploy docker sub package <code>packages/docker/foo/</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Execute <code>make</code> for more docker related targets.</p>
+<h2 id="npm-packages"><a class="header" href="#npm-packages">npm packages</a></h2>
+<ul>
+<li>
+<p>deploy/push npm package</p>
+<p>Deploying a npm package to a NPM registry like <a href="https://www.npmjs.com/">npmjs</a> requires at least a npm access token.
+The <a href="https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-tokens-on-the-website">access token</a> can be provided using a <code>.env</code> file or as environment variable.</p>
+<p>Examples :</p>
+<ul>
+<li>
+<p><code>NPM_TOKEN=xxx make packages/npm/</code> will deploy all docker sub packages to the default registry (Docker Hub)</p>
+</li>
+<li>
+<p><code>NPM_TOKEN=xxx make packages/npm/foo/</code> will deploy npm sub package <code>packages/npm/foo/</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Execute <code>make</code> for more docker related targets.</p>
+<h1 id="caveats"><a class="header" href="#caveats">Caveats</a></h1>
+<ul>
+<li>
+<p>You made changes in your sub package but <code>make ...</code> does not rebuild/thinks nothing has changed</p>
+<p>Your can workaround this issue by simply force rebuilding the package using <code>make -B ...</code></p>
+</li>
+<li>
+<p>Don't use minus (<code>-</code>) sign in docker sub package scopes</p>
+<p>Suppose you have a sub package <code>/packages/docker/bar</code> named <code>@my-foo/bar</code>.</p>
+<p><code>make docker-build-bar</code> and <code>make docker-push-bar</code> will derive the <code>DOCKER_USER</code> environment variable from scope (package scope=&quot;<code>@my-foo</code>&quot;, derived DOCKER_USER=&quot;<code>my-foo</code>&quot;) by default.</p>
+<p>Unfortunately Docker usernames are prohibited to contain the minus (<code>-</code>) sign. <em>NPM package names in contrast allow minus (<code>-</code>) sign in package scopes.</em></p>
+<p>Either remove the minus (<code>-</code>) sign from the sub package scope or set environment variable <code>DOCKER_USER</code> (using an <code>.env</code> file or at commandline) to the desired docker user.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumcreate"><a class="header" href="#pnpmkambriumcreate">@pnpmkambrium/create</a></h1>
+<p>@TODO:</p>
+<p>see https://github.com/kefranabg/readme-md-generator</p>
 
                     </main>
 
