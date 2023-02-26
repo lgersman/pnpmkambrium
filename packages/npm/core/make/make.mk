@@ -169,6 +169,7 @@ interactive:
 > ./packages/docker/shaunch/bin/shaunch.sh --border-label " Make " --preview-label " Info " --title "Targets" -c "$$HELP_FILE" ||:
 > trap "rm -f -- $$HELP_FILE" EXIT
 
+KAMBRIUM_TRACE ?= false
 # print out targets and dependencies before executing if environment variable KAMBRIUM_TRACE is set to true
 ifeq ($(KAMBRIUM_TRACE),true)
   # see https://www.cmcrossroads.com/article/tracing-rule-execution-gnu-make

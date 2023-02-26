@@ -80,7 +80,6 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
       --argjson authors "$$MDBOOK_AUTHORS" \
       '{title: $$title, description: $$description, authors: $$authors}' \
     )
-> echo "$$MDBOOK_BOOK"
 >   MDBOOK_GIT_REPOSITORY_URL="$$(\
       printenv MDBOOK_GIT_REPOSITORY_URL || \
       jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
@@ -111,6 +110,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build $(@D)
 > fi
+> find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \; 
 > mkdir -p $(@D)/dist
 > # redirecting into the target zip archive frees us from removing an existing archive first
 > (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
