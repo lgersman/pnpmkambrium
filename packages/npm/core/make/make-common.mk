@@ -105,18 +105,29 @@ TERMINAL_RESET  != tput sgr0
 # if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
 CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
 
-
-
 # enable SECONDEXPANSION feature of make for all following targets
 # see https://www.cmcrossroads.com/article/making-directories-gnu-make
 .SECONDEXPANSION:
 
+ENV_FILES := $(shell find . -type f -name '.env')
+
+# find all *.kambrium-template marked as executable
+KAMBRIUM_TEMPLATES := $(shell find . ! -path '*/dist/*' ! -path '*/build/*' -type f -executable -name '*.kambrium-template')
+# transform temaplte list to a list with target files (example foo.md.kambrium-template => foo.kambrium-template)
+KAMBRIUM_TEMPLATE_TARGETS := $(patsubst %.kambrium-template, %, $(KAMBRIUM_TEMPLATES))
+
 # generic dependency for sub package build-info targets (package/*/*/build-info)
 # this variables is dynamic (i.e. evaluated per use) and requires make .SECONDEXPANSION feature to be enabled
-KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) package.json
+KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) \
+ $(KAMBRIUM_TEMPLATE_TARGETS) \
+ .env \
+ package.json 
 
 # generic dependency for sub package targets (package/*/*/)
-KAMBRIUM_SUB_PACKAGE_DEPS = $(KAMBRIUM_TEMPLATE_TARGETS) $$(@D)/build-info 
+KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info 
 
 # generic dependency for all sub packages flavors (package/*/)
 KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/))
+
+.PHONY: kambrium-templates
+kambrium-templates: $(KAMBRIUM_TEMPLATE_TARGETS) ;

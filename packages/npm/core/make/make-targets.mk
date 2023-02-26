@@ -12,11 +12,15 @@ build: packages/
 # EOF
 packages/: $$(wildcard $$(@D)/*/) ;
 
-%: %.kambrium-template
-> echo "transforming $< => $@"
-> [[ -x "$<" ]] && "$<" > $@ || echo "template(=$<) is not executable : don't know how to generate target file(=$@)"
-
-KAMBRIUM_TEMPLATES := $(shell find . -type f -name '*.kambrium-template')
-KAMBRIUM_TEMPLATE_TARGETS := $(patsubst %.kambrium-template, %, $(TEMPLATES))
-.PHONY: templates
-templates: $(KAMBRIUM_TEMPLATE_TARGETS) ;
+# enable template support for *.kambrium-template files
+% : %.kambrium-template $(ENV_FILES)
+> # import matching .env file if template is located in a monorepo package directory  
+> if [[ "$<" =~ ^(packages/([^/]+/){2}) ]]; then
+> 	# set -a causes variables defined from now on to be automatically exported.
+> 	set -a
+> 	DOT_ENV="$${BASH_REMATCH[1]}.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV 
+> fi
+> command -v "$<" 1 > /dev/null && 
+> 	echo "$< => $@" && 
+> 	"$<" > "$@" ||
+>   (echo "template(=$<) is no executable : don't know how to generate target file(=$@)" >&2 && false)
