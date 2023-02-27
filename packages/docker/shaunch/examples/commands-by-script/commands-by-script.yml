@@ -1,0 +1,24 @@
+# requires yq (https://mikefarah.gitbook.io/yq/)
+# ./packages/docker/shaunch/bin/shaunch.sh -- 'yq -o=json . ./packages/docker/shaunch/examples/commands-by-script/commands-by-script.yml'
+- caption: Mount
+  help: "~/workspace/pnpmkambrium/packages/docker/shaunch/examples/commands-by-script/mount.md.sh"
+  exec: |-
+    echo 'mounted'
+    echo 'Press any key to continue ...'; 
+    read  -n 1
+- caption: Status
+  help: "~/workspace/pnpmkambrium/packages/docker/shaunch/examples/commands-by-script/status.md"
+- caption: Exit
+  help: |-
+    # Exit
+
+    Quits the program
+  exec: "shaunch: exit"
+- caption: Prompt example
+  help: |-
+    # Prompt Example
+
+    Quits the program
+
+    and writes 'hello world' to next prompt input
+  prompt: hello world

@@ -39,6 +39,8 @@ Available options:
 -t,  --title                     Title string above the commands to launch
 -c,  --commands <dir/executable> Directory to scan for commands (defaults to current directory) 
                                  or executable returning json command structure  
+-- <command--returning-json>     everything behind '--' will be evaluated as bash script
+                                 the result is expected to return json command structure 
 EOF
   exit
 }
@@ -199,6 +201,10 @@ parse_params() {
         BORDER_LABEL="${2-}"
         shift
       ;;
+      --) 
+        shift
+        export COMMANDS=$($@)
+      ;;
       -c | --commands) 
         if [[ -d "${2-}" ]]; then
           export COMMANDS=$(scan_commands "${2-}")
@@ -236,15 +242,16 @@ parse_params "$@"
 export SHAUNCH_EXEC_FILE="$(mktemp)"
 
 function onExit() {
+  # see https://unix.stackexchange.com/questions/213799/can-bash-write-to-its-own-input-stream
+  saved_settings=$(stty -g)
+  stty -echo -icanon min 1 time 0
+
   SHAUNCH_EXEC=$(cat "$SHAUNCH_EXEC_FILE")
   rm -rf -- "$SHAUNCH_EXEC_FILE"
   perl -e 'ioctl(STDIN, 0x5412, $_) for split "", join " ", @ARGV' "$SHAUNCH_EXEC" 
   stty "$saved_settings" 
 }
 
-# see https://unix.stackexchange.com/questions/213799/can-bash-write-to-its-own-input-stream
-saved_settings=$(stty -g)
-stty -echo -icanon min 1 time 0
 trap "onExit" EXIT
 
 PREVIEW_CMD="'${BASH_SOURCE[0]}' render_markdown {}"
