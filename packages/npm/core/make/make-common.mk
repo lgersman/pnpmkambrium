@@ -120,7 +120,7 @@ KAMBRIUM_TEMPLATE_TARGETS := $(patsubst %.kambrium-template, %, $(KAMBRIUM_TEMPL
 # this variables is dynamic (i.e. evaluated per use) and requires make .SECONDEXPANSION feature to be enabled
 KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info'  -type f) \
  $(KAMBRIUM_TEMPLATE_TARGETS) \
- .env \
+ $(wildcard *.env) \
  package.json 
 
 # generic dependency for sub package targets (package/*/*/)
