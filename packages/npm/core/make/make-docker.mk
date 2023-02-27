@@ -12,10 +12,12 @@ export DOCKER_SCAN_SUGGEST:=false
 #
 export DOCKER_BUILDKIT:=1
 
+DEFAULT_DOCKER_REGISTRY:=registry.hub.docker.com
+
 #
 # target docker registry
 #
-export DOCKER_REGISTRY?=registry.hub.docker.com
+export DOCKER_REGISTRY?=$(DEFAULT_DOCKER_REGISTRY)
 
 # HELP<<EOF
 # build and tag all outdated docker images in `packages/docker/`
@@ -99,7 +101,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 #   - `DOCKER_TOKEN` (required) can be the docker password (a docker token is preferred for security reasons)
 #   - `DOCKER_USER` use the docker identity/username, your docker account email will not work
 #   - `DOCKER_REPOSITORY` (optional,default=sub package name part after minus) 
-#   - `DOCKER_REGISTRY` (optional,default=`registry.hub.docker.com`)
+#   - `DOCKER_REGISTRY` (optional,default=$(DEFAULT_DOCKER_REGISTRY))
 #
 # environment variables can be provided using:
 #   - make variables provided at commandline
@@ -129,13 +131,13 @@ docker-push-%: packages/docker/$$*/
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
 >   PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 >   # docker login --username [username] and docker access-token or real password must be initially before push
->   echo "$$DOCKER_TOKEN" | docker login --username "$$DOCKER_USER" --password-stdin $$DOCKER_REGISTRY >/dev/null 2>&1
+>   echo "$$DOCKER_TOKEN" | docker login --username "$$DOCKER_USER" --password-stdin $$([[ "$$DOCKER_REGISTRY" != "$(DEFAULT_DOCKER_REGISTRY)" ]] && echo "$$DOCKER_REGISTRY") >/dev/null 2>&1
 >   docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:latest
 >   docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:$$PACKAGE_VERSION
 >    echo '[done]'
 > 
->    # if DOCKER_REGISTRY == registry.hub.docker.com : update description and README.md
->    if [[ "$$DOCKER_REGISTRY" == "registry.hub.docker.com" ]]; then
+>    # if DOCKER_REGISTRY == $(DEFAULT_DOCKER_REGISTRY) : update description and README.md
+>    if [[ "$$DOCKER_REGISTRY" == "$(DEFAULT_DOCKER_REGISTRY)" ]]; then
 >     echo "updating description/README.md for docker image $$DOCKER_IMAGE"
 # >       cat ~/my_password.txt | docker login --username foo --password-stdin
 # >       docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
