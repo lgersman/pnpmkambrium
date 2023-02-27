@@ -34,9 +34,6 @@ KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDI
 # delete all KAMBRIUM_TMPDIR's older than one day
 $(shell find $(shell dirname $(KAMBRIUM_TMPDIR)) -maxdepth 0 -ctime +1 -name '*.*.pnpmkambrium-$(shell basename $(CURDIR))' -type d -delete)
 
-.PHONY: foo
-foo: ;
-
 -include .env
 
 # this target triggers pnpm to download/install the required nodejs if not yet available 
