@@ -9,7 +9,7 @@
     "pnpm": ">= 7.14.0"
   },
   "scripts": {
-    "prepare": "npx -y only-allow pnpm && git config core.hookspath ./node_modules/@pnpmkambrium/core/presets/default/.githooks"
+    "prepare": "npx -y only-allow pnpm && (make prepare || echo \"failed to initialize @pnpmkambrium/core : please run 'make -f node_modules/@pnpmkambrium/core/make/make.mk init  manually'\")"
   },
   "keywords": [
     "pnpm",
