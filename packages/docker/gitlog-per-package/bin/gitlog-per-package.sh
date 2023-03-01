@@ -82,7 +82,6 @@ package=$("$script_dir/fzf" \
   --prompt='search: ' \
   --header-lines=3 \
   --ansi \
-  --bind 'esc:execute(echo "$1" && exit)' \
   --preview-window=80% \
   --preview="$PREVIEW_CMD" \
   < <(echo "
