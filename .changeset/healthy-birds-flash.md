@@ -9,7 +9,7 @@
   ```
   ...
   "scripts": {
-    "prepare": "npx -y only-allow pnpm && git config core.hookspath packages/npm/core/presets/default/.githooks",
+    "prepare": "npx -y only-allow pnpm && make --silent -f node_modules/@pnpmkambrium/core/make/make.mk",
   }
   ...
   ```
@@ -19,6 +19,8 @@
   - hook `pre-commit` will execute `nano-staged` to verify commitizen standard conformance of staged sources
 
   - hook `prepare-commit-message` will utilize `git cz` to compute the git commit message interactively
+
+  - hook `commit-msg` will execute `commitlint` to verify commitizen standard conformance
 
   - hook `commit-msg` will execute `commitlint` to verify commitizen standard conformance
 

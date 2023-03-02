@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# ensure all pnpmkambrium prerequisites are set up
+make --silent node_modules/
+make --silent init 

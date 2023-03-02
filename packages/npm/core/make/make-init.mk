@@ -17,7 +17,6 @@
 # 
 .PHONY: init
 init: 
-> set -x
 > KAMBRIUM_CORE_PATH=$$(realpath --relative-to=$$(pwd) node_modules/@pnpmkambrium/core)
 > # configure git to use our git hooks
 > git config core.hookspath "$${KAMBRIUM_CORE_PATH}/presets/default/.githooks"
@@ -26,11 +25,12 @@ init:
 > # see https://stackoverflow.com/a/45018435/1554103 
 > GIT_EXCLUDE_TEMPLATE="$${KAMBRIUM_CORE_PATH}/presets/default/.gitignore"
 > GIT_EXCLUDE=.git/info/exclude
-> if [[ -L $$GIT_EXCLUDE ]] && diff $$GIT_EXCLUDE $$GIT_EXCLUDE_TEMPLATE; then
+> if [[ -L $$GIT_EXCLUDE ]] && cmp -s -- $$GIT_EXCLUDE $$GIT_EXCLUDE_TEMPLATE; then
 > 	# if GIT_EXCLUDE exists and is a symlink (-L) and points exact same content as GIT_EXCLUDE_TEMPLATE
->   echo "[skip] $$GIT_EXCLUDE links to $$GIT_EXCLUDE_TEMPLATE"
+>   # echo "[skipped] $$GIT_EXCLUDE links to $$GIT_EXCLUDE_TEMPLATE"
+>   : 
 > else
 > 	rm -f $$GIT_EXCLUDE
 > 	# create a symlink GIT_EXCLUDE pointing to GIT_EXCLUDE_TEMPLATE
-> 	printf "[done] create local git ignore file : $$(ln -s -v ../../$$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
+> 	printf "[done] link local git exclude file to kambrium git exclude list : $$(ln -s -v ../../$$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
 > fi
