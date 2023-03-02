@@ -17,7 +17,8 @@
 # 
 .PHONY: init
 init: 
-> 	set -x
+> set -x
+> FOO=bar
 > # initialize our gitignore list in .git/info/excludes 
 > # see https://stackoverflow.com/a/45018435/1554103 
 > GIT_EXCLUDE_TEMPLATE=$$(realpath --relative-to=$$(pwd) node_modules/@pnpmkambrium/core/presets/default/.gitignore)
