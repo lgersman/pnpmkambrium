@@ -29,6 +29,7 @@ ignorePatterns:
   - '*.md'
   - 'packages/docs/**/*.min.js'
   - '*.json'
+  - '*.code-workspace'
 rules:
   prettier/prettier:
     - error
