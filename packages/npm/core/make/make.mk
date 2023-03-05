@@ -65,9 +65,10 @@ lint: node_modules/
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
 >   $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
 > {
->   echo "Checking for unwanted tabs in makefiles:"
+>   echo "Checking for unwanted tabs in makefiles..."
 >   ! git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -n $$'\t' Makefile **/*.mk \
 >     | sed -e "s/\t/\x1b\[31m'\\\\t\x1b\[0m/" 
+>   echo "[done]"
 > }
 
 # HELP<<EOF
@@ -81,12 +82,12 @@ lint-fix: node_modules/
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
 >   $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
 > # lint-fix make files (poor mans edition): replace tabs with 2 spaces
->  git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -nH --name-only $$'\t' Makefile **/*.mk \
+>  (git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -nH --name-only $$'\t' Makefile **/*.mk \
 >   | xargs -I '{}' -r bash -c \
 >   ' \
 >     sed -i -e "s/\t/  /g" {}; \
 >     printf "[done] fixed makefile(=%s) : replaced tabs with 2 spaces\n" {} \
->  '
+>  ')||:
 
 
 # HELP<<EOF
