@@ -21,6 +21,9 @@ init:
 > # configure git to use our git hooks
 > git config core.hookspath "$${KAMBRIUM_CORE_PATH}/presets/default/.githooks"
 > 
+> # configure git to use true symlinks (https://github.com/git/git/blob/master/Documentation/config/core.txt)
+> git config core.symlinks true
+> 
 > # initialize our gitignore list in .git/info/excludes 
 > # see https://stackoverflow.com/a/45018435/1554103 
 > GIT_EXCLUDE_TEMPLATE="$${KAMBRIUM_CORE_PATH}/presets/default/.gitignore"
@@ -32,5 +35,6 @@ init:
 > else
 >   rm -f $$GIT_EXCLUDE
 >   # create a symlink GIT_EXCLUDE pointing to GIT_EXCLUDE_TEMPLATE
->   printf "[done] link local git exclude file to kambrium git exclude list : $$(ln -s -v ../../$$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
+>   # (note that we use ln -r to automatically convert the target path to ../../$$GIT_EXCLUDE_TEMPLATE)
+>   printf "[done] link local git exclude file to kambrium git exclude list : $$(ln -s -r -v $$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
 > fi
