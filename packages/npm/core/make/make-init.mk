@@ -28,13 +28,10 @@ init:
 > # see https://stackoverflow.com/a/45018435/1554103 
 > GIT_EXCLUDE_TEMPLATE="$${KAMBRIUM_CORE_PATH}/presets/default/.gitignore"
 > GIT_EXCLUDE=.git/info/exclude
-> if [[ -L $$GIT_EXCLUDE ]] && cmp -s -- $$GIT_EXCLUDE $$GIT_EXCLUDE_TEMPLATE; then
->   # if GIT_EXCLUDE exists and is a symlink (-L) and points exact same content as GIT_EXCLUDE_TEMPLATE
->   # echo "[skipped] $$GIT_EXCLUDE links to $$GIT_EXCLUDE_TEMPLATE"
->   : 
-> else
->   rm -f $$GIT_EXCLUDE
+> if [[ ! -L $$GIT_EXCLUDE ]] || ! cmp -s -- $$GIT_EXCLUDE $$GIT_EXCLUDE_TEMPLATE; then
+>   # if (GIT_EXCLUDE not exists or not is a symlink (-L) or not points exact same content as GIT_EXCLUDE_TEMPLATE)
 >   # create a symlink GIT_EXCLUDE pointing to GIT_EXCLUDE_TEMPLATE
 >   # (note that we use ln -r to automatically convert the target path to ../../$$GIT_EXCLUDE_TEMPLATE)
->   printf "[done] link local git exclude file to kambrium git exclude list : $$(ln -s -r -v $$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
+>   # the ln -f option will force overwriting GIT_EXCLUDE even if its a existing file/link
+>   printf "[done] link local git exclude file to kambrium git exclude list : $$(ln -s -r -f -v $$GIT_EXCLUDE_TEMPLATE $$GIT_EXCLUDE)\n"
 > fi
