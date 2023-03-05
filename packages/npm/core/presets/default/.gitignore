@@ -12,4 +12,7 @@ build
 /docker/*.tgz
 build-info
 /.pnpm-store
-!/packages/npm/core/presets/default/.env
+# never ever track .secrets files since they are proposed to keep sensitive data
+.secrets
+# force addition of .env files since some people add .env to their user .gitignore 
+!.env
