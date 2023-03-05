@@ -64,6 +64,11 @@ lint: node_modules/
 > $(ESLINT) .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
 >   $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input ./packages/**/*.{css,scss}
+> {
+>   echo "Checking for unwanted tabs in makefiles:"
+>   ! git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -n $$'\t' Makefile **/*.mk \
+>     | sed -e "s/\t/\x1b\[31m'\\\\t\x1b\[0m/" 
+> }
 
 # HELP<<EOF
 # lint the project and apply fixes provided by the linters
@@ -74,7 +79,15 @@ lint-fix: node_modules/
 > $(PRETTIER) --cache --check --write .
 > $(ESLINT) --fix .
 > ! (command -v $$($(PNPM) bin)/stylelint >/dev/null) || \
-> $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
+>   $(PNPM) stylelint --ignore-path='$(CURDIR)/.lintignore' --allow-empty-input --fix ./packages/**/*.{css,scss}
+> # lint-fix make files (poor mans edition): replace tabs with 2 spaces
+>  git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -nH --name-only $$'\t' Makefile **/*.mk \
+>   | xargs -I '{}' -r bash -c \
+>   ' \
+>     sed -i -e "s/\t/  /g" {}; \
+>     printf "[done] fixed makefile(=%s) : replaced tabs with 2 spaces\n" {} \
+>  '
+
 
 # HELP<<EOF
 # delete resources matching `.gitignore` entries except 
@@ -121,10 +134,10 @@ distclean: clean
 # supported variables are : 
 #   - `VERBOSE` (optional, default=``) enables verbose help parsing informations 
 #   - `FORMAT` (optional, default=`text`) the output format of the help information
-#	    - `text` will print help in text format to terminal
-#	      - addional option `PAGER=false` may be used to output help without pagination
+#      - `text` will print help in text format to terminal
+#        - addional option `PAGER=false` may be used to output help without pagination
 #     - `json` will print help in json format for further processing
-#	    - `markdown` will print help in markdown format for integrating output in static documentation
+#      - `markdown` will print help in markdown format for integrating output in static documentation
 #
 # environment variables can be provided using:
 #   - make variables provided at commandline
@@ -139,17 +152,17 @@ help:
 > . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 > help=$$( VERBOSE=$${VERBOSE:-}; FORMAT=$${FORMAT:-}; kambrium:help < <(cat $(MAKEFILE_LIST)) )
 > if [[ "$${FORMAT:-}" == '' ]]; then
-> 	if [[ "$${PAGER:-}" != 'false' ]]; then
-> 		echo -e "$$help" | less -r
-> 	else 
->   	echo -e "$$help" 
-> 	fi
+>   if [[ "$${PAGER:-}" != 'false' ]]; then
+>     echo -e "$$help" | less -r
+>   else 
+>     echo -e "$$help" 
+>   fi
 > elif [[ "$${FORMAT:-}" == 'json' ]]; then 
-> 	echo $$help | jq .
+>   echo $$help | jq .
 > elif [[ "$${FORMAT:-}" == 'markdown' ]]; then
 >   echo "$$help"
 > else 
->		echo "unknown FORMAT option(='$$FORMAT')" >&2 && false
+>    echo "unknown FORMAT option(='$$FORMAT')" >&2 && false
 > fi
 
 # HELP<<EOF
