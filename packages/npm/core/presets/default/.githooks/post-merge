@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 # ensure all pnpmkambrium prerequisites are set up
 make --silent node_modules/
-make --silent init 
+make --silent init
 # ask make if changed/new files require a rebuild and spit out a notice to the user 
 make --silent --question build \
-  || printf '\e[1m[notice] sources changed - project needs to be rebuild.'\e[0m\n'
+  || printf '\e[1m[notice] sources changed - project needs to be rebuild.\e[0m\n'
