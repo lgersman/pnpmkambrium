@@ -45,3 +45,31 @@ init:
 > # instead of a .gitattributes file we can simply set git config option pointing to our git attribution 
 > # (see details here : https://github.com/git/git/blob/master/Documentation/config/core.txt)
 > git config core.attributesFile "$${KAMBRIUM_CORE_PATH}/presets/default/.gitattributes"
+
+.PHONY: doctor
+doctor:
+> KAMBRIUM_CORE_PATH=$$(realpath --relative-to=$$(pwd) node_modules/@pnpmkambrium/core)
+> {
+>   EXPECTED="$${KAMBRIUM_CORE_PATH}/presets/default/.githooks"
+>   CURRENT="$$(git config core.hookspath)"
+>   printf "[%1s] git config core.hookspath      (='%s')\n" "$$([[ "$$CURRENT" == "$$EXPECTED" ]] && printf '✔' || printf ' ')" "$$CURRENT" 
+>   [[ "$$CURRENT" == "$$EXPECTED" ]] || printf "\t=> should be '$$EXPECTED'\n"
+> }
+> {
+>   EXPECTED='true'
+>   CURRENT="$$(git config core.symlinks)"
+>   printf "[%1s] git config core.symlinks       (=%s)\n" "$$([[ "$$CURRENT" == "$$EXPECTED" ]] && printf '✔' || printf ' ')" "$$CURRENT" 
+>   [[ "$$CURRENT" == "$$EXPECTED" ]] || printf "\t=> should be '$$EXPECTED'\n"
+> }
+> {
+>   EXPECTED="$${KAMBRIUM_CORE_PATH}/presets/default/.gitignore"
+>   CURRENT="$$(git config core.excludesFile)"
+>   printf "[%1s] git config core.excludesFile   (='%s')\n" "$$([[ "$$CURRENT" == "$$EXPECTED" ]] && printf '✔' || printf ' ')" "$$CURRENT" 
+>   [[ "$$CURRENT" == "$$EXPECTED" ]] || printf "\t=> should be '$$EXPECTED'\n"
+> }
+> {
+>   EXPECTED="$${KAMBRIUM_CORE_PATH}/presets/default/.gitattributes"
+>   CURRENT="$$(git config core.attributesFile)"
+>   printf "[%1s] git config core.attributesFile (='%s')\n" "$$([[ "$$CURRENT" == "$$EXPECTED" ]] && printf '✔' || printf ' ')" "$$CURRENT" 
+>   [[ "$$CURRENT" == "$$EXPECTED" ]] || printf "\t=> should be '$$EXPECTED'\n"
+> }
