@@ -46,6 +46,13 @@ init:
 > # (see details here : https://github.com/git/git/blob/master/Documentation/config/core.txt)
 > git config core.attributesFile "$${KAMBRIUM_CORE_PATH}/presets/default/.gitattributes"
 
+# HELP<<EOF
+# Checks pnpmkambrium status  
+#
+# Tests if all settings, files and directories are properly set up 
+# 
+#  example: `make doctor` 
+# EOF
 .PHONY: doctor
 doctor:
 > KAMBRIUM_CORE_PATH=$$(realpath --relative-to=$$(pwd) node_modules/@pnpmkambrium/core)
@@ -73,3 +80,4 @@ doctor:
 >   printf "[%1s] git config core.attributesFile (='%s')\n" "$$([[ "$$CURRENT" == "$$EXPECTED" ]] && printf '✔' || printf ' ')" "$$CURRENT" 
 >   [[ "$$CURRENT" == "$$EXPECTED" ]] || printf "\t=> should be '$$EXPECTED'\n"
 > }
+> $(PNPM) -s doctor
