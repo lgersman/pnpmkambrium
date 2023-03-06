@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+#
+# will be called whenever a rebase/merge was done (i.e. after a git pull)
+#
+
 set -Eeuo pipefail
 
 # ensure all pnpmkambrium prerequisites are set up

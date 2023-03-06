@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+#
+# will be called after git pull/checkout 
+# see https://stackoverflow.com/a/5623947/1554103
+#
+
+# ensure all pnpmkambrium prerequisites are set up
+make --silent node_modules/
+make --silent init
