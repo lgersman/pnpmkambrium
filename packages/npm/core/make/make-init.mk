@@ -26,7 +26,7 @@ init:
 > # configure git to use true symlinks
 > git config core.symlinks true
 > 
-> # configure our gitignore list (${KAMBRIUM_CORE_PATH}/presets/default/.gitignore) via git config 
+> # configure our gitignore list ($${KAMBRIUM_CORE_PATH}/presets/default/.gitignore) via git config 
 > # (best solution so far compared to linking to .gitignore or .git/info/exclude)
 > git config core.excludesFile "$${KAMBRIUM_CORE_PATH}/presets/default/.gitignore"
 # > {
