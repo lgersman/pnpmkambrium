@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+#
+# After you run a successful git checkout, the post-checkout hook runs; 
+# you can use it to set up your working directory properly for your project environment. 
+# see: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
+#
+
+# ensure all pnpmkambrium prerequisites are set up
+make --silent node_modules/
+make --silent init
