@@ -39,7 +39,7 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > 
 > $$(echo -n "---")
 > 
-> $$(tar -ztf $(@D)/dist/*.tgz)
+> $$(tar -ztf $(@D)/dist/*.tgz | sort)
 > EOF
 
 # HELP<<EOF
