@@ -31,7 +31,7 @@ MAKEFLAGS += --no-builtin-rules
 #
 # disable stone age default built-in rule-specific variables enabled by default (yacc, cc and stuff)
 #
-MAKEFLAGS += ----no-builtin-variables
+MAKEFLAGS += --no-builtin-variables
 
 export DOCKER_FLAGS := -q
 
