@@ -6,6 +6,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-rules.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-targets.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-init.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-wp-plugin.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
