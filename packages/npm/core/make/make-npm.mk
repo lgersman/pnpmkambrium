@@ -52,7 +52,7 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 #    pushes all npm sub packages in `packages/npm/` to the npm registry
 # EOF
 .PHONY: npm-push
-npm-push: $(foreach PACKAGE, $(shell ls packages/npm), $(addprefix npm-push-, $(PACKAGE))) ;
+npm-push: $(foreach PACKAGE, $(shell find packages/npm/ -mindepth 1 -maxdepth 1 -type d -printf "%f " 2>/dev/null ||:), $(addprefix npm-push-, $(PACKAGE))) ;
 
 # HELP<<EOF
 # push npm package to registry

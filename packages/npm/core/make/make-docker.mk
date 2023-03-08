@@ -84,8 +84,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # see supported environment variables on target `docker-push-%`
 # EOF
 .PHONY: docker-push
-#HELP: * push docker images to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push' to push all docker sub packages
-docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-push-, $(PACKAGE))) ;
+docker-push: $(foreach PACKAGE, $(shell find packages/docker/ -mindepth 1 -maxdepth 1 -type d -printf "%f " 2>/dev/null ||:), $(addprefix docker-push-, $(PACKAGE))) ;
 
 # HELP<<EOF
 # push docker image to registry. 
