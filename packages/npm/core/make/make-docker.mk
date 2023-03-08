@@ -99,7 +99,7 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # supported variables are: 
 #   - `DOCKER_TOKEN` (required) can be the docker password (a docker token is preferred for security reasons)
-#   - `DOCKER_USER` use the docker identity/username, your docker account email will not work
+#   - `DOCKER_USER` (optional,default=sub package scope without `@`) use the docker identity/username, your docker account email will not work
 #   - `DOCKER_REPOSITORY` (optional,default=sub package name part after minus) 
 #   - `DOCKER_REGISTRY` (optional,default=$(DEFAULT_DOCKER_REGISTRY))
 #
@@ -111,10 +111,9 @@ docker-push: $(foreach PACKAGE, $(shell ls packages/docker), $(addprefix docker-
 # 
 # example: `make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar`
 # 
-#    will build/tag (if outdated) the docker image and 
+#    will build/tag (if outdated) the docker image and push it to wordpress.org
 # EOF
 .PHONY: docker-push-%
-#HELP: * push a single docker image to registry.\n\texample: 'DOCKER_TOKEN=your-token make docker-push-foo' to push docker package 'packages/docker/foo'
 docker-push-%: packages/docker/$$*/
 # read .env file from package if exists 
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
