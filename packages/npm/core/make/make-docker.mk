@@ -136,29 +136,28 @@ docker-push-%: packages/docker/$$*/
 > 
 >    # if DOCKER_REGISTRY == $(DEFAULT_DOCKER_REGISTRY) : update description and README.md
 >    if [[ "$$DOCKER_REGISTRY" == "$(DEFAULT_DOCKER_REGISTRY)" ]]; then
->     echo "updating description/README.md for docker image $$DOCKER_IMAGE"
-# >       cat ~/my_password.txt | docker login --username foo --password-stdin
-# >       docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
->     LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_TOKEN")
->     JWT_TOKEN=$$($(CURL) -H "Content-Type: application/json" -X POST -d "$$LOGIN_PAYLOAD" https://hub.docker.com/v2/users/login/ | jq --exit-status -r .token)
-#     GET : > $(CURL) -v -H "Authorization: JWT $${JWT_TOKEN}" "https://hub.docker.com/v2/repositories/$(DOCKER_IMAGE)/"
->     DESCRIPTION=$$(docker image inspect --format='' $$DOCKER_IMAGE:latest | jq -r '.[0].Config.Labels["org.opencontainers.image.description"] | values')
-# see https://frontbackend.com/linux/how-to-post-a-json-data-using-curl
-# see https://stackoverflow.com/a/48470227/1554103
->     DATA=`jq -n \
->       --arg description "$$(jq -r '.description | values' $$PACKAGE_JSON)" \
->       --arg full_description "$$(cat packages/docker/$*/README.md 2>/dev/null ||:)" '{description: $$description, full_description: $$full_description}' \
+>      echo "updating description/README.md for docker image $$DOCKER_IMAGE"
+#>      cat ~/my_password.txt | docker login --username foo --password-stdin
+#>      docker login --username='$(DOCKER_USER)' --password='$(DOCKER_PASS)' $${DOCKER_HOST:-}
+>      LOGIN_PAYLOAD=$$(printf '{ "username": "%s", "password": "%s" }' "$$DOCKER_USER" "$$DOCKER_TOKEN")
+>      JWT_TOKEN=$$($(CURL) -H "Content-Type: application/json" -X POST -d "$$LOGIN_PAYLOAD" https://hub.docker.com/v2/users/login/ | jq --exit-status -r .token)
+>      # GET : > $(CURL) -v -H "Authorization: JWT $${JWT_TOKEN}" "https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/"
+>      DESCRIPTION=$$(docker image inspect --format='' $$DOCKER_IMAGE:latest | jq -r '.[0].Config.Labels["org.opencontainers.image.description"] | values')
+>      # see https://frontbackend.com/linux/how-to-post-a-json-data-using-curl
+>      # see https://stackoverflow.com/a/48470227/1554103
+>      DATA=`jq -n \
+>        --arg description "$$(jq -r '.description | values' $$PACKAGE_JSON)" \
+>        --arg full_description "$$(cat packages/docker/$*/README.md 2>/dev/null ||:)" '{description: $$description, full_description: $$full_description}' \
 >      `
->     echo "$$DATA" && $(CURL) \
->       -H "Content-Type: application/json" \
->       -H "Authorization: JWT $${JWT_TOKEN}" \
->       -X PATCH \
->       --data "$$DATA" \
->       "https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/" \
->     | jq '{ description, full_description }'
+>      $(CURL) \
+>        -H "Content-Type: application/json" \
+>        -H "Authorization: JWT $${JWT_TOKEN}" \
+>        -X PATCH \
+>        --data "$$DATA" \
+>        "https://hub.docker.com/v2/repositories/$$DOCKER_IMAGE/" \
+>      | jq '{ description, full_description }'
 >      echo '[done]'
->   fi
->
+>    fi
 > else
 >   echo "[skipped]: package.json is marked as private"
 > fi

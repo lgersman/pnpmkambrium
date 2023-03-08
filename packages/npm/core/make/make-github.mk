@@ -48,7 +48,7 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >   --arg homepage "$$GITHUB_REPO_HOMEPAGE" \
 >   '{description: $$description, homepage: $$homepage }' \
 > `
-> echo "$$DATA" && $(CURL) \
+> $(CURL) \
 >    -X PATCH \
 >   -H "Accept: application/vnd.github+json" \
 >    -H "Authorization: Bearer $$GITHUB_TOKEN"\
@@ -62,7 +62,7 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >   --argjson topics "$$GITHUB_REPO_TOPICS" \
 >   '{ names : $$topics}' \
 > `
-> echo "$$DATA" && $(CURL) \
+> $(CURL) \
 >    -X PUT \
 >   -H "Accept: application/vnd.github+json" \
 >    -H "Authorization: Bearer $$GITHUB_TOKEN"\
