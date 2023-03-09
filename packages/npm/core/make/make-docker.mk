@@ -38,6 +38,16 @@ packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 # build and tag docker image
 #
+# supported variables are: 
+#   - `AUTHOR_NAME` (optional,default=package.json .author.name)
+#   - `AUTHOR_EMAIL` (optional,default=package.json .author.name) 
+#
+# environment variables can be provided using:
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
+#
 # we utilize file "build-info" to track if the docker image was build/is up to date
 packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # import kambrium bash function library
@@ -49,7 +59,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> PACKAGE_AUTHOR="$$(kambrium:author_name $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
+> PACKAGE_AUTHOR="$$(kambrium:author_name $$PACKAGE_JSON) <$$(kambrium:author_email $$PACKAGE_JSON)>"
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if DOCKER_USER is not set take the package scope (example: "@foo/bar" package user is "foo")
 > DOCKER_USER=$${DOCKER_USER:-$${PACKAGE_NAME%/*}}
