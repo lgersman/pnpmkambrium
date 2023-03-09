@@ -128,11 +128,12 @@ function kambrium:help() {
 # the first one found wins.
 # 
 # - environment variable AUTHOR_NAME
-# - .author.name from the package.json provided as first parameter (sub package from packages/*/*/package.json)
+# - .author.name from the package.json provided as parameter $1 (sub package from packages/*/*/package.json)
 # - .author.name from the root package.json
 # - the configured git user name (git config user.name)
 #
-# writes the author name to stdout
+# @param $1 path to package.json 
+# @return the first found author or an empty string if not found
 #
 function kambrium:author_name() {
   # assign environment variable AUTHOR_NAME or '' as fallback
