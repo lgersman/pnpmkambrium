@@ -141,3 +141,31 @@ function kambrium:help() {
     printf "%s" "$text"
   fi
 }
+
+#
+# computes the author name by querying a priorized list of sources. 
+# the first one found wins.
+# 
+# - environment variable AUTHOR_NAME
+# - .author.name from the package.json provided as first parameter (sub package from packages/*/*/package.json)
+# - .author.name from the root package.json
+# - the configured git user name (git config user.name)
+#
+# writes the author name to stdout
+#
+function kambrium:author_name() {
+  # assign environment variable AUTHOR_NAME or '' as fallback
+  VAL=${AUTHOR_NAME:-}
+  
+  # if empty : try evaluating .author.name from sub package.json 
+  [[ "$VAL" == '' ]] && VAL=$(jq -r '.autshor.name // ""' $1)
+
+  # if empty : try evaluating .author.name from root package.json 
+  [[ "$VAL" == '' ]] && VAL=$(jq -r '.autshor.name // ""' package.json)
+  
+  # if empty : try evaluating git user.name
+  [[ "$VAL" == '' ]] && VAL=$(git config user.name)
+
+  echo "$VAL"
+}
+

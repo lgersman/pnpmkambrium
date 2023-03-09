@@ -40,6 +40,8 @@ packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 #
 # we utilize file "build-info" to track if the docker image was build/is up to date
 packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
+> # import kambrium bash function library
+> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 # target depends on root located package.json and every file located in packages/docker/% except build-info
 # set -a causes variables¹ defined from now on to be automatically exported.
 > set -a 
@@ -47,7 +49,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> PACKAGE_AUTHOR="$$(jq -r '.author.name | values' $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
+> PACKAGE_AUTHOR="$$(kambrium:author_name $$PACKAGE_JSON) <$$(jq -r '.author.email | values' $$PACKAGE_JSON)>"
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if DOCKER_USER is not set take the package scope (example: "@foo/bar" package user is "foo")
 > DOCKER_USER=$${DOCKER_USER:-$${PACKAGE_NAME%/*}}
