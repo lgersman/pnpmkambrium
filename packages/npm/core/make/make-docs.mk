@@ -37,6 +37,8 @@ packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 #
 # build docs package
 # 
+# see target packages/docs/%/ for configuration options
+#
 # we utilize file "build-info" to track if the package was build/is up to date
 #
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
@@ -64,17 +66,13 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > else
 >   # ensure mdbook image is available
 >   $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
->    # prepare configuration
->    # @TODO: we could replace the bash function with pure jq using https://stackoverflow.com/questions/19529688/how-to-merge-2-json-objects-from-2-files-using-jq ? 
->   # @TODO: enable direct configurable MDBOOK_AUTHORS property and take the json data as fallback
->   MDBOOK_AUTHORS=$$(kambrium:jq:first_non_empty_array \
-      "$${MDBOOK_AUTHORS:-[]}" \
-      "$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)" \
-      "$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)" \
-      "$$(jq '[.contributors[]? | .name]' package.json)" \
-      "$$(jq '[.author.name | select(.|.!=null)]' package.json)" \
-    )
->    MDBOOK_BOOK=$$(jq -n --compact-output \
+>   # prepare MDBOOK_AUTHORS json array (the first non empty json array result wins)
+>   MDBOOK_AUTHORS="$${MDBOOK_AUTHORS:-[]}"
+>    [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)"
+>   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)"
+>   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' package.json)"
+>   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' package.json)"
+>   MDBOOK_BOOK=$$(jq -n --compact-output \
       --arg title "$${MDBOOK_TITLE:-$$PACKAGE_NAME}" \
       --arg description "$${MDBOOK_DESCRIPTION:-$$PACKAGE_DESCRIPTION}" \
       --argjson authors "$$MDBOOK_AUTHORS" \
@@ -85,11 +83,11 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
       jq --exit-status -r '.repository.url | select(.!=null)' $$PACKAGE_JSON || \
       jq --exit-status -r '.repository.url | select(.!=null)' package.json \
     )"
->    MDBOOK_GIT_URL_TEMPLATE="$${MDBOOK_GIT_URL_TEMPLATE:-}"
->    MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
->    MDBOOK_NO_SECTION_LABEL="$${MDBOOK_NO_SECTION_LABEL:-true}"
->    if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then
->      docker run --rm -it \
+>   MDBOOK_GIT_URL_TEMPLATE="$${MDBOOK_GIT_URL_TEMPLATE:-}"
+>   MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
+>   MDBOOK_NO_SECTION_LABEL="$${MDBOOK_NO_SECTION_LABEL:-true}"
+>   if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then
+>     docker run --rm -it \
         -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
@@ -99,8 +97,8 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
         -u $$(id -u):$$(id -g) \
         -p 3000:3000 -p 3001:3001 \
         pnpmkambrium/mdbook mdbook serve $(@D) -n 0.0.0.0
->    fi
->    docker run --rm -it \
+>   fi
+>   docker run --rm -it \
       -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
       -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
       -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
