@@ -11,16 +11,16 @@ endif
 # make to use > as the block character
 .RECIPEPREFIX = >
 
-#
-# alwas use bash as shell (to get <<< and stuff working), otherwise sh would be used by default
-#
-SHELL != sh -c "command -v bash"
+# #
+# # alwas use bash as shell (to get <<< and stuff working), otherwise sh would be used by default
+# #
+# SHELL != sh -c "command -v bash"
 
-#
-# use bash strict mode o that make will fail if a bash statement fails
-# (disabled) -O starglob enables extended globbing (example foo/**/*)
-#
-.SHELLFLAGS := -eu -o pipefail -c 
+# #
+# # use bash strict mode o that make will fail if a bash statement fails
+# # (disabled) -O starglob enables extended globbing (example foo/**/*)
+# #
+# .SHELLFLAGS := -eu -o pipefail -c 
 
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)

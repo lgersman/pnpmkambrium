@@ -10,7 +10,8 @@ ifndef KAMBRIUM_MAKEFILE_DIR
 # KAMBRIUM_MAKEFILE_DIR points to the directory where this file was loaded from
 override KAMBRIUM_MAKEFILE_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
-export KAMBRIUM_MAKEFILE_DIR 
+export KAMBRIUM_MAKEFILE_DIR
+include $(KAMBRIUM_MAKEFILE_DIR)/make-shell.mk 
 include $(KAMBRIUM_MAKEFILE_DIR)/make-common.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-functions.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-rules.mk
