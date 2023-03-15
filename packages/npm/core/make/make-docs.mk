@@ -42,9 +42,7 @@ packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 # we utilize file "build-info" to track if the package was build/is up to date
 #
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
-packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
-> # import kambrium bash function library
-> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
+packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
 > # set -a causes variables defined from now on to be automatically exported.
 > set -a
 > # read .env file from package if exists
@@ -56,22 +54,22 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # if package.json has a build script execute package script build. otherwise run mdbook
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 >   $(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
->    if jq --exit-status '.scripts | has("dev")' $$PACKAGE_JSON >/dev/null; then
->      $(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run dev
->    else
->      echo 'error: generic build/watch is not implemented yet' >&2
->      exit 1
->      # @TODO: add generic build/watch with browser refresh
->    fi
+>   if jq --exit-status '.scripts | has("dev")' $$PACKAGE_JSON >/dev/null; then
+>     $(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run dev
+>   else
+>     echo 'error: generic build/watch is not implemented yet' >&2
+>     exit 1
+>     # @TODO: add generic build/watch with browser refresh
+>   fi
 > else
 >   # ensure mdbook image is available
 >   $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
 >   # prepare MDBOOK_AUTHORS json array (the first non empty json array result wins)
 >   MDBOOK_AUTHORS="$${MDBOOK_AUTHORS:-[]}"
->    [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)"
->   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)"
->   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' package.json)"
->   [[ "$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' package.json)"
+>   [[ "$$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)"
+>   [[ "$$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)"
+>   [[ "$$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' package.json)"
+>   [[ "$$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.author.name | select(.|.!=null)]' package.json)"
 >   MDBOOK_BOOK=$$(jq -n --compact-output \
       --arg title "$${MDBOOK_TITLE:-$$PACKAGE_NAME}" \
       --arg description "$${MDBOOK_DESCRIPTION:-$$PACKAGE_DESCRIPTION}" \

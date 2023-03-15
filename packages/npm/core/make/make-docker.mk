@@ -50,10 +50,8 @@ packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 #
 # we utilize file "build-info" to track if the docker image was build/is up to date
 packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
-> # import kambrium bash function library
-> . "$(KAMBRIUM_MAKEFILE_DIR)/make-bash-functions.sh"
 # target depends on root located package.json and every file located in packages/docker/% except build-info
-# set -a causes variables¹ defined from now on to be automatically exported.
+# set -a causes variables defined from now on to be automatically exported.
 > set -a 
 # read .env file from package if exists 
 > DOT_ENV="packages/docker/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV

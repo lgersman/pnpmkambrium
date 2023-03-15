@@ -5,12 +5,12 @@
 # see https://github.com/lgersman/make-auto-import-bash-library-using-shell-wrapper-demo/ for inspiration
 #
 
-# undefine any KAMBRIUM_SHELL_ variables that may be (unintended) inherited
-# from the environment or the Make command line variables
-override undefine KAMBRIUM_SHELL_PRELOAD
-override undefine KAMBRIUM_SHELL_PROLOGUE
-override undefine KAMBRIUM_SHELL_ALWAYS_PRELOADm
-override undefine KAMBRIUM_SHELL_ALWAYS_PROLOGUE
+# # undefine any KAMBRIUM_SHELL_ variables that may be (unintended) inherited
+# # from the environment or the Make command line variables
+# override undefine KAMBRIUM_SHELL_PRELOAD
+# override undefine KAMBRIUM_SHELL_PROLOGUE
+# override undefine KAMBRIUM_SHELL_ALWAYS_PRELOAD
+# override undefine KAMBRIUM_SHELL_ALWAYS_PROLOGUE
 
 # set to true in your Makefile to enable bash xtrace 
 KAMBRIUM_SHELL_XTRACE ?= false

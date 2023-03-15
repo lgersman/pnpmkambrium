@@ -34,7 +34,7 @@ define ensure-docker-images-exists
 endef
 
 #
-#  dump make variables 
+# dump make variables 
 # example usage : 
 # mytarget: 
 # > $(call kambrium_dump_vars)

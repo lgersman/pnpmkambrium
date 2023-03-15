@@ -9,24 +9,12 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
   $(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
 endif
 # make to use > as the block character
-.RECIPEPREFIX = >
-
-# #
-# # alwas use bash as shell (to get <<< and stuff working), otherwise sh would be used by default
-# #
-# SHELL != sh -c "command -v bash"
-
-# #
-# # use bash strict mode o that make will fail if a bash statement fails
-# # (disabled) -O starglob enables extended globbing (example foo/**/*)
-# #
-# .SHELLFLAGS := -eu -o pipefail -c 
+.RECIPEPREFIX := >
 
 #
 # disable stone age default rules enabled by default (yacc, cc and stuff)
 #
 MAKEFLAGS += --no-builtin-rules
-
 
 #
 # disable stone age default built-in rule-specific variables enabled by default (yacc, cc and stuff)
@@ -108,6 +96,8 @@ CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 
 # enable SECONDEXPANSION feature of make for all following targets
 # see https://www.cmcrossroads.com/article/making-directories-gnu-make
 .SECONDEXPANSION:
+
+KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-common.sh
 
 ENV_FILES := $(shell find . -type f -name '.env')
 

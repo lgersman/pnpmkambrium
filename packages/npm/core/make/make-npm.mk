@@ -25,10 +25,10 @@ packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # we utilize file "build-info" to track if the package was build/is up to date
 #
 packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
-# target depends on root located package.json and every file located in packages/npm/% except build-info 
-# set -a causes variables¹ defined from now on to be automatically exported.
+> # target depends on root located package.json and every file located in packages/npm/% except build-info 
+> # set -a causes variables defined from now on to be automatically exported.
 > set -a
-# read .env file from package if exists
+> # read .env file from package if exists
 > DOT_ENV="$(@D)/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_JSON=$(@D)/package.json
 > rm -f $(@D)/dist/*.tgz

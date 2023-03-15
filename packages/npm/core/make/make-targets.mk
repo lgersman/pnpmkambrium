@@ -20,7 +20,7 @@ packages/: $$(wildcard $$(@D)/*/) ;
 >   set -a
 >   DOT_ENV="$${BASH_REMATCH[1]}.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV 
 > fi
-> command -v "$<" 1 > /dev/null && 
->   echo "$< => $@" && 
->   "$<" > "$@" ||
+> command -v "$<" 1 > /dev/null && \
+>   echo "$< => $@" && \
+>   "$<" > "$@" || \
 >   (echo "template(=$<) is no executable : don't know how to generate target file(=$@)" >&2 && false)
