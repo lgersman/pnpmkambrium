@@ -111,8 +111,11 @@ main() {
   (( "${#prologues[@]}" > 0 )) && script_lines+=( "# prologue scripts:" "$(printf 'source %q\n' "${prologues[@]}")" '' )
 
   # append rest of the script (i.e. the Makefile recipe contents)
-  script_lines+=( "$script_body" )
-
+  # make doesnt strip the leading space per line since it does not know
+  # our SHELL so we do it ourself using bash string subtitution
+  # (this is needed to prevent heredoc warnings)
+  script_lines+=( "${script_body//$'\n' /$'\n'}" )
+  
   if [[ "${KAMBRIUM_SHELL_DUMP:-}" == 'true' ]]; then
     printf '%s\n' "${script_lines[@]}"
   else
