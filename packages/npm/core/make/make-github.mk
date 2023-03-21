@@ -68,3 +68,82 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >   --data "$$DATA" \
 >   | jq .
 > echo '[done]'
+
+#!interactive-delete-ghrelease
+# HELP<<EOF
+# Delete a existing release from a remoote Github repository
+# 
+# supported variables are : 
+#   - `GITHUB_TOKEN` (required) can be the GitHub password (a GitHub token is preferred for security reasons)
+#   - `GITHUB_OWNER` (required) GitHub username 
+#   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
+# 
+# environment variables can be provided using:
+#   - make variables provided at commandline
+#   - `.env` file from sub package#   - `.env` file from monorepo root
+#   - environment##  example: `make --silent github-details-push`
+#    
+#    will update the GitHub repository metadata with the provided data
+#
+# TODO: GITHUB_TAG Gum selection is not dockerized!
+# EOF
+.PHONY: interactive-delete-ghrelease
+interactive-delete-ghrelease:
+#* ensure environment is sufficently defined 
+> DOT_ENV=".env" && [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
+> : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
+> GITHUB_REPO=$${GITHUB_REPO:-$$(jq -r '.name | values' package.json)}
+> GITHUB_REPO_URL="https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}"
+>
+#* fetch all tags in repository and check if there are any releases to delete
+>  USED_TAGS=`$(CURL) \
+>  -H "Accept: application/vnd.github+json" \
+>  -H "Authorization: Bearer $$GITHUB_TOKEN" \
+>  -H "X-GitHub-Api-Version: 2022-11-28" \
+>  $$GITHUB_REPO_URL/tags | jq -r ".[] | .name"`
+> if [ -z $$USED_TAGS ]; then \
+>  $(GUM) format --type="markdown" "# There are no releases to delete. Stopping" >&2; \
+>  exit 0; \
+> fi
+>
+#* let user select Github Tag to remove
+> GITHUB_TAG=$$(gum choose $$USED_TAGS)
+> RELEASE=`$(CURL) \
+> -H "Accept: application/vnd.github+json" \
+> -H "Authorization: Bearer $$GITHUB_TOKEN" \
+> -H "X-GitHub-Api-Version: 2022-11-28" \
+> $$GITHUB_REPO_URL/releases/tags/$$GITHUB_TAG`
+>
+> RELEASE_ID=$$(jq -S '.id' <<< $$RELEASE)
+> RELEASE_AUTHOR=$$(jq -S '.author.login' <<< $$RELEASE)
+> RELEASE_ASSETS=$$(jq -S '.assets' <<< $$RELEASE)
+> RELEASE_CREATING_DATE=$$(jq -S '.created_at' <<< $$RELEASE)
+> RELEASE_PUBLISH_DATE=$$(jq -S '.published_at' <<< $$RELEASE)
+> 
+#* Formated info on release
+> $(GUM) format "## Tag		: $$GITHUB_TAG"
+> $(GUM) format "## ID 		: $$RELEASE_ID"
+> $(GUM) format "## Author 	: $$RELEASE_AUTHOR"
+> $(GUM) format "## Created 	: $$RELEASE_CREATING_DATE"
+> $(GUM) format "## Published 	: $$RELEASE_PUBLISH_DATE"
+> $(GUM) format "## Assets	: $$RELEASE_ASSETS"
+>
+> #* check if user wants to delete release, then delete release and attached Github tag
+> $(GUM) confirm && \
+> $(CURL) \
+> -X DELETE \
+> -H "Accept: application/vnd.github+json" \
+> -H "Authorization: Bearer $$GITHUB_TOKEN" \
+> -H "X-GitHub-Api-Version: 2022-11-28" \
+> $$GITHUB_REPO_URL/releases/$$RELEASE_ID && \
+> $(CURL) \
+> -X DELETE \
+> -H "Accept: application/vnd.github+json" \
+> -H "Authorization: Bearer $$GITHUB_TOKEN" \
+> -H "X-GitHub-Api-Version: 2022-11-28" \
+> $$GITHUB_REPO_URL/git/refs/tags/$$GITHUB_TAG
+
+PHONY: release-packages/%
+release-packages/% : packages/$$*
+> echo $(filename $^)
