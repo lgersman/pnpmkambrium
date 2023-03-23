@@ -31,6 +31,18 @@ function kambrium:author_name() {
 }
 
 #
+# load the `.env` file from path in parameter $1 if exists.
+# bash will source the `.env file` and export any variable/function declared in the file to the caller.
+#
+# if the `.env` file is a executable it will be executed and its output will be sourced end exported to the caller script
+#
+# @param $1 (optional, default is `pwd`) path to current paackage sub directory
+#
+function kambrium:load_dotenv() {
+  echo "huhu !"
+} 
+
+#
 # computes the author email by querying a priorized list of sources. 
 # the first one found wins.
 # 
