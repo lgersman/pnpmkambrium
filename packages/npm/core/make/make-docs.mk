@@ -43,10 +43,8 @@ packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 #
 # target depends on root located package.json and every file located in packages/docs/% except build-info 
 packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
-> # set -a causes variables defined from now on to be automatically exported.
-> set -a
-> # read .env file from package if exists
-> DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')

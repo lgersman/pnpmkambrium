@@ -21,11 +21,8 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
 packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
-> # target depends on root located package.json and every file located in packages/wp-plugin/% except build-info
-> # set -a causes variables defined from now on to be automatically exported.
-> set -a 
-# read .env file from package if exists 
-> DOT_ENV="packages/wp-plugin/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_AUTHOR="$$(kambrium:author_name $$PACKAGE_JSON) <$$(kambrium:author_email $$PACKAGE_JSON)>"
@@ -90,8 +87,8 @@ wp-plugin-push: $(foreach PACKAGE, $(shell find packages/wp-plugin/ -mindepth 1 
 # EOF
 .PHONY: wp-plugin-push-%
 wp-plugin-push-%: packages/wp-plugin/$$*/
-# read .env file from package if exists 
-> DOT_ENV="packages/wp-plugin/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env packages/wp-plugin/$*
 > PACKAGE_JSON=packages/wp-plugin/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if WORDPRESS_USER is not set take the package scope (example: "@foo/bar" wordpress user is "foo")

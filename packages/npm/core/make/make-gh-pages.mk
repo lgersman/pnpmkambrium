@@ -31,8 +31,8 @@
 # EOF
 .PHONY: gh-pages-push-%
 gh-pages-push-%: packages/docs/$$*/
-> # read .env file from package if exists
-> DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env packages/docs/$*
 > PACKAGE_JSON=packages/docs/$*/package.json
 > echo "update gh-pages branch using packages/docs/$*/build"
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then 
@@ -109,6 +109,8 @@ gh-pages-push-%: packages/docs/$$*/
 >        echo '[error] : Failed to update GitHub Pages configuration (http status=$$HTTP_STATUS)'
 >        exit 1
 >      fi
+>    else 
+>      echo "[skipped]: updating github pages configuration - GITHUB_TOKEN environment was empty/not-set"
 >   fi
 >
 > else

@@ -16,9 +16,8 @@ packages/: $$(wildcard $$(@D)/*/) ;
 % : %.kambrium-template $(ENV_FILES)
 > # import matching .env file if template is located in a monorepo package directory  
 > if [[ "$<" =~ ^(packages/([^/]+/){2}) ]]; then
->   # set -a causes variables defined from now on to be automatically exported.
->   set -a
->   DOT_ENV="$${BASH_REMATCH[1]}.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV 
+>   # inject sub package environments from {.env,.secrets} files
+>   kambrium:load_env "$${BASH_REMATCH[1]}"
 > fi
 > command -v "$<" 1 > /dev/null && \
 >   echo "$< => $@" && \

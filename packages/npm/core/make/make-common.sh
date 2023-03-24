@@ -31,16 +31,27 @@ function kambrium:author_name() {
 }
 
 #
-# load the `.env` file from path in parameter $1 if exists.
-# bash will source the `.env file` and export any variable/function declared in the file to the caller.
+# load the `.env` and `.secrets` file from path in parameter $1 if `.env`/`.secrets` file exists.
+# bash will source the `.env`/`.secrets` and export any variable/functions declared in the file to the caller.
 #
-# if the `.env` file is a executable it will be executed and its output will be sourced end exported to the caller script
+# if the `.env`/`.secrets` file is a executable it will be executed and its output will be sourced end exported to the caller script
 #
-# @param $1 (optional, default is `pwd`) path to current paackage sub directory
+# @param $1 (optional, default is `pwd`) path to current package sub directory
 #
-function kambrium:load_dotenv() {
-  echo "huhu !"
-} 
+function kambrium:load_env() {
+  local path=$(realpath "${1:-$(pwd)}")
+
+  for file in "$path/"{.env,.secrets}; do
+    if [[ -f "$file" ]]; then
+      # enable export all variables bash feature
+      set -a  
+      # include .env/.secret files into current bash process
+      source "$file"
+      # disabled export all variables bash feature
+      set +a
+    fi
+  done
+}
 
 #
 # computes the author email by querying a priorized list of sources. 
@@ -68,3 +79,6 @@ function kambrium:author_email() {
 
   echo "$VAL"
 }
+
+# load and export project root .env/.secret files
+kambrium:load_env 

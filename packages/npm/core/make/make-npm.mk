@@ -25,11 +25,8 @@ packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # we utilize file "build-info" to track if the package was build/is up to date
 #
 packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
-> # target depends on root located package.json and every file located in packages/npm/% except build-info 
-> # set -a causes variables defined from now on to be automatically exported.
-> set -a
-> # read .env file from package if exists
-> DOT_ENV="$(@D)/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > rm -f $(@D)/dist/*.tgz
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
@@ -74,8 +71,8 @@ npm-push: $(foreach PACKAGE, $(shell find packages/npm/ -mindepth 1 -maxdepth 1 
 # EOF
 .PHONY: npm-push-%
 npm-push-%: packages/npm/$$*/
-> # read .env file from package if exists 
-> DOT_ENV="packages/npm/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
+> # inject sub package environments from {.env,.secrets} files
+> kambrium:load_env packages/npm/$*
 > PACKAGE_JSON=packages/npm/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON)
 > # abort if NPM_TOKEN is not defined 

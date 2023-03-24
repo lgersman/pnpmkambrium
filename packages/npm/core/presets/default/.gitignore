@@ -9,7 +9,6 @@ node_modules
 dist
 .pnpm-debug.log
 build
-/docker/*.tgz
 build-info
 /.pnpm-store
 # never ever track .secrets files since they are proposed to keep sensitive data

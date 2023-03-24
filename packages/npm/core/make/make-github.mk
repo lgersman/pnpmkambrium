@@ -34,8 +34,6 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
 # abort if GITHUB_OWNER is not defined
 > : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
-> # read .env file from package if exists
-> DOT_ENV="packages/docs/$*/.env"; [[ -f $$DOT_ENV ]] && source $$DOT_ENV
 > PACKAGE_NAME=$$(jq -r '.name | values' package.json)
 > GITHUB_REPO=$${GITHUB_REPO:-$$PACKAGE_NAME}
 > GITHUB_REPO_DESCRIPTION=$${GITHUB_REPO_DESCRIPTION:-$$(jq --exit-status -r '.description | values' package.json)}
