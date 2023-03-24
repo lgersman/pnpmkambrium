@@ -30,7 +30,7 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > PACKAGE_JSON=$(@D)/package.json
 > rm -f $(@D)/dist/*.tgz
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
-> (cd $(@D) && pnpm pack --pack-destination ./dist >/dev/null)
+> (cd $(@D) && $(PNPM) pack --pack-destination ./dist >/dev/null)
 > cat << EOF | tee $@
 > $$(cd $(@D)/dist && ls -1shS *.tgz) 
 > 

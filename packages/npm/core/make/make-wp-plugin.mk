@@ -39,7 +39,7 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?  
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > # @TODO: zip build/* folder contents 
-# > (cd $(@D) && pnpm pack --pack-destination ./dist >/dev/null)
+# > (cd $(@D) && $(PNPM) pack --pack-destination ./dist >/dev/null)
 # > ARCHIVE_NAME="$$(basename $<)-v$${PLUGIN_VERSION}.zip"
 # > cd $< && zip -qq -r -o ../$$ARCHIVE_NAME * 
 > # output zip archives 

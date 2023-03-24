@@ -43,6 +43,14 @@ MAKEFLAGS += --no-print-directory
 #
 .DEFAULT_GOAL := help
 
+TERMINAL_GREY != tput setaf 2
+TERMINAL_YELLOW != tput setaf 3
+TERMINAL_RESET  != tput sgr0
+
+# use curl always with these options 
+# if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
+CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
+
 #
 # targets like "make packages/docker/" making build-info files
 # would be treated as immediate files and removed immediately after executing sub target 
@@ -60,39 +68,7 @@ MAKEFLAGS += --no-print-directory
 # > You can disable intermediate files completely in your makefile by providing .NOTINTERMEDIATE as a target with no prerequisites: 
 # > in that case it applies to every file in the makefile.
 # .NOTINTERMEDIATE:
-
-# ensure pnpm is available
-ifeq (,$(shell command -v pnpm))
-  define PNPM_NOT_FOUND
-pnpm is not installed or not in PATH. 
-Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
-(windows : 'iwr https://get.pnpm.io/install.ps1 -useb | iex') 
-
-See more here : https://docs.npmjs.com/getting-started/installing-node 
-  endef
-  $(error $(PNPM_NOT_FOUND))
-else
-  PNPM != command -v pnpm
-endif
-
-# ensure a recent nodejs version is available
-# (required by pnpm)
-ifeq (,$(shell command -v node))
-  define NODEJS_NOT_FOUND
-node is not installed or not in PATH. 
-See more here : https://nodejs.org/en/download/ 
-  endef
-  $(error $(NODEJS_NOT_FOUND))
-endif
-
-TERMINAL_GREY != tput setaf 2
-TERMINAL_YELLOW != tput setaf 3
-TERMINAL_RESET  != tput sgr0
-
-# use curl always with these options 
-# if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
-CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
-
+#
 # enable SECONDEXPANSION feature of make for all following targets
 # see https://www.cmcrossroads.com/article/making-directories-gnu-make
 .SECONDEXPANSION:

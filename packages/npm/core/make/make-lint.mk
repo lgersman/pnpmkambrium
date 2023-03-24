@@ -1,5 +1,11 @@
 # lint related targets
 
+# always run prettier using ignored files from .lintignore 
+PRETTIER := $(PNPM) prettier --ignore-path='$(CURDIR)/.lintignore' --cache --check
+
+# always run eslint using ignored files from .lintignore 
+ESLINT := $(PNPM) eslint --ignore-path='$(CURDIR)/.lintignore' --no-error-on-unmatched-pattern
+
 # HELP<<EOF
 # lint sources
 # EOF
