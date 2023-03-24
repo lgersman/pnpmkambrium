@@ -161,6 +161,7 @@
 </ul>
 </li>
 <li><a href="#caveats">Caveats</a></li>
+<li><a href="#faq">FAQ</a></li>
 </ul>
 <h1 id="purpose"><a class="header" href="#purpose">Purpose</a></h1>
 <p>@TODO:</p>
@@ -221,6 +222,32 @@ The <a href="https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-
 <p>Either remove the minus (<code>-</code>) sign from the sub package scope or set environment variable <code>DOCKER_USER</code> (using an <code>.env</code> file or at commandline) to the desired docker user.</p>
 </li>
 </ul>
+<h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<ul>
+<li>Some files are ignored by GIT version control but I cannot find a <code>.gitignore</code> file. Why is it ignored ?</li>
+</ul>
+<p><code>@pnpmkambrium/core</code> configures a default set of GIT ignored resources (like <code>build</code>/<code>dist</code> directories) in <code>.git/info/exclude</code>.</p>
+<p><code>.git/info/exclude</code> is a standard GIT file intended for local usage only by GIT. It has same semantics and meaning as <code>.gitignore</code> but a lower priority (<code>.gitignore</code> rules override <code>.git/info/exclude</code> rules).</p>
+<p>Package <code>@pnpmkambrium/core</code> will link <code>.git/info/exclude</code> to an built-in git ignore exclude file declaring all pnpmkambrium intermediate files.</p>
+<p>If you worry about a untracked file you can ask GIT what's the reason :</p>
+<pre><code># ask GIT why file build-info is not tracked by GIT
+$&gt; git check-ignore -v build-info
+# GIT tells you what file/line-in-file was the reason
+$&gt; .git/info/exclude:13:build-info build-info
+</code></pre>
+<p>As mentioned <code>.git/info/exclude</code> is the file containing the pnpm kambrium git ignore rules.
+It is linked to a file provided by package <code>@pnpmkambrium/core</code> :</p>
+<pre><code># ask the systen where .git/info/exclude is linked to
+$&gt; ls -la .git/info/exclude
+# thats the git ignore file provided by pnpmkambrium
+$&gt; lrwxrwxrwx 1 user user 50 Mar  2 15:12 .git/info/exclude -&gt; node_modules/@pnpmkambrium/core/presets/default/.gitignore
+</code></pre>
+<p>If you want to override a setting of the default ignore list provided by <code>@pnpmkambrium/core</code> you can do this by providing a <code>.gitignore</code> file and mention the file you want to track with git :</p>
+<pre><code># situation: .env files are listed in the pnpmkambrium git ignore list
+# (=&gt; .env files may contain secrets/tokens/passwords, thats why pnpmkambrium configured git to ignore .env files from being tracked)
+$&gt; echo &quot;!/.env&quot; &gt; .gitignore
+# now we have a .gitignore file with a single line telling git to NO MORE(!) ignore .env files
+</code></pre>
 
                     </main>
 
