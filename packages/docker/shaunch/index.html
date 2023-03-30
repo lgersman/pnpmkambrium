@@ -196,7 +196,7 @@
 <li>pre-packaged docker image</li>
 <li><a href="https://github.com/lgersman/pnpmkambrium/blob/develop/packages/docker/shaunch/bin/shaunch.sh">self contained bash script</a>
 <ul>
-<li><a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> will be downloaded/installed on demand to a <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> private directory</li>
+<li><a href="https://github.com/junegunn/fzf">fzf</a> will be downloaded/installed on demand to a <a href="https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch">shaunch</a> private directory</li>
 </ul>
 </li>
 </ul>
@@ -382,7 +382,7 @@ services:
 <ul>
 <li>
 <p>The local bash script works right now only on amd64 linux machines because i did not figured out a way to install it's dependencies in a cross platform manner.</p>
-<p>@TODO: This can be easily fixed by downloading the correct <a href="https://github.com/junegunn/fzf">fzf</a> and <a href="https://github.com/sharkdp/bat">batcat</a> binaries depending on the platform.</p>
+<p>@TODO: This can be easily fixed by downloading the correct <a href="https://github.com/junegunn/fzf">fzf</a> binary depending on the platform.</p>
 </li>
 <li>
 <p>writing to the next prompt using the <code>prompt</code> property will not work when executed from docker</p>
