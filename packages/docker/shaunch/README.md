@@ -20,7 +20,7 @@ I wrote [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages
 
   - pre-packaged docker image
   - [self contained bash script](https://github.com/lgersman/pnpmkambrium/blob/develop/packages/docker/shaunch/bin/shaunch.sh)
-    - [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat) will be downloaded/installed on demand to a [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch) private directory
+    - [fzf](https://github.com/junegunn/fzf) will be downloaded/installed on demand to a [shaunch](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch) private directory
 
 - when started with `-c <directory>` the contained scripts and documentation files will be out of the box presented to the user (see [static directory example](https://github.com/lgersman/pnpmkambrium/tree/develop/packages/docker/shaunch/examples/commands-by-directory)). Output will be assumed to be JSON according to the shaunch json schema definition
 
@@ -174,7 +174,7 @@ docker run -it --rm -v $(pwd)/your-shaunch-app-dir:/app pnpmkambrium/shaunch
 
 - The local bash script works right now only on amd64 linux machines because i did not figured out a way to install it's dependencies in a cross platform manner.
 
-  @TODO: This can be easily fixed by downloading the correct [fzf](https://github.com/junegunn/fzf) and [batcat](https://github.com/sharkdp/bat) binaries depending on the platform.
+  @TODO: This can be easily fixed by downloading the correct [fzf](https://github.com/junegunn/fzf) binary depending on the platform.
 
 - writing to the next prompt using the `prompt` property will not work when executed from docker
 
