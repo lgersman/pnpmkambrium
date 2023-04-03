@@ -1,4 +1,4 @@
-const settings = require('./packages/npm/core/presets/default/commitlint.config.js');
+const settings = require('@pnpmkambrium/core/presets/default/commitlint.config.js');
 module.exports = {
   ...settings,
 };
