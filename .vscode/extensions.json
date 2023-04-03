@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
     "formulahendry.vscode-mysql",
+    "EditorConfig.EditorConfig",
 
     // taken from https://github.com/antfu/vscode-settings/blob/main/.vscode/extensions.json
     // "usernamehw.errorlens",
