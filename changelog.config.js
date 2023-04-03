@@ -1,4 +1,4 @@
-const settings = require('./packages/npm/core/presets/default/changelog.config.js');
+const settings = require('@pnpmkambrium/core/presets/default/changelog.config.js');
 module.exports = {
   ...settings,
 };
