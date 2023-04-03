@@ -1,4 +1,4 @@
-const settings = require('./packages/npm/core/presets/default/.prettierrc.js');
+const settings = require('@pnpmkambrium/core/presets/default/.prettierrc.js');
 module.exports = {
   ...settings,
 };
