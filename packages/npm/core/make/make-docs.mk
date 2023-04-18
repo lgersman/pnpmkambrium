@@ -104,7 +104,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build $(@D)
 > fi
-> [[ -d "$(@D)/build" ]] || echo "don't know how to build archive from build directory(='$(@D)/build') : directory does not exist" >&2 && false
+> [[ -d "$(@D)/build" ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 > mkdir -p $(@D)/dist
 > # redirecting into the target zip archive frees us from removing an existing archive first

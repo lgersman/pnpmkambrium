@@ -1,6 +1,6 @@
 #
 # this is the main pnpmkambrium makefile
-# 
+#
 # if you want to extend pnpmkambrium with custom make targets simply include this file in your own make file
 #
 
@@ -8,7 +8,7 @@
 KAMBRIUM_MAKEFILE_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 export KAMBRIUM_MAKEFILE_DIR
-include $(KAMBRIUM_MAKEFILE_DIR)/make-shell.mk 
+include $(KAMBRIUM_MAKEFILE_DIR)/make-shell.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-common.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-functions.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-rules.mk
@@ -20,6 +20,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-clean.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-wp-plugin.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-generic.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-github.mk
