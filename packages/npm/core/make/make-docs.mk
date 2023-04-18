@@ -12,14 +12,14 @@ packages/docs/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 #
 # task utilizes various informations from `package.json` like authors/contributors/title/etc.
 #
-# the following mdbook configuration options can be provided by environment variables: 
-#   - `MDBOOK_GIT_REPOSITORY_URL` (optional, default=repository.url from (sub|root)package.json) 
-#   - `MDBOOK_GIT_REPOSITORY_ICON` (optional, default=`fa-code-fork`) 
-#   - `MDBOOK_GIT_URL_TEMPLATE` (optional), 
+# the following mdbook configuration options can be provided by environment variables:
+#   - `MDBOOK_GIT_REPOSITORY_URL` (optional, default=repository.url from (sub|root)package.json)
+#   - `MDBOOK_GIT_REPOSITORY_ICON` (optional, default=`fa-code-fork`)
+#   - `MDBOOK_GIT_URL_TEMPLATE` (optional),
 #   - `MDBOOK_NO_SECTION_LABEL` (optional, default=`true`) set to `false` to enable numeric section labels in the table of contents column
 #   - `MDBOOK_AUTHORS` (optional) json array of author names. falling back to package.json properties `authors.name` / `contributors`
 #   - `MDBOOK_TITLE` (optional, defaults to `package.json` property `name`)
-#   - `MDBOOK_DESCRIPION` (optional, defaults to `package.json` property `description`) 
+#   - `MDBOOK_DESCRIPION` (optional, defaults to `package.json` property `description`)
 #    (see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)
 #
 # environment variables can be provided using:
@@ -36,12 +36,12 @@ packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 
 #
 # build docs package
-# 
+#
 # see target packages/docs/%/ for configuration options
 #
 # we utilize file "build-info" to track if the package was build/is up to date
 #
-# target depends on root located package.json and every file located in packages/docs/% except build-info 
+# target depends on root located package.json and every file located in packages/docs/% except build-info
 packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
 > # inject sub package environments from {.env,.secrets} files
 > kambrium:load_env $(@D)
@@ -104,28 +104,29 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build $(@D)
 > fi
-> find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \; 
+> [[ -d "$(@D)/build" ]] || echo "don't know how to build archive from build directory(='$(@D)/build') : directory does not exist" >&2 && false
+> find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 > mkdir -p $(@D)/dist
 > # redirecting into the target zip archive frees us from removing an existing archive first
 > (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
 > cat << EOF | tee $@
-> $$(cd $(@D)/dist && ls -1shS *.zip ) 
-> 
+> $$(cd $(@D)/dist && ls -1shS *.zip )
+>
 > $$(echo -n "---")
-> 
+>
 > $$(unzip -l $(@D)/dist/*.zip)
 > EOF
 
 # HELP<<EOF
 # start dev server for a docs sub package in `packages/docs/`
-# 
+#
 # please note that this target __MUST__ be called with make option `-b`.
-# 
+#
 # using this target enables you to edit a docs sub package and preview it in the browser at your fingertips
 #
 # example: `make -B dev-docs-foo`
 #
-#      will start the dev server for docs sub package `foo`. 
+#      will start the dev server for docs sub package `foo`.
 #      Every change in `packages/docs/foo` will result in rebuild/reloading the docs in the browser.
 # EOF
 .PHONY: dev-docs-%
