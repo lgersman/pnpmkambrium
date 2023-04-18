@@ -6,3 +6,4 @@ packages:
   - 'packages/docs/*'
   - 'packages/wp-plugin/*'
   - 'packages/wp-theme/*'
+  - 'packages/generic/*'
