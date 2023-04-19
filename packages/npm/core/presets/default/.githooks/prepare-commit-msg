@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ensure all dependencies are installed before executing 
+# ensure all dependencies are installed before executing
 make --silent node_modules/ && exec < /dev/tty && \
   PNPM_WORKSPACE_PACKAGES=$( \
-    pnpm list --filter "*/*" --json | jq -c  '[.[].name | select( . != null )]' \
+    pnpm list --filter "*/*" --json | jq -c  '[.[].name | select( . != null )] | sort' \
   ) pnpm git cz --hook ||:
