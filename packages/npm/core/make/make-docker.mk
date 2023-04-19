@@ -7,7 +7,7 @@
 export DOCKER_SCAN_SUGGEST:=false
 
 #
-# use  buildx for more performant image builds 
+# use  buildx for more performant image builds
 # see https://docs.docker.com/build/buildkit/
 #
 export DOCKER_BUILDKIT:=1
@@ -29,18 +29,18 @@ packages/docker/: $(KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS) ;
 # build and tag outdated docker image sub package by name.
 #
 # image metadata like author/description/version will be taken from sub package file `package.json`
-# 
-# example: `make packages/docker/foo/` 
-# 
+#
+# example: `make packages/docker/foo/`
+#
 #   will build the docker image in sub package `packages/docker/foo`
 # EOF
 packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 
 # build and tag docker image
 #
-# supported variables are: 
+# supported variables are:
 #   - `AUTHOR_NAME` (optional,default=package.json .author.name)
-#   - `AUTHOR_EMAIL` (optional,default=package.json .author.name) 
+#   - `AUTHOR_EMAIL` (optional,default=package.json .author.name)
 #
 # environment variables can be provided using:
 #   - make variables provided at commandline
@@ -61,7 +61,8 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # if DOCKER_REPOSITORY is not set take the package repository (example: "@foo/bar" package repository is "bar")
 > DOCKER_REPOSITORY=$${DOCKER_REPOSITORY:-$${PACKAGE_NAME#*/}}
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
-> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
+> rm -rf $(@D)/{dist,build}
+> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \
 >   --progress=plain \
@@ -79,34 +80,34 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # output generated image labels
 > cat << EOF | tee $@
 > $$(docker image inspect $$DOCKER_IMAGE:latest | jq '.[0].Config.Labels | values')
-> 
+>
 > $$(echo -n "---")
-> 
+>
 > $$(docker image ls --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedAt}}\t{{.Size}}" $$DOCKER_IMAGE:$$PACKAGE_VERSION)
 > EOF
 
 # HELP<<EOF
 # push docker images to registry
-# 
+#
 # see supported environment variables on target `docker-push-%`
 # EOF
 .PHONY: docker-push
 docker-push: $(foreach PACKAGE, $(shell find packages/docker/ -mindepth 1 -maxdepth 1 -type d -printf "%f " 2>/dev/null ||:), $(addprefix docker-push-, $(PACKAGE))) ;
 
 # HELP<<EOF
-# push docker image to registry. 
-# 
-# target will also update 
+# push docker image to registry.
+#
+# target will also update
 #
 #   - the image short description using the `description` property of sub package file `package.json`
-#   - image long description using sub package file `README.md` 
-# 
-# at the docker registry using 
-# 
-# supported variables are: 
+#   - image long description using sub package file `README.md`
+#
+# at the docker registry using
+#
+# supported variables are:
 #   - `DOCKER_TOKEN` (required) can be the docker password (a docker token is preferred for security reasons)
 #   - `DOCKER_USER` (optional,default=sub package scope without `@`) use the docker identity/username, your docker account email will not work
-#   - `DOCKER_REPOSITORY` (optional,default=sub package name part after minus) 
+#   - `DOCKER_REPOSITORY` (optional,default=sub package name part after minus)
 #   - `DOCKER_REGISTRY` (optional,default=$(DEFAULT_DOCKER_REGISTRY))
 #
 # environment variables can be provided using:
@@ -114,9 +115,9 @@ docker-push: $(foreach PACKAGE, $(shell find packages/docker/ -mindepth 1 -maxde
 #   - `.env` file from sub package
 #   - `.env` file from monorepo root
 #   - environment
-# 
+#
 # example: `make docker-push-foo DOCKER_USER=foo DOCKER_TOKEN=foobar`
-# 
+#
 #    will build/tag (if outdated) the docker image and push it to wordpress.org
 # EOF
 .PHONY: docker-push-%
@@ -130,17 +131,17 @@ docker-push-%: packages/docker/$$*/
 # if DOCKER_REPOSITORY is not set take the package repository (example: "@foo/bar" package repository is "bar")
 > DOCKER_REPOSITORY=$${DOCKER_REPOSITORY:-$${PACKAGE_NAME#*/}}
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
-# abort if DOCKER_TOKEN is not defined 
+# abort if DOCKER_TOKEN is not defined
 > : $${DOCKER_TOKEN:?"DOCKER_TOKEN environment is required but not given"}
 > echo "push docker image $$DOCKER_IMAGE using docker user $$DOCKER_USER"
-> if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then  
+> if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then
 >   PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 >   # docker login --username [username] and docker access-token or real password must be initially before push
 >   echo "$$DOCKER_TOKEN" | docker login --username "$$DOCKER_USER" --password-stdin $$([[ "$$DOCKER_REGISTRY" != "$(DEFAULT_DOCKER_REGISTRY)" ]] && echo "$$DOCKER_REGISTRY") >/dev/null 2>&1
 >   docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:latest
 >   docker push $(DOCKER_FLAGS) $$DOCKER_IMAGE:$$PACKAGE_VERSION
 >    echo '[done]'
-> 
+>
 >    # if DOCKER_REGISTRY == $(DEFAULT_DOCKER_REGISTRY) : update description and README.md
 >    if [[ "$$DOCKER_REGISTRY" == "$(DEFAULT_DOCKER_REGISTRY)" ]]; then
 >      echo "updating description/README.md for docker image $$DOCKER_IMAGE"

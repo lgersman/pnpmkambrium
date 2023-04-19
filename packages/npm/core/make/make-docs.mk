@@ -49,11 +49,14 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 > PACKAGE_DESCRIPTION=$$(jq -r '.description | values' $$PACKAGE_JSON)
+> rm -rf $(@D)/{dist,build}
+> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 > # if package.json has a build script execute package script build. otherwise run mdbook
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
->   $(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
+>   $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
+>   $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
 >   if jq --exit-status '.scripts | has("dev")' $$PACKAGE_JSON >/dev/null; then
->     $(PNPM) --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run dev
+>     $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run dev
 >   else
 >     echo 'error: generic build/watch is not implemented yet' >&2
 >     exit 1
@@ -103,6 +106,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
       --mount type=bind,source=$$(pwd),target=/data \
       -u $$(id -u):$$(id -g) \
       pnpmkambrium/mdbook mdbook build $(@D)
+>   $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
 > fi
 > [[ -d "$(@D)/build" ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
