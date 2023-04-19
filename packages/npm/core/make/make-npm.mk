@@ -28,7 +28,7 @@ packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
 > kambrium:load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
-> rm -rf $(@D)/{dist,build}
+> rm -rf $(@D)/{dist,build,build-info}
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > (cd $(@D) && $(PNPM) pack --pack-destination ./dist >/dev/null)

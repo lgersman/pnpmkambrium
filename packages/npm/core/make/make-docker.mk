@@ -61,7 +61,7 @@ packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # if DOCKER_REPOSITORY is not set take the package repository (example: "@foo/bar" package repository is "bar")
 > DOCKER_REPOSITORY=$${DOCKER_REPOSITORY:-$${PACKAGE_NAME#*/}}
 > DOCKER_IMAGE="$$DOCKER_USER/$$DOCKER_REPOSITORY"
-> rm -rf $(@D)/{dist,build}
+> rm -rf $(@D)/{dist,build,build-info}
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 # image labels : see https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 > docker build \

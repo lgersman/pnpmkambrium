@@ -25,7 +25,7 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > kambrium:load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> rm -rf $(@D)/{dist,build}
+> rm -rf $(@D)/{dist,build,build-info}
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 >   $(PNPM)-r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build

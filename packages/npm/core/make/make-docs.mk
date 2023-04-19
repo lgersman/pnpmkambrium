@@ -49,7 +49,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 > PACKAGE_DESCRIPTION=$$(jq -r '.description | values' $$PACKAGE_JSON)
-> rm -rf $(@D)/{dist,build}
+> rm -rf $(@D)/{dist,build,build-info}
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
 > # if package.json has a build script execute package script build. otherwise run mdbook
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
