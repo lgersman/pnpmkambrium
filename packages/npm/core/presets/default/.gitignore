@@ -1,8 +1,8 @@
 #
 # default git ignore configuration
-# 
-# this file is usually soft-linked to your monorepo root. 
-# if you want to customize your .gitignore simply replace the soft-link to this file 
+#
+# this file is usually soft-linked to your monorepo root.
+# if you want to customize your .gitignore simply replace the soft-link to this file
 # in your project with your own file.
 #
 node_modules
@@ -13,5 +13,7 @@ build-info
 /.pnpm-store
 # never ever track .secrets files since they are proposed to keep sensitive data
 .secrets
-# force addition of .env files since some people add .env to their user .gitignore 
+# force addition of .env files since some people add .env to their user .gitignore
 !.env
+# never track composer installed extensions
+vendor
