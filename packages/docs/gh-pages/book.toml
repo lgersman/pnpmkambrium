@@ -2,7 +2,6 @@
 authors = []
 language = "en"
 multilingual = false
-src = "src"
 
 [preprocessor.toc]
 command = "mdbook-toc"
@@ -18,5 +17,3 @@ additional-js = ["mermaid.min.js", "mermaid-init.js"]
 
 #[preprocessor.presentation-preprocessor]
 
-[build]
-build-dir = "./build"

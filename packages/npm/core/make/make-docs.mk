@@ -65,6 +65,8 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
 > else
 >   # ensure mdbook image is available
 >   $(call ensure-docker-images-exists, pnpmkambrium/mdbook)
+>   # mdbook expects the build directory to exist
+>   mkdir -p $(@D)/build
 >   # prepare MDBOOK_AUTHORS json array (the first non empty json array result wins)
 >   MDBOOK_AUTHORS="$${MDBOOK_AUTHORS:-[]}"
 >   [[ "$$MDBOOK_AUTHORS" == '[]' ]] && MDBOOK_AUTHORS="$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)"
@@ -95,7 +97,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
         --mount type=bind,source=$$(pwd),target=/data \
         -u $$(id -u):$$(id -g) \
         -p 3000:3000 -p 3001:3001 \
-        pnpmkambrium/mdbook mdbook serve $(@D) -n 0.0.0.0
+        pnpmkambrium/mdbook mdbook serve $(@D) -n 0.0.0.0 --dest-dir ./build
 >   fi
 >   docker run --rm -it \
       -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
@@ -105,7 +107,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
       -e "MDBOOK_OUTPUT__HTML__no_section-label=$$MDBOOK_NO_SECTION_LABEL" \
       --mount type=bind,source=$$(pwd),target=/data \
       -u $$(id -u):$$(id -g) \
-      pnpmkambrium/mdbook mdbook build $(@D)
+      pnpmkambrium/mdbook mdbook build $(@D) --dest-dir ./build
 >   $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
 > fi
 > [[ -d "$(@D)/build" ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
