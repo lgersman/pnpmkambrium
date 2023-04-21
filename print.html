@@ -170,7 +170,7 @@
 <p>please note that this target <strong>MUST</strong> be called with make option <code>-b</code>.</p>
 <p>using this target enables you to edit a docs sub package and preview it in the browser at your fingertips</p>
 <p>example: <code>make -B dev-docs-foo</code></p>
-<pre><code> will start the dev server for docs sub package `foo`. 
+<pre><code> will start the dev server for docs sub package `foo`.
  Every change in `packages/docs/foo` will result in rebuild/reloading the docs in the browser.
 </code></pre>
 <h2 id="distclean"><a class="header" href="#distclean">distclean</a></h2>
@@ -188,18 +188,18 @@
 <h2 id="docker-push-"><a class="header" href="#docker-push-">docker-push-%</a></h2>
 <p>Syntax: <code>make [make-options] docker-push-% [make-variables]</code></p>
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
-<p>push docker image to registry. </p>
-<p>target will also update </p>
+<p>push docker image to registry.</p>
+<p>target will also update</p>
 <ul>
 <li>the image short description using the <code>description</code> property of sub package file <code>package.json</code></li>
-<li>image long description using sub package file <code>README.md</code> </li>
+<li>image long description using sub package file <code>README.md</code></li>
 </ul>
-<p>at the docker registry using </p>
-<p>supported variables are: </p>
+<p>at the docker registry using</p>
+<p>supported variables are:</p>
 <ul>
 <li><code>DOCKER_TOKEN</code> (required) can be the docker password (a docker token is preferred for security reasons)</li>
 <li><code>DOCKER_USER</code> (optional,default=sub package scope without <code>@</code>) use the docker identity/username, your docker account email will not work</li>
-<li><code>DOCKER_REPOSITORY</code> (optional,default=sub package name part after minus) </li>
+<li><code>DOCKER_REPOSITORY</code> (optional,default=sub package name part after minus)</li>
 <li><code>DOCKER_REGISTRY</code> (optional,default=$(DEFAULT_DOCKER_REGISTRY))</li>
 </ul>
 <p>environment variables can be provided using:</p>
@@ -329,13 +329,13 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <p>Syntax: <code>make [make-options] npm-push [make-variables]</code></p>
 <p>pushes all npm sub packages to a npm registry</p>
 <p>see supported environment variables on target <code>npm-push-%</code></p>
-<p>example: `make npm-push NPM_TOKEN=your-token' </p>
+<p>example: `make npm-push NPM_TOKEN=your-token'</p>
 <p>pushes all npm sub packages in <code>packages/npm/</code> to the npm registry</p>
 <h2 id="npm-push-"><a class="header" href="#npm-push-">npm-push-%</a></h2>
 <p>Syntax: <code>make [make-options] npm-push-% [make-variables]</code></p>
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
 <p>push npm package to registry</p>
-<p>supported variables are : </p>
+<p>supported variables are :</p>
 <ul>
 <li><code>NPM_TOKEN</code> (required) can be the npm password (a npm token is preferred for security reasons)</li>
 <li><code>NPM_REGISTRY</code> (optional, default is <code>https://registry.npmjs.org/</code>)</li>
@@ -347,7 +347,7 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <li><code>.env</code> file from monorepo root</li>
 <li>environment</li>
 </ul>
-<p>example: <code>NPM_TOKEN=your-token make npm-push-foo</code> </p>
+<p>example: <code>NPM_TOKEN=your-token make npm-push-foo</code></p>
 <p>to publish npm sub package <code>foo</code> in <code>packages/npm/foo</code> to the npm registry</p>
 <h2 id="packages"><a class="header" href="#packages">packages/</a></h2>
 <p>Syntax: <code>make [make-options] packages/ [make-variables]</code></p>
@@ -360,7 +360,7 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
 <p>build and tag outdated docker image sub package by name.</p>
 <p>image metadata like author/description/version will be taken from sub package file <code>package.json</code></p>
-<p>example: <code>make packages/docker/foo/</code> </p>
+<p>example: <code>make packages/docker/foo/</code></p>
 <p>will build the docker image in sub package <code>packages/docker/foo</code></p>
 <h2 id="packagesdocs"><a class="header" href="#packagesdocs">packages/docs/</a></h2>
 <p>Syntax: <code>make [make-options] packages/docs/ [make-variables]</code></p>
@@ -371,15 +371,15 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
 <p>build outdated docs sub package by name</p>
 <p>task utilizes various informations from <code>package.json</code> like authors/contributors/title/etc.</p>
-<p>the following mdbook configuration options can be provided by environment variables: </p>
+<p>the following mdbook configuration options can be provided by environment variables:</p>
 <ul>
-<li><code>MDBOOK_GIT_REPOSITORY_URL</code> (optional, default=repository.url from (sub|root)package.json) </li>
-<li><code>MDBOOK_GIT_REPOSITORY_ICON</code> (optional, default=<code>fa-code-fork</code>) </li>
-<li><code>MDBOOK_GIT_URL_TEMPLATE</code> (optional), </li>
+<li><code>MDBOOK_GIT_REPOSITORY_URL</code> (optional, default=repository.url from (sub|root)package.json)</li>
+<li><code>MDBOOK_GIT_REPOSITORY_ICON</code> (optional, default=<code>fa-code-fork</code>)</li>
+<li><code>MDBOOK_GIT_URL_TEMPLATE</code> (optional),</li>
 <li><code>MDBOOK_NO_SECTION_LABEL</code> (optional, default=<code>true</code>) set to <code>false</code> to enable numeric section labels in the table of contents column</li>
 <li><code>MDBOOK_AUTHORS</code> (optional) json array of author names. falling back to package.json properties <code>authors.name</code> / <code>contributors</code></li>
 <li><code>MDBOOK_TITLE</code> (optional, defaults to <code>package.json</code> property <code>name</code>)</li>
-<li><code>MDBOOK_DESCRIPION</code> (optional, defaults to <code>package.json</code> property <code>description</code>) 
+<li><code>MDBOOK_DESCRIPION</code> (optional, defaults to <code>package.json</code> property <code>description</code>)
 (see https://rust-lang.github.io/mdBook/format/configuration/renderers.html#html-renderer-options)</li>
 </ul>
 <p>environment variables can be provided using:</p>
@@ -391,6 +391,15 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 </ul>
 <p>example: <code>MDBOOK_AUTHORS='[&quot;foo bar&quot;]' make packages/docs/gh-pages/</code></p>
 <p>will rebuild outdated sub package <code>packages/docs/gh-pages</code></p>
+<h2 id="packagesgeneric"><a class="header" href="#packagesgeneric">packages/generic/</a></h2>
+<p>Syntax: <code>make [make-options] packages/generic/ [make-variables]</code></p>
+<p>build all outdated npm sub packages in <code>packages/npm/</code></p>
+<h2 id="packagesgeneric-1"><a class="header" href="#packagesgeneric-1">packages/generic/%/</a></h2>
+<p>Syntax: <code>make [make-options] packages/generic/%/ [make-variables]</code></p>
+<p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
+<p>build outdated generic package by name</p>
+<p>example: <code>make packages/generic/foo/</code></p>
+<p>will build the generic sub package in <code>packages/generic/foo</code></p>
 <h2 id="packagesnpm"><a class="header" href="#packagesnpm">packages/npm/</a></h2>
 <p>Syntax: <code>make [make-options] packages/npm/ [make-variables]</code></p>
 <p>build all outdated npm sub packages in <code>packages/npm/</code></p>
@@ -398,7 +407,7 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <p>Syntax: <code>make [make-options] packages/npm/%/ [make-variables]</code></p>
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
 <p>build outdated npm package by name</p>
-<p>example: <code>make packages/npm/foo/</code> </p>
+<p>example: <code>make packages/npm/foo/</code></p>
 <p>will build the npm sub package in <code>packages/npm/foo</code></p>
 <h2 id="packageswp-plugin"><a class="header" href="#packageswp-plugin">packages/wp-plugin/</a></h2>
 <p>Syntax: <code>make [make-options] packages/wp-plugin/ [make-variables]</code></p>
@@ -408,7 +417,7 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
 <p>build and zip outdated wordpress plugin package by name.</p>
 <p>plugin metadata like author/description/version will be taken from sub package file <code>package.json</code></p>
-<p>example: <code>make packages/wp-plugin/foo/</code> </p>
+<p>example: <code>make packages/wp-plugin/foo/</code></p>
 <p>will build the wordpress plugin sub package <code>packages/wp-plugin/foo</code></p>
 <h2 id="wp-plugin-push"><a class="header" href="#wp-plugin-push">wp-plugin-push</a></h2>
 <p>Syntax: <code>make [make-options] wp-plugin-push [make-variables]</code></p>
@@ -417,18 +426,18 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <h2 id="wp-plugin-push-"><a class="header" href="#wp-plugin-push-">wp-plugin-push-%</a></h2>
 <p>Syntax: <code>make [make-options] wp-plugin-push-% [make-variables]</code></p>
 <p><em>(This is a generic target. You need to replace the <code>%</code> wildcard with a existing package name.)</em></p>
-<p>push wordpress plugin to wordpress.org </p>
-<p>target will also update </p>
+<p>push wordpress plugin to wordpress.org</p>
+<p>target will also update</p>
 <ul>
 <li>the readme.txt description/version/author using the <code>description</code> property of sub package file <code>package.json</code></li>
 <li>the wordpress images</li>
 </ul>
-<p>at wordpress.org using </p>
-<p>supported variables are: </p>
+<p>at wordpress.org using</p>
+<p>supported variables are:</p>
 <ul>
-<li><code>WORDPRESS_TOKEN</code> (required) the wordpress.org account password </li>
+<li><code>WORDPRESS_TOKEN</code> (required) the wordpress.org account password</li>
 <li><code>WORDPRESS_USER</code> (optional,default=sub package scope without <code>@</code>) the wordpress.org identity/username.</li>
-<li><code>WORDPRESS_PLUGIN</code> (optional,default=sub package name part after <code>/</code>) </li>
+<li><code>WORDPRESS_PLUGIN</code> (optional,default=sub package name part after <code>/</code>)</li>
 </ul>
 <p>environment variables can be provided using:</p>
 <ul>
@@ -438,7 +447,7 @@ the GitHub repository (annotated in property <code>repository.url</code> in root
 <li>environment</li>
 </ul>
 <p>example: <code>make wp-plugin-push-foo WORDPRESS_USER=foo WORDPRESS_TOKEN=foobar</code></p>
-<p>will build (if outdated) the wordpress plugins and push it ot wordpress.org </p>
+<p>will build (if outdated) the wordpress plugins and push it ot wordpress.org</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pnpmkambriumfzf"><a class="header" href="#pnpmkambriumfzf">pnpmkambrium/fzf</a></h1>
 <ul>
 <li><a href="packages/docker/fzf/index.html#about">About</a>
