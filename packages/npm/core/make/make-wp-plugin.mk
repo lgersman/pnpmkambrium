@@ -48,6 +48,8 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >       echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
 >       exit 1
 >     fi
+>   else
+>     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
 >   fi
 > fi
 >
