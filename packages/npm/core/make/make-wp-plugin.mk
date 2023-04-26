@@ -30,8 +30,29 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 >   $(PNPM)-r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
+>   mkdir -p $(@D)/build
+>   touch $(@D)/build/foo.bar
+>
+>   if [[ -d $(@D)/src ]]; then
+>     # transpile js/css
+>     if [[ -f $(@D)/cm4all-wp-bundle.json ]]; then
+>       # using cm4all-wp-bundle if a configuration file exists
+>       CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/cm4all-wp-bundle.json | jq .)
+>
+# >       for MJS in $(@D)/*.mjs
+# >       do
+# >         echo "transpile $$MJS"
+# >       done
+>     else
+>       # using wp-scrips as default
+>       echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
+>       exit 1
+>     fi
+>   fi
+> fi
+>
 > # @TODO: build wordpress plugin
-> # - build js/css in src/ (take package.json src/entry info into account)
+> # build js/css in src/ (take package.json src/entry info into account)
 > # - generate/update i18n resources pot/mo/po
 > # - update plugin.php readme.txt or use readme.txt.template => readme.txt mechnic
 > # - resize/generate wordpress.org plugin images
@@ -43,18 +64,14 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 > mkdir -p $(@D)/dist
-> # @TODO: zip build/* folder contents
-# > (cd $(@D) && $(PNPM) pack --pack-destination ./dist >/dev/null)
-# > ARCHIVE_NAME="$$(basename $<)-v$${PLUGIN_VERSION}.zip"
-# > cd $< && zip -qq -r -o ../$$ARCHIVE_NAME *
-> # output zip archives
+> # redirecting into the target zip archive frees us from removing an existing archive first
+> (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
 > cat << EOF | tee $@
-> $$(cd $(@D)/dist && ls -1shS *.zip)
+> $$(cd $(@D)/dist && ls -1shS *.zip )
 >
 > $$(echo -n "---")
 >
-> @TODO: list archive contents
-> (tar -ztf $(@D)/dist/*.zip | sort)
+> $$(unzip -l $(@D)/dist/*.zip)
 > EOF
 
 # HELP<<EOF
