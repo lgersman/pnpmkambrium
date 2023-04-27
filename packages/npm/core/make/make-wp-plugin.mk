@@ -1,5 +1,17 @@
 # contains generic wordpress plugin  related make settings and rules
 
+# dynamic variable containing all js source files to transpile (wp-plugin/*/src/*.mjs files)
+KAMBRIUM_WP_PLUGIN_JS_SOURCES = $$(wildcard $$(@D)/src/*.mjs)
+# dynamic variable containing all transpiled js files (wp-plugin/*/build/*.js files)
+KAMBRIUM_WP_PLUGIN_JS_TARGETS = $$(shell echo '$(KAMBRIUM_WP_PLUGIN_JS_SOURCES)' | sed -e 's/src/build/g' -e 's/.mjs/.js/g' )
+
+# generic rule to transpile a single js sourcefile into its transpiled result
+packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
+> @echo "compiling '$<' -> '$@'"
+
+packages/wp-plugin/cm4all-wp-impex/foo.txt : $(KAMBRIUM_WP_PLUGIN_JS_TARGETS)
+> @echo "$^"
+
 # HELP<<EOF
 # build and tag all outdated wordpress plugins in `packages/wp-plugin/`
 #
@@ -39,10 +51,10 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >       # using cm4all-wp-bundle if a configuration file exists
 >       CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/cm4all-wp-bundle.json | jq .)
 >
-# >       for MJS in $(@D)/*.mjs
-# >       do
-# >         echo "transpile $$MJS"
-# >       done
+>       for MJS in $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' -execdir basename '{}' \;);
+>       do
+>         echo "transpile $$MJS"
+>       done
 >     else
 >       # using wp-scrips as default
 >       echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
@@ -61,7 +73,6 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # - update plugin.php metadata
 > # - transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
 > # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?
-> fi
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
 > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
