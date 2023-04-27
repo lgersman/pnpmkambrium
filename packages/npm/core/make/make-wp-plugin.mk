@@ -5,12 +5,36 @@ KAMBRIUM_WP_PLUGIN_JS_SOURCES = $$(wildcard $$(@D)/src/*.mjs)
 # dynamic variable containing all transpiled js files (wp-plugin/*/build/*.js files)
 KAMBRIUM_WP_PLUGIN_JS_TARGETS = $$(shell echo '$(KAMBRIUM_WP_PLUGIN_JS_SOURCES)' | sed -e 's/src/build/g' -e 's/.mjs/.js/g' )
 
-# generic rule to transpile a single js sourcefile into its transpiled result
-packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
-> @echo "compiling '$<' -> '$@'"
+# docker image containing our bundler imge name
+KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER := lgersman/cm4all-wp-bundle:latest
 
-packages/wp-plugin/cm4all-wp-impex/foo.txt : $(KAMBRIUM_WP_PLUGIN_JS_TARGETS)
-> @echo "$^"
+# generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
+packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
+> if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
+>   # using cm4all-wp-bundle if a configuration file exists
+>   CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   GLOBAL_NAME=$$(basename -s .mjs $<)
+>   # if make was called from GitHub action we need to run cm4all-wp-bundle using --user root to have write permissions to checked out repository
+>   # (the cm4all-wp-bundle image will by default use user "node" instead of "root" for security purposes)
+>   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
+>   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   for mode in 'development' 'production' ; do
+>     printf "$$BUNDLER_CONFIG" | \
+      docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
+        --analyze \
+        --global-name="$$GLOBAL_NAME" \
+        --mode="$$mode" \
+        --outdir='$(@D)' \
+        $<
+>   done
+>   # if runned in GitHub action touch will not work because of wrong permissions as a result of the docker invocation using --user root before
+>   # => which was needed to have write access to the checkout out repository
+>   [[ "$${GITHUB_ACTIONS:-false}" == "false" ]] && touch -m $@ $(@:.js=.min.js)
+> else
+>   # using wp-scrips as default
+>   echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
+>   exit 1
+> fi
 
 # HELP<<EOF
 # build and tag all outdated wordpress plugins in `packages/wp-plugin/`
@@ -43,29 +67,15 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   $(PNPM)-r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
 >   mkdir -p $(@D)/build
->   touch $(@D)/build/foo.bar
 >
 >   if [[ -d $(@D)/src ]]; then
->     # transpile js/css
->     if [[ -f $(@D)/cm4all-wp-bundle.json ]]; then
->       # using cm4all-wp-bundle if a configuration file exists
->       CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/cm4all-wp-bundle.json | jq .)
->
->       for MJS in $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' -execdir basename '{}' \;);
->       do
->         echo "transpile $$MJS"
->       done
->     else
->       # using wp-scrips as default
->       echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
->       exit 1
->     fi
+>     # transpile src/{*.js,*.css} files
+>     $(MAKE) $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' | sed -e 's/src/build/g' -e 's/.mjs/.js/g')
 >   else
 >     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
 >   fi
 > fi
 >
-> # @TODO: build wordpress plugin
 > # build js/css in src/ (take package.json src/entry info into account)
 > # - generate/update i18n resources pot/mo/po
 > # - update plugin.php readme.txt or use readme.txt.template => readme.txt mechnic
