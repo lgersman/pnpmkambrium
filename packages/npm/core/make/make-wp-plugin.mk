@@ -8,6 +8,10 @@ KAMBRIUM_WP_PLUGIN_JS_TARGETS = $$(shell echo '$(KAMBRIUM_WP_PLUGIN_JS_SOURCES)'
 # docker image containing our bundler imge name
 KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER := lgersman/cm4all-wp-bundle:latest
 
+# create or update a i18n plugin pot file
+packages/wp-plugin/%.pot : $$(shell find $$(realpath $$(@D)/..) -type f -not -path '*/tests/*' -not -path '*/dist/*' -and  -name '*.php' -or -name "*.?js" -or -name 'block.json')
+> docker run $(DOCKER_FLAGS) --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/$$(dirname $(@D)):/var/www/html wordpress:cli-php8.2 wp i18n make-pot --exclude=dist/tests/,*-min.js,vendor/ . languages/$(@F)
+
 # generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
 packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
 > if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
@@ -66,13 +70,21 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > if jq --exit-status '.scripts | has("build")' $$PACKAGE_JSON >/dev/null; then
 >   $(PNPM)-r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" run build
 > else
->   mkdir -p $(@D)/build
+>   mkdir -p $(@D)/build/
 >
+>   # transpile src/{*.js,*.css} files
 >   if [[ -d $(@D)/src ]]; then
->     # transpile src/{*.js,*.css} files
 >     $(MAKE) $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' | sed -e 's/src/build/g' -e 's/.mjs/.js/g')
 >   else
 >     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
+>   fi
+>
+>   # compile pot -> po -> mo files
+>   if [[ -d $(@D)/languages ]]; then
+>     $(MAKE) packages/wp-plugin/$*/languages/$*.pot
+# >     docker run $(DOCKER_FLAGS) --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/packages/wp-plugin/$*:/var/www/html wordpress:cli-php8.2 wp i18n make-pot  --debug --exclude=tests/,*-min.js,vendor/ . languages/$*.pot
+>   else
+>     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
 >   fi
 > fi
 >
@@ -96,6 +108,18 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >
 > $$(unzip -l $(@D)/dist/*.zip)
 > EOF
+
+# HELP<<EOF
+# create or update the pot file in a wordpress sub package (`packages/wp-plugin/*`)
+#
+# example: `make wp-plugin-i18n-pot-foo`
+#
+#   will create (if not exist) or update (if any of the plugin source files changed) the pot file `packages/wp-plugin/foo/languages/foo.pot`
+#
+# If you create a directory `languages/` in your wordpress plugin sub package and call the build command the pot file will even be created or updated.
+# EOF
+.PHONY: wp-plugin-i18n-pot-%
+wp-plugin-i18n-pot-%: $$(packages/wp-plugin/$*/languages/$*.pot)
 
 # HELP<<EOF
 # push wordpress plugin to wordpress.org
