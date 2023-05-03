@@ -51,10 +51,10 @@ packages/docker/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # we utilize file "build-info" to track if the docker image was build/is up to date
 packages/docker/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env $(@D)
+> kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> PACKAGE_AUTHOR="$$(kambrium:author_name $$PACKAGE_JSON) <$$(kambrium:author_email $$PACKAGE_JSON)>"
+> PACKAGE_AUTHOR="$$(kambrium.author_name $$PACKAGE_JSON) <$$(kambrium.author_email $$PACKAGE_JSON)>"
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if DOCKER_USER is not set take the package scope (example: "@foo/bar" package user is "foo")
 > DOCKER_USER=$${DOCKER_USER:-$${PACKAGE_NAME%/*}}
@@ -123,7 +123,7 @@ docker-push: $(foreach PACKAGE, $(shell find packages/docker/ -mindepth 1 -maxde
 .PHONY: docker-push-%
 docker-push-%: packages/docker/$$*/
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env packages/docker/$*
+> kambrium.load_env packages/docker/$*
 > PACKAGE_JSON=packages/docker/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if DOCKER_USER is not set take the package scope (example: "@foo/bar" package user is "foo")

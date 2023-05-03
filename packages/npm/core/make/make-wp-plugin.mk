@@ -32,7 +32,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
 packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env $(@D)
+> kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > rm -rf $(@D)/{dist,build,build-info}
@@ -180,7 +180,7 @@ wp-plugin-push: $(foreach PACKAGE, $(shell find packages/wp-plugin/ -mindepth 1 
 .PHONY: wp-plugin-push-%
 wp-plugin-push-%: packages/wp-plugin/$$*/
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env packages/wp-plugin/$*
+> kambrium.load_env packages/wp-plugin/$*
 > PACKAGE_JSON=packages/wp-plugin/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 # if WORDPRESS_USER is not set take the package scope (example: "@foo/bar" wordpress user is "foo")

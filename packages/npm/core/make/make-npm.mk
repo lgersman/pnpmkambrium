@@ -26,7 +26,7 @@ packages/npm/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 #
 packages/npm/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env $(@D)
+> kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > rm -rf $(@D)/{dist,build,build-info}
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run pre-build
@@ -74,7 +74,7 @@ npm-push: $(foreach PACKAGE, $(shell find packages/npm/ -mindepth 1 -maxdepth 1 
 .PHONY: npm-push-%
 npm-push-%: packages/npm/$$*/
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env packages/npm/$*
+> kambrium.load_env packages/npm/$*
 > PACKAGE_JSON=packages/npm/$*/package.json
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON)
 > # abort if NPM_TOKEN is not defined

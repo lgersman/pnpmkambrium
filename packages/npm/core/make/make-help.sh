@@ -1,10 +1,10 @@
 #
 # renders the given markdown text into escape sequence'd text suitable for the terminal
-# 
-# @param $1 string markdown text 
-# @return escape sequenced markdown text suitable for terminals   
 #
-function kambrium:render_markdown() {
+# @param $1 string markdown text
+# @return escape sequenced markdown text suitable for terminals
+#
+function kambrium.render_markdown() {
   local text=$1
 
   # highlight text between '`'
@@ -20,7 +20,7 @@ function kambrium:render_markdown() {
   text=$(sed -E 's/(^|[^[:alnum:]_])~~([^_]+)~~([^[:alnum:]_]|$)/\1\\e[9m\2\\e[0m\3/g' <<< "$text")
 
   # highlight markdown links and pure links between '[...]()' underline "\e[4munderline\e[0m"
-  #  `(\[.*\])(\((http)(?:s)?(\:\/\/).*\))` 
+  #  `(\[.*\])(\((http)(?:s)?(\:\/\/).*\))`
   text=$(sed -E 's/(^|[^[:alnum:]_])(\[[^]]+\])?\((https?:[^)]+)\)([^[:alnum:]_]|$)/\1\\e[33m\2(\\e[0;4m\3\\e[33m)\\e[0m\4/g' <<< "$text")
 
   # highlight headings (#-#####) "\e[1bold\e[0m"
@@ -31,23 +31,23 @@ function kambrium:render_markdown() {
 
 #
 # computes help for the Makefile
-# 
+#
 # required environment variables:
-#   VERBOSE(default='' is disabled)   dumps debugging output to stderr 
+#   VERBOSE(default='' is disabled)   dumps debugging output to stderr
 #   FORMAT(json/text,default=text)    output format. text means output send to desktop, json provides help in json format for further processing
 #
 # writes the computed help information to stdout
 #
-function kambrium:help() {
+function kambrium.help() {
   declare -A HELP_TOPICS=()
   IFS=$'\n'
   # pipe all read makefiles into read loop
   while read line; do
-    # if help heredoc marker matches /#\s<<([\w\:\-\_]+)/ current line 
-    if [[ "$line" =~ ^#[[:blank:]]HELP\<\<([[:print:]]+)$ ]]; then 
+    # if help heredoc marker matches /#\s<<([\w\:\-\_]+)/ current line
+    if [[ "$line" =~ ^#[[:blank:]]HELP\<\<([[:print:]]+)$ ]]; then
       HEREDOC_KEY="${BASH_REMATCH[1]}"
       declare -a HEREDOC_BODY=()
-      # read lines starting with '# ' until a line containing just the heredoc token comes in 
+      # read lines starting with '# ' until a line containing just the heredoc token comes in
       while read line; do
         if [[ "$line" =~ ^#[[:blank:]]$HEREDOC_KEY$ ]]; then
           # join string array
@@ -56,7 +56,7 @@ function kambrium:help() {
           HEREDOC_BODY=${HEREDOC_BODY:1}
           if [[ "$HEREDOC_BODY" == '' ]]; then
             [[ "$VERBOSE" != '' ]] && echo "[skipped] Help HereDoc(='$HEREDOC_KEY') : help body is empty" >&2
-          else 
+          else
             [[ "$VERBOSE" != '' ]] && echo "'$HEREDOC_KEY'='$HEREDOC_BODY'" >&2
             # read while we match a make target
             while read line; do
@@ -64,7 +64,7 @@ function kambrium:help() {
               if [[ "$line" =~ ^(((([A-Za-z0-9_/.\%]|-)+)[[:blank:]]*)+): ]] && [[ "${line::1}" != '.' ]]; then
                 HELP_TOPICS["${BASH_REMATCH[1]}"]="$HEREDOC_BODY"
                 break
-              fi 
+              fi
             done
           fi
           break
@@ -100,7 +100,7 @@ function kambrium:help() {
       )
     done
     JSON=$JSON jq -n -r -s 'env.JSON|.'
-  else 
+  else
     printf -v text '# Syntax\n\n`make [make-options] [target] [make-variables] ...`\n\n# Targets\n\n'
 
     if [[ "${#HELP_TOPICS[@]}" == '0' ]]; then
@@ -116,7 +116,7 @@ function kambrium:help() {
     fi
 
     if [[ "${FORMAT:-}" != 'markdown' ]]; then
-      text=$(kambrium:render_markdown "$text")
+      text=$(kambrium.render_markdown "$text")
     fi
 
     printf "%s" "$text"

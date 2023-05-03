@@ -21,7 +21,7 @@ packages/generic/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 #
 packages/generic/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
-> kambrium:load_env $(@D)
+> kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
 > PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 > rm -rf $(@D)/{dist,build,build-info}
