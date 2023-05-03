@@ -27,7 +27,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-github.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-help.mk
 
 # ensure required utilities are installed
-_ := $(call ensure-commands-exists, sed git touch jq docker tee awk)
+_ := $(call ensure-commands-exists, sed git touch jq docker tee awk msginit)
 
 # pick up npm scope from package.json name
 MONOREPO_SCOPE != jq -r '.name | values' package.json

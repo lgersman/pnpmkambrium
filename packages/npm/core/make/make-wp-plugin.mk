@@ -1,5 +1,7 @@
 # contains generic wordpress plugin  related make settings and rules
 
+KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-wp-plugin.sh
+
 # dynamic variable containing all js source files to transpile (wp-plugin/*/src/*.mjs files)
 KAMBRIUM_WP_PLUGIN_JS_SOURCES = $$(wildcard $$(@D)/src/*.mjs)
 # dynamic variable containing all transpiled js files (wp-plugin/*/build/*.js files)
@@ -7,38 +9,6 @@ KAMBRIUM_WP_PLUGIN_JS_TARGETS = $$(shell echo '$(KAMBRIUM_WP_PLUGIN_JS_SOURCES)'
 
 # docker image containing our bundler imge name
 KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER := lgersman/cm4all-wp-bundle:latest
-
-# create or update a i18n plugin pot file
-packages/wp-plugin/%.pot : $$(shell find $$(realpath $$(@D)/..) -type f -not -path '*/tests/*' -not -path '*/dist/*' -and  -name '*.php' -or -name "*.?js" -or -name 'block.json')
-> docker run $(DOCKER_FLAGS) --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/$$(dirname $(@D)):/var/www/html wordpress:cli-php8.2 wp i18n make-pot --exclude=dist/tests/,*-min.js,vendor/ . languages/$(@F)
-
-# generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
-packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
-> if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
->   # using cm4all-wp-bundle if a configuration file exists
->   CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
->   GLOBAL_NAME=$$(basename -s .mjs $<)
->   # if make was called from GitHub action we need to run cm4all-wp-bundle using --user root to have write permissions to checked out repository
->   # (the cm4all-wp-bundle image will by default use user "node" instead of "root" for security purposes)
->   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
->   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
->   for mode in 'development' 'production' ; do
->     printf "$$BUNDLER_CONFIG" | \
-      docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
-        --analyze \
-        --global-name="$$GLOBAL_NAME" \
-        --mode="$$mode" \
-        --outdir='$(@D)' \
-        $<
->   done
->   # if runned in GitHub action touch will not work because of wrong permissions as a result of the docker invocation using --user root before
->   # => which was needed to have write access to the checkout out repository
->   [[ "$${GITHUB_ACTIONS:-false}" == "false" ]] && touch -m $@ $(@:.js=.min.js)
-> else
->   # using wp-scrips as default
->   echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
->   exit 1
-> fi
 
 # HELP<<EOF
 # build and tag all outdated wordpress plugins in `packages/wp-plugin/`
@@ -82,7 +52,7 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   # compile pot -> po -> mo files
 >   if [[ -d $(@D)/languages ]]; then
 >     $(MAKE) packages/wp-plugin/$*/languages/$*.pot
-# >     docker run $(DOCKER_FLAGS) --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/packages/wp-plugin/$*:/var/www/html wordpress:cli-php8.2 wp i18n make-pot  --debug --exclude=tests/,*-min.js,vendor/ . languages/$*.pot
+# >     docker run --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/packages/wp-plugin/$*:/var/www/html wordpress:cli-php8.2 wp i18n make-pot  --debug --exclude=tests/,*-min.js,vendor/ . languages/$*.pot
 >   else
 >     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
 >   fi
@@ -112,14 +82,67 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 # HELP<<EOF
 # create or update the pot file in a wordpress sub package (`packages/wp-plugin/*`)
 #
-# example: `make wp-plugin-i18n-pot-foo`
+# example: `make packages/wp-plugin/foo/languages/`
 #
 #   will create (if not exist) or update (if any of the plugin source files changed) the pot file `packages/wp-plugin/foo/languages/foo.pot`
-#
-# If you create a directory `languages/` in your wordpress plugin sub package and call the build command the pot file will even be created or updated.
 # EOF
-.PHONY: wp-plugin-i18n-pot-%
-wp-plugin-i18n-pot-%: $$(packages/wp-plugin/$*/languages/$*.pot)
+packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
+
+# dynamic definition of dockerized wp-cli
+KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
+  --user '$(shell id -u $(USER)):$(shell id -g $(USER))' \
+  -v `pwd`/`dirname $(@D)`:/var/www/html \
+  wordpress:cli-php8.2 \
+  wp
+
+.PRECIOUS: packages/wp-plugin/%.pot
+# create or update a i18n plugin pot file
+packages/wp-plugin/%.pot : $$(shell find $$(realpath $$(@D)/..) -type f -not -path '*/tests/*' -not -path '*/dist/*' -and  -name '*.php' -or -name "*.?js" -or -name 'block.json' -or -name 'theme.json')
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --exclude=dist/tests/,*-min.js,vendor/ . languages/$(@F)
+
+# HELP<<EOF
+# create or update a i18n po file in a wordpress sub package (`packages/wp-plugin/*`)
+#
+# example: `make packages/wp-plugin/foo/languages/foo-pl_PL.po`
+#
+#   will create (if not exist) or update (if any of the plugin source files changed) the po file `packages/wp-plugin/foo/languages/foo-pl_PL.po`
+# EOF
+packages/wp-plugin/%.po : $$(shell kambrium.get_pot_path $$(@))
+> if [[ -f "$@" ]]; then
+>   # update po file
+>   $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n update-po languages/$$(basename $^) languages/$(@F)
+> else
+>   LOCALE=$$([[ "$@" =~ ([a-z]+_[A-Z]+)\.po$$ ]] && echo $${BASH_REMATCH[1]})
+>   msginit -i $< -l $$LOCALE --no-translator -o $@
+> fi
+
+# generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
+packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
+> if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
+>   # using cm4all-wp-bundle if a configuration file exists
+>   CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   GLOBAL_NAME=$$(basename -s .mjs $<)
+>   # if make was called from GitHub action we need to run cm4all-wp-bundle using --user root to have write permissions to checked out repository
+>   # (the cm4all-wp-bundle image will by default use user "node" instead of "root" for security purposes)
+>   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
+>   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   for mode in 'development' 'production' ; do
+>     printf "$$BUNDLER_CONFIG" | \
+      docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
+        --analyze \
+        --global-name="$$GLOBAL_NAME" \
+        --mode="$$mode" \
+        --outdir='$(@D)' \
+        $<
+>   done
+>   # if runned in GitHub action touch will not work because of wrong permissions as a result of the docker invocation using --user root before
+>   # => which was needed to have write access to the checkout out repository
+>   [[ "$${GITHUB_ACTIONS:-false}" == "false" ]] && touch -m $@ $(@:.js=.min.js)
+> else
+>   # using wp-scrips as default
+>   echo "[@TODO:] js/css transpilation of wp-plugin ressources using wp-scripts is not jet supported"
+>   exit 1
+> fi
 
 # HELP<<EOF
 # push wordpress plugin to wordpress.org
