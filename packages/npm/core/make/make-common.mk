@@ -1,5 +1,5 @@
 #
-# contains common Makefile settings 
+# contains common Makefile settings
 #
 
 #
@@ -34,12 +34,12 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-print-directory
 
 #
-# always execute targets as a single shell script (i.e. : not line by line) 
+# always execute targets as a single shell script (i.e. : not line by line)
 #
 .ONESHELL:
 
 #
-# execute help target if make gets called without any arguments 
+# execute help target if make gets called without any arguments
 #
 .DEFAULT_GOAL := help
 
@@ -47,25 +47,25 @@ TERMINAL_GREY != tput setaf 2
 TERMINAL_YELLOW != tput setaf 3
 TERMINAL_RESET  != tput sgr0
 
-# use curl always with these options 
+# use curl always with these options
 # if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
 CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 2>&1) && echo "--fail-with-body" || echo "--fail")
 
 #
 # targets like "make packages/docker/" making build-info files
-# would be treated as immediate files and removed immediately after executing sub target 
+# would be treated as immediate files and removed immediately after executing sub target
 # packages/docker/[subpackage]/build-info
-# 
-# solution: .SECONDARY with no prerequisites causes all targets to be treated as secondary 
+#
+# solution: .SECONDARY with no prerequisites causes all targets to be treated as secondary
 # (i.e., no target is removed because it is considered intermediate).
 # see https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
 #
-# alternative would be to mark such targets as non intermediate using 
-# .PRECIOUS: packages/docker/%/build-info 
+# alternative would be to mark such targets as non intermediate using
+# .PRECIOUS: packages/docker/%/build-info
 #
 # .SECONDARY:
-# 
-# > You can disable intermediate files completely in your makefile by providing .NOTINTERMEDIATE as a target with no prerequisites: 
+#
+# > You can disable intermediate files completely in your makefile by providing .NOTINTERMEDIATE as a target with no prerequisites:
 # > in that case it applies to every file in the makefile.
 # .NOTINTERMEDIATE:
 #
@@ -87,10 +87,10 @@ KAMBRIUM_TEMPLATE_TARGETS := $(patsubst %.kambrium-template, %, $(KAMBRIUM_TEMPL
 KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info' -type f) \
  $(KAMBRIUM_TEMPLATE_TARGETS) \
  $(wildcard *.env) \
- package.json 
+ package.json
 
 # generic dependency for sub package targets (package/*/*/)
-KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info 
+KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info
 
 # generic dependency for all sub packages flavors (package/*/)
 KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/))
