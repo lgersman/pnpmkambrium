@@ -52,7 +52,7 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   # compile pot -> po -> mo files
 >   if [[ -d $(@D)/languages ]]; then
 >     $(MAKE) packages/wp-plugin/$*/languages/$*.pot
-# >     docker run --user "$$(id -u $$USER):$$(id -g $$USER)" -v $$(pwd)/packages/wp-plugin/$*:/var/www/html wordpress:cli-php8.2 wp i18n make-pot  --debug --exclude=tests/,*-min.js,vendor/ . languages/$*.pot
+>     # @TODO: compile mo/json files
 >   else
 >     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
 >   fi
@@ -98,7 +98,7 @@ KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
 .PRECIOUS: packages/wp-plugin/%.pot
 # create or update a i18n plugin pot file
 packages/wp-plugin/%.pot : $$(shell find $$(realpath $$(@D)/..) -type f -not -path '*/tests/*' -not -path '*/dist/*' -and  -name '*.php' -or -name "*.?js" -or -name 'block.json' -or -name 'theme.json')
-> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --exclude=dist/tests/,*-min.js,vendor/ . languages/$(@F)
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --debug --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
 
 # HELP<<EOF
 # create or update a i18n po file in a wordpress sub package (`packages/wp-plugin/*`)
@@ -114,6 +114,20 @@ packages/wp-plugin/%.po : $$(shell kambrium.get_pot_path $$(@))
 > else
 >   LOCALE=$$([[ "$@" =~ ([a-z]+_[A-Z]+)\.po$$ ]] && echo $${BASH_REMATCH[1]})
 >   msginit -i $< -l $$LOCALE --no-translator -o $@
+> fi
+
+# HELP<<EOF
+# create or update a i18n mo file in a wordpress sub package (`packages/wp-plugin/*`)
+#
+# example: `make packages/wp-plugin/foo/languages/foo-pl_PL.mo`
+#
+#   will create (if not exist) or update (if any of the plugin source files changed) the mo file `packages/wp-plugin/foo/languages/foo-pl_PL.mo`
+# EOF
+packages/wp-plugin/%.mo: packages/wp-plugin/%.po
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-mo languages/$(<F)
+> # if a src directory exists we assume that the i18n json files schould also be created
+> if [[ -d $$(dirname $(@D))/src ]]; then
+>   $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-json languages/$(<F) --no-purge --pretty-print
 > fi
 
 # generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
