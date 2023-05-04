@@ -17,3 +17,5 @@ build-info
 !.env
 # never track composer installed extensions
 vendor
+**/languages/*.mo
+**/languages/*.json
