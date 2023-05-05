@@ -3,6 +3,32 @@
 #
 
 #
+# extract the kambrium sub package name from path a argument
+#
+# @param $1 path to a file/dir within a sub package
+# @return the file name of the sub package
+#
+function kambrium.get_sub_package_name_from_path() {
+  local PATH="$1"
+
+  local NAME=$([[ "$PATH" =~ packages\/[^\/]+\/([^\/]+) ]] && echo ${BASH_REMATCH[1]})
+  echo "$NAME"
+}
+
+#
+# extract the kambrium sub package type from path a argument
+#
+# @param $1 path to a file/dir within a sub package
+# @return the type of the sub package
+#
+function kambrium.get_sub_package_type_from_path() {
+  local PATH="$1"
+
+  local TYPE=$([[ "$PATH" =~ packages\/([^\/]+) ]] && echo ${BASH_REMATCH[1]})
+  echo "$TYPE"
+}
+
+#
 # computes the author name by querying a priorized list of sources.
 # the first one found wins.
 #
