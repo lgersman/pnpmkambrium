@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
@@ -45,15 +45,15 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   # transpile src/{*.js,*.css} files
 >   if [[ -d $(@D)/src ]]; then
 >     $(MAKE) $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' | sed -e 's/src/build/g' -e 's/.mjs/.js/g')
->     $(MAKE) $(@D)/build/block.json
+>     [[ -f $(@D)/src/block.json ]] && $(MAKE) $(@D)/build/block.json
 >   else
 >     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
 >   fi
 >
 >   # compile pot -> po -> mo files
 >   if [[ -d $(@D)/languages ]]; then
->     $(MAKE) packages/wp-plugin/$*/languages/$*.pot
->     # @TODO: compile mo/json files
+>     echo $(MAKE) packages/wp-plugin/$*/languages/$*.pot
+>     $(MAKE) $(patsubst %.po,%.mo,$(wildcard packages/wp-plugin/$*/languages/*.po))
 >   else
 >     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
 >   fi
