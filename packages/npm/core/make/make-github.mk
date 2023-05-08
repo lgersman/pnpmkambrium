@@ -108,8 +108,6 @@ interactive-delete-ghrelease:
 > set +x
 #* let user select Github Tag to remove
 > GITHUB_TAG=$$(gum choose $$USED_TAGS)
->
->
 > RELEASE=$$($(CURL) \
    -H "Accept: application/vnd.github+json" \
    -H "Authorization: Bearer $$GITHUB_TOKEN" \
@@ -123,7 +121,12 @@ interactive-delete-ghrelease:
 > RELEASE_PUBLISH_DATE=$$(jq -S '.published_at' <<< $$RELEASE)
 >
 #* Formated info on release
-> $(GUM) format "## Tag    : $$GITHUB_TAG" "## ID     : $$RELEASE_ID" "## Author   : $$RELEASE_AUTHOR" "## Created   : $$RELEASE_CREATING_DATE" "## Published   : $$RELEASE_PUBLISH_DATE" "## Assets  : $$RELEASE_ASSETS"
+> $(GUM) format "## Tag       : $$GITHUB_TAG" \
+                "## ID        : $$RELEASE_ID" \
+                "## Author    : $$RELEASE_AUTHOR" \
+                "## Created   : $$RELEASE_CREATING_DATE" \
+                "## Published : $$RELEASE_PUBLISH_DATE" \
+                "## Assets    : $$RELEASE_ASSETS"
 >
 > #* check if user wants to delete release, then delete release and attached Github tag
 > $(GUM) confirm && \
