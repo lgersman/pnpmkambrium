@@ -45,7 +45,9 @@ MAKEFLAGS += --no-print-directory
 
 TERMINAL_GREY != tput setaf 2
 TERMINAL_YELLOW != tput setaf 3
+export TERMINAL_YELLOW
 TERMINAL_RESET  != tput sgr0
+export TERMINAL_RESET
 
 # use curl always with these options
 # if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail

@@ -2,12 +2,22 @@
 # common bash functions automatically injected in our make SHELL
 #
 
+#
+# echoes a message prefixed with "[done]"
+#
+# @param $1 the message to log
+#
 function kambrium.log_done() {
-  echo "[done] ${1:-}"
+  echo "${TERMINAL_YELLOW:-}[done]${TERMINAL_RESET:-} ${1:-}"
 }
 
+#
+# echoes a message prefixed with "[skipped]"
+#
+# @param $1 the message to log
+#
 function kambrium.log_skipped() {
-  echo "[skipped] ${1:-}"
+  echo "${TERMINAL_YELLOW:-}[skipped]${TERMINAL_RESET:-} ${1:-}"
 }
 
 #
