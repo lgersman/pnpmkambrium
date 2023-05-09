@@ -40,8 +40,8 @@ gh-pages-push-%: packages/docs/$$*/
 >   GIT_REMOTE_REPOSITORY_NAME=$${GIT_REMOTE_REPOSITORY_NAME:-origin}
 >   # ensure we are not in branch gh-pages yet
 >   [[ $$(git rev-parse --abbrev-ref HEAD) == 'gh-pages' ]] && echo "cannot push gh-pages : current branch is gh-pages. switch to another branch and try again." >&2 && exit 1
-# >   # ensure there are no uncommitted changes in current branch
-# >   [[ -z "$(git status --porcelain)" ]] && echo "cannot push gh-pages : current branch contains uncommited changes. commit changes and try again." >&2 && exit 1
+#>   # ensure there are no uncommitted changes in current branch
+#>   [[ -z "$(git status --porcelain)" ]] && echo "cannot push gh-pages : current branch contains uncommited changes. commit changes and try again." >&2 && exit 1
 >   # ensure our (potential existing) temp directory gets removed after this make target
 >   trap 'rm -rf "$(KAMBRIUM_TMPDIR)/$@"; exit' EXIT
 >
@@ -51,14 +51,14 @@ gh-pages-push-%: packages/docs/$$*/
 >     # clone only branch gh-pages without any checked out files (-n)
 >     git clone -q -b gh-pages -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" >/dev/null
 >   else
->      (
->        # cd command will only affect commands in subshell
+>     (
+>       # cd command will only affect commands in subshell
 >       cd "$(KAMBRIUM_TMPDIR)"
 >       # clone project repo with minimal git history (--depth 1) and without any checked out contents (-n)
 >       git clone -q -n file://$(CURDIR) --depth 1 "$(KAMBRIUM_TMPDIR)/$@" && cd $$_
 >       # create a new branch gh-pages with a detached history (--orphan)
 >       git switch --orphan gh-pages  &> /dev/null
->        git commit --allow-empty -m "Initializing gh-pages branch" >/dev/null
+>       git commit --allow-empty -m "Initializing gh-pages branch" >/dev/null
 >     )
 >   fi
 >
@@ -73,14 +73,14 @@ gh-pages-push-%: packages/docs/$$*/
 >     git commit -m "deploy: #$$SHORT_COMMIT_HASH sub package $* version $$PACKAGE_VERSION" >/dev/null || exit 1
 >     # push back changes to project repo
 >     git push --set-upstream $$GIT_REMOTE_REPOSITORY_NAME gh-pages &> /dev/null
->    ) || {
+>   ) || {
 >     # if commit was empty and exit 1 was executed we will land here
->     echo "[skipped]: nothing changed"
->      exit
->    }
+>     kambrium.log_skipped "nothing changed"
+>     exit
+>   }
 >   # push local updated gh-pages branch back back to remote repo
->    git push origin gh-pages:gh-pages &> /dev/null
->   echo '[done]'
+>   git push origin gh-pages:gh-pages &> /dev/null
+>   kambrium.log_done
 >
 >   if [[ "$${GITHUB_TOKEN:-}" != '' ]]; then
 >     # configure/enable GitHub pages
@@ -88,31 +88,31 @@ gh-pages-push-%: packages/docs/$$*/
 >     # see https://docs.github.com/en/rest/pages?apiVersion=2022-11-28#update-information-about-a-github-pages-site
 >     GITHUB_REPO=$${GITHUB_REPO:-$$(jq -r '.name | values' package.json)}
 >     : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
->      DATA='{"source":{"branch":"gh-pages","path":"/"}}'
->      echo "$$DATA"
+>     DATA='{"source":{"branch":"gh-pages","path":"/"}}'
+>     echo "$$DATA"
 >     HTTP_STATUS=`$(CURL) \
->        -X PUT \
+>       -X PUT \
 >       -H "Accept: application/vnd.github+json" \
->        -H "Authorization: Bearer $$GITHUB_TOKEN"\
->        -w '%{http_code}' \
->        https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
->       --data "$$DATA" \
->      `
->      if [[ "$$HTTP_STATUS" == '204' ]]; then
+>       -H "Authorization: Bearer $$GITHUB_TOKEN"\
+>       -w '%{http_code}' \
+>       https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
+>      --data "$$DATA" \
+>     `
+>     if [[ "$$HTTP_STATUS" == '204' ]]; then
 >       $(CURL) \
 >         -H "Accept: application/vnd.github+json" \
->          -H "Authorization: Bearer $$GITHUB_TOKEN"\
->          https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
+>         -H "Authorization: Bearer $$GITHUB_TOKEN"\
+>         https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/pages \
 >        | jq '{ source }'
->       echo '[done]'
->      else
->        echo '[error] : Failed to update GitHub Pages configuration (http status=$$HTTP_STATUS)'
->        exit 1
->      fi
->    else
->      echo "[skipped]: updating github pages configuration - GITHUB_TOKEN environment was empty/not-set"
+>       kambrium.log_done
+>     else
+>       echo '[error] : Failed to update GitHub Pages configuration (http status=$$HTTP_STATUS)'
+>       exit 1
+>     fi
+>   else
+>     kambrium.log_skipped "updating github pages configuration - GITHUB_TOKEN environment was empty/not-set"
 >   fi
 >
 > else
->   echo "[skipped]: package.json is marked as private"
+>   kambrium.log_skipped "package.json is marked as private"
 > fi

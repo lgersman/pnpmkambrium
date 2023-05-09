@@ -83,7 +83,7 @@ npm-push-%: packages/npm/$$*/
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then
 >   # bash does not allow declaring env variables containing "/"
 >   env "npm_config_$$NPM_REGISTRY:_authtoken=$$NPM_TOKEN" $(SHELL) -c "env | grep npm_ && pnpm -r --filter $$PACKAGE_NAME publish --no-git-checks"
->    echo '[done]'
+>    kambrium.log_done
 > else
->   echo "[skipped]: package.json is marked as private"
+>   kambrium.log_skipped "package.json is marked as private"
 > fi

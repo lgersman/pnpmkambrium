@@ -1,13 +1,13 @@
 # contains GitHub related targets
 
 # HELP<<EOF
-# syncs informational data like description/tags/etc. to GitHub repository metadata  
+# syncs informational data like description/tags/etc. to GitHub repository metadata
 #    - sync repo description and tags from root file `package.json`
 #    - enable GitHub pages if a docs sub package `packages/docs/gh-pages` exists and `packages/docs/gh-pages/package.json` property 'private' is falsy
-# 
-# supported variables are : 
+#
+# supported variables are :
 #   - `GITHUB_TOKEN` (required) can be the GitHub password (a GitHub token is preferred for security reasons)
-#   - `GITHUB_OWNER` (required) GitHub username 
+#   - `GITHUB_OWNER` (required) GitHub username
 #   - `GIT_REMOTE_REPOSITORY_NAME` (optional, default=`origin`) the remote repository to push to
 #   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
 #   - `GITHUB_REPO_DESCRIPTION` (optional,default=property `description` in root file `package.json`)
@@ -21,7 +21,7 @@
 #   - environment
 #
 # example: `make --silent github-details-push`
-#    
+#
 #    will update the GitHub repository metadata with the provided data
 # EOF
 .PHONY: github-details-push
@@ -67,4 +67,4 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >    https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/topics \
 >   --data "$$DATA" \
 >   | jq .
-> echo '[done]'
+> kambrium.log_done

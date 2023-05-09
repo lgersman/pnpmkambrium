@@ -1,9 +1,9 @@
 # lint related targets
 
-# always run prettier using ignored files from .lintignore 
+# always run prettier using ignored files from .lintignore
 PRETTIER := $(PNPM) prettier --ignore-path='$(CURDIR)/.lintignore' --cache --check
 
-# always run eslint using ignored files from .lintignore 
+# always run eslint using ignored files from .lintignore
 ESLINT := $(PNPM) eslint --ignore-path='$(CURDIR)/.lintignore' --no-error-on-unmatched-pattern
 
 # HELP<<EOF
@@ -19,8 +19,8 @@ lint: node_modules/
 > {
 >   echo "Checking for unwanted tabs in makefiles..."
 >   ! git --no-pager grep --no-color --no-exclude-standard --untracked --no-recurse-submodules -n $$'\t' Makefile **/*.mk \
->     | sed -e "s/\t/\x1b\[31m'\\\\t\x1b\[0m/" 
->   echo "[done]"
+>     | sed -e "s/\t/\x1b\[31m'\\\\t\x1b\[0m/"
+>   kambrium.log_done
 > }
 
 # HELP<<EOF

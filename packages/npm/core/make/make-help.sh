@@ -55,7 +55,7 @@ function kambrium.help() {
           # strip leading \n
           HEREDOC_BODY=${HEREDOC_BODY:1}
           if [[ "$HEREDOC_BODY" == '' ]]; then
-            [[ "$VERBOSE" != '' ]] && echo "[skipped] Help HereDoc(='$HEREDOC_KEY') : help body is empty" >&2
+            [[ "$VERBOSE" != '' ]] && kambrium.log_skipped "Help HereDoc(='$HEREDOC_KEY') : help body is empty" >&2
           else
             [[ "$VERBOSE" != '' ]] && echo "'$HEREDOC_KEY'='$HEREDOC_BODY'" >&2
             # read while we match a make target
@@ -71,7 +71,7 @@ function kambrium.help() {
         elif [[ "$line" =~ ^#[[:blank:]]?(([[:print:]]|[[:space:]])*)$ ]]; then
           HEREDOC_BODY+=(${BASH_REMATCH[1]:- })
         else
-          [[ "$VERBOSE" != '' ]] && echo "[skipped] Help HereDoc(='$HEREDOC_KEY') : line '$line' does not match help line prefix(='# ') nor HereDoc end marker(='$HEREDOC_KEY')" >&2
+          [[ "$VERBOSE" != '' ]] && kambrium.log_skipped "Help HereDoc(='$HEREDOC_KEY') : line '$line' does not match help line prefix(='# ') nor HereDoc end marker(='$HEREDOC_KEY')" >&2
           break
         fi
       done

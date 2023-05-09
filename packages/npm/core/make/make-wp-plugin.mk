@@ -47,7 +47,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >     $(MAKE) $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' | sed -e 's/src/build/g' -e 's/.mjs/.js/g')
 >     [[ -f $(@D)/src/block.json ]] && $(MAKE) $(@D)/build/block.json
 >   else
->     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
+>     kambrium.log_skipped "js/css transpilation skipped - no ./src directory found"
 >   fi
 >
 >   # compile pot -> po -> mo files
@@ -56,7 +56,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
         packages/wp-plugin/$*/languages/$*.pot \
         $(patsubst %.po,%.mo,$(wildcard packages/wp-plugin/$*/languages/*.po))
 >   else
->     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
+>     kambrium.log_skipped "i18n transpilation skipped - no ./languages directory found"
 >   fi
 > fi
 >
@@ -138,6 +138,8 @@ packages/wp-plugin/%.mo: packages/wp-plugin/%.po
 >   $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-json languages/$(<F) --no-purge --pretty-print
 > fi
 
+# tell make that transpiled js files should be kept
+.PRECIOUS: packages/wp-plugin/build/%.js
 # generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
 packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
 > if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
@@ -215,7 +217,7 @@ wp-plugin-push-%: packages/wp-plugin/$$*/
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then
 >   PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 >   # @TODO: push plugin to wordpress.org
->   echo '[done]'
+>   kambrium.log_done
 > else
->   echo "[skipped]: package.json is marked as private"
+>   kambrium.log_skipped "package.json is marked as private"
 > fi

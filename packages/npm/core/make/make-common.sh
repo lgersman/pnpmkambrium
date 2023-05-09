@@ -2,6 +2,14 @@
 # common bash functions automatically injected in our make SHELL
 #
 
+function kambrium.log_done() {
+  echo "[done] ${1:-}"
+}
+
+function kambrium.log_skipped() {
+  echo "[skipped] ${1:-}"
+}
+
 #
 # extract the kambrium sub package name from path a argument
 #
