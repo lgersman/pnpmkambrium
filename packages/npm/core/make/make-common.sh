@@ -14,7 +14,7 @@ function kambrium.log_done() {
 #
 # echoes a error message prefixed with "[error]"
 #
-# @param $1 the message to log
+# @param $1 the error message to log
 #
 function kambrium.log_error() {
   echo "${TERMINAL_RED:-}[error]${TERMINAL_RESET:-} ${1:-}"
