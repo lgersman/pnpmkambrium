@@ -52,8 +52,9 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >
 >   # compile pot -> po -> mo files
 >   if [[ -d $(@D)/languages ]]; then
->     echo $(MAKE) packages/wp-plugin/$*/languages/$*.pot
->     $(MAKE) $(patsubst %.po,%.mo,$(wildcard packages/wp-plugin/$*/languages/*.po))
+>     $(MAKE) \
+        packages/wp-plugin/$*/languages/$*.pot \
+        $(patsubst %.po,%.mo,$(wildcard packages/wp-plugin/$*/languages/*.po))
 >   else
 >     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
 >   fi
@@ -100,7 +101,7 @@ KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
 .PRECIOUS: packages/wp-plugin/%.pot
 # create or update a i18n plugin pot file
 packages/wp-plugin/%.pot : $$(shell kambrium.get_pot_dependencies $$@)
-> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --debug --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
 
 # HELP<<EOF
 # create or update a i18n po file in a wordpress sub package (`packages/wp-plugin/*`)
@@ -132,7 +133,7 @@ packages/wp-plugin/%/build/block.json: packages/wp-plugin/%/src/block.json
 # EOF
 packages/wp-plugin/%.mo: packages/wp-plugin/%.po
 > $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-mo languages/$(<F)
-> # if a src directory exists we assume that the i18n json files schould also be created
+> # if a src directory exists we assume that the i18n json files should also be created
 > if [[ -d $$(dirname $(@D))/src ]]; then
 >   $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-json languages/$(<F) --no-purge --pretty-print
 > fi
