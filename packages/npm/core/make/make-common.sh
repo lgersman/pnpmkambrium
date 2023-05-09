@@ -12,6 +12,15 @@ function kambrium.log_done() {
 }
 
 #
+# echoes a error message prefixed with "[error]"
+#
+# @param $1 the message to log
+#
+function kambrium.log_error() {
+  echo "${TERMINAL_RED:-}[error]${TERMINAL_RESET:-} ${1:-}"
+}
+
+#
 # echoes a message prefixed with "[skipped]"
 #
 # @param $1 the message to log

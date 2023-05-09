@@ -44,6 +44,8 @@ MAKEFLAGS += --no-print-directory
 .DEFAULT_GOAL := help
 
 TERMINAL_GREY != tput setaf 2
+TERMINAL_RED != tput setaf 1
+export TERMINAL_RED
 TERMINAL_YELLOW != tput setaf 3
 export TERMINAL_YELLOW
 TERMINAL_RESET  != tput sgr0
