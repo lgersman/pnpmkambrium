@@ -60,6 +60,30 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >   fi
 > fi
 >
+> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
+>
+> # update plugin.php metadata
+>
+> # copy plugin code to dist/[plugin-name]
+> mkdir -p $(@D)/dist/$*
+> rsync -rupE \
+    --exclude=node_modules/ \
+    --exclude=package.json \
+    --exclude=dist/ \
+    --exclude=build/ \
+    --exclude=tests/ \
+    --exclude=src/ \
+    --exclude=composer.* \
+    --exclude=vendor/ \
+    --exclude=plugin.php \
+    --exclude=*.kambrium-template \
+    --exclude=cm4all-wp-bundle.json \
+    $(@D)/ $(@D)/dist/$*
+>
+# > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
+> find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
+> find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
+>
 > # build js/css in src/ (take package.json src/entry info into account)
 > # - generate/update i18n resources pot/mo/po
 > # - update plugin.php readme.txt or use readme.txt.template => readme.txt mechnic
@@ -67,19 +91,18 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 > # - update plugin.php metadata
 > # - transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
 > # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?
-> $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
 > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
-> mkdir -p $(@D)/dist
-> # redirecting into the target zip archive frees us from removing an existing archive first
-> (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
-> cat << EOF | tee $@
-> $$(cd $(@D)/dist && ls -1shS *.zip )
->
-> $$(echo -n "---")
->
-> $$(unzip -l $(@D)/dist/*.zip)
-> EOF
+# > # redirecting into the target zip archive frees us from removing an existing archive first
+# > (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
+# > cat << EOF | tee $@
+# > $$(cd $(@D)/dist && ls -1shS *.zip )
+# >
+# > $$(echo -n "---")
+# >
+# > $$(unzip -l $(@D)/dist/*.zip)
+# > EOF
+> touch $@
 
 # HELP<<EOF
 # create or update the pot file in a wordpress sub package (`packages/wp-plugin/*`)
