@@ -113,6 +113,67 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 # EOF
 packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
 
+# update plugin.php metadata if any of its metadata sources changed
+packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
+> # inject sub package environments from {.env,.secrets} files
+> kambrium.load_env $(@D)
+> PACKAGE_JSON=$(@D)/package.json
+> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
+> PACKAGE_AUTHOR="$$(kambrium.author_name $$PACKAGE_JSON) <$$(kambrium.author_email $$PACKAGE_JSON)>"
+> PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
+> # update plugin name
+> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $$PACKAGE_NAME/" $@
+> # update plugin uri
+> HOMEPAGE=$${HOMEPAGE:-$$(jq -r -e '.homepage | values' $$PACKAGE_JSON || jq -r '.homepage | values' package.json)}
+> sed -i "s/^ \* Plugin URI: .*/ \* Plugin URI: $$HOMEPAGE/" $@
+> # update description
+> DESCRIPTION=$${DESCRIPTION:-$$(jq -r -e '.description | values' $$PACKAGE_JSON || jq -r '.description | values' package.json)}
+> sed -i "s/^ \* Description: .*/ \* Description: $$DESCRIPTION/" $@
+> # update version
+> sed -i "s/^ \* Version: .*/ \* Version: $$PACKAGE_VERSION/" $@
+> # update tags
+> TAGS=$${TAGS:-$$(jq -r -e '.keywords | values | join(", ")' $$PACKAGE_JSON || jq -r '.keywords | values | join(", ")' package.json)}
+> sed -i "s/^ \* Tags: .*/ \* Tags: $$TAGS/" $@
+> # update required php version
+> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.engines.php | values' $$PACKAGE_JSON || jq -r '.engines.php | values' package.json)}
+> sed -i "s/^ \* Requires PHP: .*/ \* Requires PHP: $$PHP_VERSION/" $@
+> # update requires at least wordpress version if provided
+> # @TODO: it would be better to provide PHP and WORDPRESS_VERSION using package.json config (https://docs.npmjs.com/cli/v6/configuring-npm/package-json#config)
+> # this would allowing reuse for wp-env and friends
+> # @TODO: a plugin can be directly started using wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#starting-the-environment)
+> WORDPRESS_VERSION=$${WORDPRESS_VERSION:-$$(jq -r -e '.engines.wordpress | values' $$PACKAGE_JSON || jq -r '.engines.wordpress | values' package.json)}
+> [[ "$$WORDPRESS_VERSION" != "" ]] && sed -i "s/^ \* Requires at least: .*/ \* Requires at least: $$WORDPRESS_VERSION/" $@
+> # update author
+> AUTHORS="$${AUTHORS:-[]}"
+> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)
+> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)
+> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.contributors[]? | .name]' package.json)
+> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.author.name | select(.|.!=null)]' package.json)
+> # if AUTHORS looks like a json array ([.*]) transform it into a comma separated list
+> [[ "$$AUTHORS" =~ ^\[[[:print:]]*\]$$ ]] AUTHORS=$$(| jq -r '. | values | join(", ")')
+> [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $$AUTHORS/" $@
+> # update author uri
+> VENDOR=$${VENDOR:-}
+> [[ "$$VENDOR" != "" ]] && sed -i "s/^ \* Author URI: .*/ \* Author URI: $$VENDOR/" $@
+> # update license
+> LICENSE=$$(\
+    jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' $$PACKAGE_JSON || \
+    jq -r -e 'if '(.license | type) == "string" then .license else .license.type end | values' package.json || \
+    true \
+  )
+> [[ "$$LICENSE" != "" ]] && sed -i "s/^ \* License: .*/ \* License: $$LICENSE/" $@
+> # update license uri
+> LICENSE_URI=$$(\
+    jq -r -e '.license.uri | values' $$PACKAGE_JSON || \
+    jq -r -e '.license.uri | values' package.json || \
+    [[ "$$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$$LICENSE" || \
+    echo "" \
+  )
+> [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $$LICENSE_URI/" $@
+> kambrium.log_done "$(@D) : updated wordpress metadata in plugin.php"
+> touch -m $@
+
+
 # dynamic definition of dockerized wp-cli
 KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
   --user '$(shell id -u $(USER)):$(shell id -g $(USER))' \
