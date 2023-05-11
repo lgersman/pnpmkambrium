@@ -54,5 +54,4 @@ ${1:%=clean-%}:
 > $(MAKE) clean PACKAGE_DIR=${1:%=packages/%}
 endef
 
-KAMBRIUM_SUB_PACKAGE_PATHS = $(shell pnpm list --recursive --filter='*/*' --json | jq -r  '.[].path' | xargs -I '{}' -r realpath --relative-base $$(pwd)/packages {})
 $(foreach sub_package, $(KAMBRIUM_SUB_PACKAGE_PATHS), $(eval $(call CLEAN_SUBPACKAGE_RULE_TEMPLATE, $(sub_package))))
