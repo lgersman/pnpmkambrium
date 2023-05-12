@@ -122,26 +122,25 @@ packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json
 > PACKAGE_AUTHOR="$$(kambrium.author_name $$PACKAGE_JSON) <$$(kambrium.author_email $$PACKAGE_JSON)>"
 > PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
 > # update plugin name
-> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $$PACKAGE_NAME/" $@
+> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $*/" $@
 > # update plugin uri
 > HOMEPAGE=$${HOMEPAGE:-$$(jq -r -e '.homepage | values' $$PACKAGE_JSON || jq -r '.homepage | values' package.json)}
-> sed -i "s/^ \* Plugin URI: .*/ \* Plugin URI: $$HOMEPAGE/" $@
+> # we need to escape slashes in the injected variables to not confuse sed (=> $${VAR//\//\\/})
+> sed -i "s/^ \* Plugin URI: .*/ \* Plugin URI: $${HOMEPAGE//\//\\/}/" $@
 > # update description
 > DESCRIPTION=$${DESCRIPTION:-$$(jq -r -e '.description | values' $$PACKAGE_JSON || jq -r '.description | values' package.json)}
-> sed -i "s/^ \* Description: .*/ \* Description: $$DESCRIPTION/" $@
+> sed -i "s/^ \* Description: .*/ \* Description: $${DESCRIPTION//\//\\/}/" $@
 > # update version
 > sed -i "s/^ \* Version: .*/ \* Version: $$PACKAGE_VERSION/" $@
 > # update tags
 > TAGS=$${TAGS:-$$(jq -r -e '.keywords | values | join(", ")' $$PACKAGE_JSON || jq -r '.keywords | values | join(", ")' package.json)}
-> sed -i "s/^ \* Tags: .*/ \* Tags: $$TAGS/" $@
+> sed -i "s/^ \* Tags: .*/ \* Tags: $${TAGS//\//\\/}/" $@
 > # update required php version
-> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.engines.php | values' $$PACKAGE_JSON || jq -r '.engines.php | values' package.json)}
+> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
 > sed -i "s/^ \* Requires PHP: .*/ \* Requires PHP: $$PHP_VERSION/" $@
 > # update requires at least wordpress version if provided
-> # @TODO: it would be better to provide PHP and WORDPRESS_VERSION using package.json config (https://docs.npmjs.com/cli/v6/configuring-npm/package-json#config)
-> # this would allowing reuse for wp-env and friends
 > # @TODO: a plugin can be directly started using wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#starting-the-environment)
-> WORDPRESS_VERSION=$${WORDPRESS_VERSION:-$$(jq -r -e '.engines.wordpress | values' $$PACKAGE_JSON || jq -r '.engines.wordpress | values' package.json)}
+> WORDPRESS_VERSION=$${WORDPRESS_VERSION:-$$(jq -r -e '.config.wordpress_version | values' $$PACKAGE_JSON || jq -r '.config.wordpress_version | values' package.json)}
 > [[ "$$WORDPRESS_VERSION" != "" ]] && sed -i "s/^ \* Requires at least: .*/ \* Requires at least: $$WORDPRESS_VERSION/" $@
 > # update author
 > AUTHORS="$${AUTHORS:-[]}"
@@ -150,11 +149,14 @@ packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json
 > [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.contributors[]? | .name]' package.json)
 > [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.author.name | select(.|.!=null)]' package.json)
 > # if AUTHORS looks like a json array ([.*]) transform it into a comma separated list
-> [[ "$$AUTHORS" =~ ^\[[[:print:]]*\]$$ ]] AUTHORS=$$(| jq -r '. | values | join(", ")')
-> [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $$AUTHORS/" $@
+> if [[ "$$AUTHORS" =~ ^\[.*\]$$ ]]; then
+>   AUTHORS=$$(echo "$$AUTHORS" | jq -r '. | values | join(", ")')
+>   echo "AUTHOIRS=$$AUTHORS"
+> fi
+> [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $${AUTHORS//\//\\/}/" $@
 > # update author uri
 > VENDOR=$${VENDOR:-}
-> [[ "$$VENDOR" != "" ]] && sed -i "s/^ \* Author URI: .*/ \* Author URI: $$VENDOR/" $@
+> [[ "$$VENDOR" != "" ]] && sed -i "s/^ \* Author URI: .*/ \* Author URI: $${VENDOR//\//\\/}/" $@
 > # update license
 > LICENSE=$$(\
     jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' $$PACKAGE_JSON || \
@@ -169,7 +171,7 @@ packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json
     [[ "$$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$$LICENSE" || \
     echo "" \
   )
-> [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $$LICENSE_URI/" $@
+> [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $${LICENSE_URI//\//\\/}/" $@
 > kambrium.log_done "$(@D) : updated wordpress metadata in plugin.php"
 > touch -m $@
 
