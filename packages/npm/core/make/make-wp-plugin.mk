@@ -151,7 +151,6 @@ packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json
 > # if AUTHORS looks like a json array ([.*]) transform it into a comma separated list
 > if [[ "$$AUTHORS" =~ ^\[.*\]$$ ]]; then
 >   AUTHORS=$$(echo "$$AUTHORS" | jq -r '. | values | join(", ")')
->   echo "AUTHOIRS=$$AUTHORS"
 > fi
 > [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $${AUTHORS//\//\\/}/" $@
 > # update author uri
@@ -160,21 +159,19 @@ packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json
 > # update license
 > LICENSE=$$(\
     jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' $$PACKAGE_JSON || \
-    jq -r -e 'if '(.license | type) == "string" then .license else .license.type end | values' package.json || \
+    jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' package.json || \
     true \
   )
 > [[ "$$LICENSE" != "" ]] && sed -i "s/^ \* License: .*/ \* License: $$LICENSE/" $@
 > # update license uri
 > LICENSE_URI=$$(\
-    jq -r -e '.license.uri | values' $$PACKAGE_JSON || \
-    jq -r -e '.license.uri | values' package.json || \
+    jq -r -e '.license.uri | values' $$PACKAGE_JSON 2>/dev/null || \
+    jq -r -e '.license.uri | values' package.json 2>/dev/null || \
     [[ "$$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$$LICENSE" || \
-    echo "" \
+    true \
   )
 > [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $${LICENSE_URI//\//\\/}/" $@
-> kambrium.log_done "$(@D) : updated wordpress metadata in plugin.php"
-> touch -m $@
-
+> kambrium.log_done "$(@D) : updated wordpress header in plugin.php"
 
 # dynamic definition of dockerized wp-cli
 KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
@@ -187,6 +184,7 @@ KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
 .PRECIOUS: packages/wp-plugin/%.pot
 # create or update a i18n plugin pot file
 packages/wp-plugin/%.pot : $$(shell kambrium.get_pot_dependencies $$@)
+> set -x
 > $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
 
 # HELP<<EOF
@@ -228,14 +226,13 @@ packages/wp-plugin/%.mo: packages/wp-plugin/%.po
 .PRECIOUS: packages/wp-plugin/build/%.js
 # generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
 packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
-> if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
+> if [[ -f "$(<D)/../cm4all-wp-bundle.json" ]]; then
 >   # using cm4all-wp-bundle if a configuration file exists
->   CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(<D)/../cm4all-wp-bundle.json | jq .)
 >   GLOBAL_NAME=$$(basename -s .mjs $<)
 >   # if make was called from GitHub action we need to run cm4all-wp-bundle using --user root to have write permissions to checked out repository
 >   # (the cm4all-wp-bundle image will by default use user "node" instead of "root" for security purposes)
 >   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
->   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
 >   for mode in 'development' 'production' ; do
 >     printf "$$BUNDLER_CONFIG" | \
       docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
