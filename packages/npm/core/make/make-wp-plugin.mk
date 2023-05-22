@@ -75,14 +75,13 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
     --exclude=src/ \
     --exclude=composer.* \
     --exclude=vendor/ \
-    --exclude=plugin.php \
     --exclude=*.kambrium-template \
     --exclude=cm4all-wp-bundle.json \
     $(@D)/ $(@D)/dist/$*
 >
 # > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
-> find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
-> find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
+# > find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
+# > find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
 >
 > # build js/css in src/ (take package.json src/entry info into account)
 > # - generate/update i18n resources pot/mo/po
