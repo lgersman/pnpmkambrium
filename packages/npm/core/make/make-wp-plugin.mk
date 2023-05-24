@@ -75,6 +75,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
     --exclude=src/ \
     --exclude=composer.* \
     --exclude=vendor/ \
+    --exclude=readme.txt \
     --exclude=*.kambrium-template \
     --exclude=cm4all-wp-bundle.json \
     $(@D)/ $(@D)/dist/$*
@@ -82,16 +83,16 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 # > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 # > find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
 # > find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
->
+> # generate/update readme.txt
+> $(MAKE) $(@D)/dist/$*/readme.txt
 > # build js/css in src/ (take package.json src/entry info into account)
-> # - generate/update i18n resources pot/mo/po
-> # - update plugin.php readme.txt or use readme.txt.template => readme.txt mechnic
+> # - update readme.txt or use readme.txt.template => readme.txt mechnic
 > # - resize/generate wordpress.org plugin images
 > # - update plugin.php metadata
 > # - transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
 > # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?
-> [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
-> find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
+# > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
+# > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 # > # redirecting into the target zip archive frees us from removing an existing archive first
 # > (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
 # > cat << EOF | tee $@
@@ -114,61 +115,31 @@ packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
 
 # update plugin.php metadata if any of its metadata sources changed
 packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
-> # inject sub package environments from {.env,.secrets} files
-> kambrium.load_env $(@D)
-> PACKAGE_JSON=$(@D)/package.json
-> PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
-> PACKAGE_AUTHOR="$$(kambrium.author_name $$PACKAGE_JSON) <$$(kambrium.author_email $$PACKAGE_JSON)>"
-> PACKAGE_NAME=$$(jq -r '.name | values' $$PACKAGE_JSON | sed -r 's/@//g')
+> kambrium.get_wp_plugin_metadata $@
 > # update plugin name
-> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $*/" $@
+> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $$PACKAGE_NAME/" $@
 > # update plugin uri
-> HOMEPAGE=$${HOMEPAGE:-$$(jq -r -e '.homepage | values' $$PACKAGE_JSON || jq -r '.homepage | values' package.json)}
 > # we need to escape slashes in the injected variables to not confuse sed (=> $${VAR//\//\\/})
 > sed -i "s/^ \* Plugin URI: .*/ \* Plugin URI: $${HOMEPAGE//\//\\/}/" $@
 > # update description
-> DESCRIPTION=$${DESCRIPTION:-$$(jq -r -e '.description | values' $$PACKAGE_JSON || jq -r '.description | values' package.json)}
 > sed -i "s/^ \* Description: .*/ \* Description: $${DESCRIPTION//\//\\/}/" $@
 > # update version
 > sed -i "s/^ \* Version: .*/ \* Version: $$PACKAGE_VERSION/" $@
 > # update tags
-> TAGS=$${TAGS:-$$(jq -r -e '.keywords | values | join(", ")' $$PACKAGE_JSON || jq -r '.keywords | values | join(", ")' package.json)}
 > sed -i "s/^ \* Tags: .*/ \* Tags: $${TAGS//\//\\/}/" $@
 > # update required php version
-> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
 > sed -i "s/^ \* Requires PHP: .*/ \* Requires PHP: $$PHP_VERSION/" $@
 > # update requires at least wordpress version if provided
 > # @TODO: a plugin can be directly started using wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#starting-the-environment)
-> WORDPRESS_VERSION=$${WORDPRESS_VERSION:-$$(jq -r -e '.config.wordpress_version | values' $$PACKAGE_JSON || jq -r '.config.wordpress_version | values' package.json)}
 > [[ "$$WORDPRESS_VERSION" != "" ]] && sed -i "s/^ \* Requires at least: .*/ \* Requires at least: $$WORDPRESS_VERSION/" $@
 > # update author
-> AUTHORS="$${AUTHORS:-[]}"
-> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.contributors[]? | .name]' $$PACKAGE_JSON)
-> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.author.name | select(.|.!=null)]' $$PACKAGE_JSON)
-> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.contributors[]? | .name]' package.json)
-> [[ "$$AUTHORS" == '[]' ]] && AUTHORS=$$(jq '[.author.name | select(.|.!=null)]' package.json)
-> # if AUTHORS looks like a json array ([.*]) transform it into a comma separated list
-> if [[ "$$AUTHORS" =~ ^\[.*\]$$ ]]; then
->   AUTHORS=$$(echo "$$AUTHORS" | jq -r '. | values | join(", ")')
-> fi
 > [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $${AUTHORS//\//\\/}/" $@
 > # update author uri
 > VENDOR=$${VENDOR:-}
 > [[ "$$VENDOR" != "" ]] && sed -i "s/^ \* Author URI: .*/ \* Author URI: $${VENDOR//\//\\/}/" $@
 > # update license
-> LICENSE=$$(\
-    jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' $$PACKAGE_JSON || \
-    jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' package.json || \
-    true \
-  )
 > [[ "$$LICENSE" != "" ]] && sed -i "s/^ \* License: .*/ \* License: $$LICENSE/" $@
 > # update license uri
-> LICENSE_URI=$$(\
-    jq -r -e '.license.uri | values' $$PACKAGE_JSON 2>/dev/null || \
-    jq -r -e '.license.uri | values' package.json 2>/dev/null || \
-    [[ "$$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$$LICENSE" || \
-    true \
-  )
 > [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $${LICENSE_URI//\//\\/}/" $@
 > kambrium.log_done "$(@D) : updated wordpress header in plugin.php"
 
@@ -206,6 +177,18 @@ packages/wp-plugin/%.po : $$(shell kambrium.get_pot_path $$(@))
 
 packages/wp-plugin/%/build/block.json: packages/wp-plugin/%/src/block.json
 > cp $< $@
+
+# helper target generating/updating dist/readme.txt
+packages/wp-plugin/%/dist/readme.txt: # $$(wildcard packages/wp-plugin/%/readme.txt) packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
+> kambrium.get_wp_plugin_metadata '$@' >$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables
+> PACKAGE_DIRECTORY="packages/$$(kambrium.get_sub_package_type_from_path '$@')/$$(kambrium.get_sub_package_name_from_path '$@')"
+> # prefer plugin specific readme.txt over default fallback
+> README_TXT=$$([[ -f '$$PACKAGE_DIRECTORY/readme.txt' ]] && echo '$$PACKAGE_DIRECTORY/dist/$*/readme.txt' || echo './node_modules/@pnpmkambrium/core/presets/default/wp-plugin/readme.txt')
+> # convert variables list into envsubst compatible form ("${foo}\n${bar}")
+> VARIABLES=$$(cat $(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$${&}/')
+> # process readme.txt and write output to dist/readme.txt
+> envsubst "$$VARIABLES" < "$$README_TXT" > $@
+
 
 # HELP<<EOF
 # create or update a i18n mo file in a wordpress sub package (`packages/wp-plugin/*`)
