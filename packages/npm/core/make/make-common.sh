@@ -94,17 +94,17 @@ export -f kambrium.author_name
 #
 function kambrium.load_env() {
   local path=$(realpath "${1:-$(pwd)}")
-
+  local CURRENT_ALLEXPORT_STATE="$(shopt -po allexport)"
+  # enable export all variables bash feature
+  set -a
   for file in "$path/"{.env,.secrets}; do
     if [[ -f "$file" ]]; then
-      # enable export all variables bash feature
-      set -a
       # include .env/.secret files into current bash process
       source "$file"
-      # disabled export all variables bash feature
-      set +a
     fi
   done
+  # restore the value of allexport option to its original value.
+  eval "$CURRENT_ALLEXPORT_STATE" >/dev/null
 }
 
 #
