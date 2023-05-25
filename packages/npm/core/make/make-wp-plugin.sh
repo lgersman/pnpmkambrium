@@ -79,6 +79,8 @@ function kambrium.get_wp_plugin_metadata() {
     [[ "$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$LICENSE" || \
     true \
   )
+#  @TODO: convert markdown to readme.txt markdown and strip 1st line containing sub package name
+  CHANGELOG=$([[ -f "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ]] && sed 's/^### \(.*\)/*\1*/g;s/^## \(.*\)/= \1 =/g;' "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ||:)
 
   local NAMES=( \
     PACKAGE_JSON \
@@ -95,6 +97,7 @@ function kambrium.get_wp_plugin_metadata() {
     VENDOR \
     LICENSE \
     LICENSE_URI \
+    CHANGELOG \
   )
 
   # print names each on a new line

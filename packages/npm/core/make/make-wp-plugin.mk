@@ -184,7 +184,7 @@ packages/wp-plugin/%/dist/readme.txt: # $$(wildcard packages/wp-plugin/%/readme.
 > PACKAGE_DIRECTORY="packages/$$(kambrium.get_sub_package_type_from_path '$@')/$$(kambrium.get_sub_package_name_from_path '$@')"
 > # prefer plugin specific readme.txt over default fallback
 > README_TXT=$$([[ -f '$$PACKAGE_DIRECTORY/readme.txt' ]] && echo '$$PACKAGE_DIRECTORY/dist/$*/readme.txt' || echo './node_modules/@pnpmkambrium/core/presets/default/wp-plugin/readme.txt')
-> # convert variables list into envsubst compatible form ("${foo}\n${bar}")
+# > convert variables list into envsubst compatible form ("${foo}\n${bar}")
 > VARIABLES=$$(cat $(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$${&}/')
 > # process readme.txt and write output to dist/readme.txt
 > envsubst "$$VARIABLES" < "$$README_TXT" > $@
