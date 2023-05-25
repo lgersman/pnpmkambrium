@@ -49,10 +49,10 @@ function kambrium.get_wp_plugin_metadata() {
   # inject sub package environments from {.env,.secrets} files
   kambrium.load_env "$WP_PLUGIN_DIRECTORY"
   PACKAGE_JSON="$WP_PLUGIN_DIRECTORY/package.json"
-  PACKAGE_VERSION=$(jq -r '.version | values' $PACKAGE_JSON)
-  PACKAGE_AUTHOR="$(kambrium.author_name $PACKAGE_JSON) <$(kambrium.author_email $PACKAGE_JSON)>"
+  PACKAGE_VERSION=${PACKAGE_VERSION:-$(jq -r '.version | values' $PACKAGE_JSON)}
+  PACKAGE_AUTHOR="${PACKAGE_AUTHOR:-$(kambrium.author_name $PACKAGE_JSON) <$(kambrium.author_email $PACKAGE_JSON)>}"
   FQ_PACKAGE_NAME=$(jq -r '.name | values' $PACKAGE_JSON | sed -r 's/@//g')
-  PACKAGE_NAME=${FQ_PACKAGE_NAME#*/}
+  PACKAGE_NAME=${PACKAGE_NAME:-${FQ_PACKAGE_NAME#*/}}
   HOMEPAGE=${HOMEPAGE:-$(jq -r -e '.homepage | values' $PACKAGE_JSON || jq -r '.homepage | values' package.json)}
   DESCRIPTION=${DESCRIPTION:-$(jq -r -e '.description | values' $PACKAGE_JSON || jq -r '.description | values' package.json)}
   TAGS=${TAGS:-$(jq -r -e '.keywords | values | join(", ")' $PACKAGE_JSON || jq -r '.keywords | values | join(", ")' package.json)}
@@ -68,19 +68,22 @@ function kambrium.get_wp_plugin_metadata() {
     AUTHORS=$(echo "$AUTHORS" | jq -r '. | values | join(", ")')
   fi
   VENDOR=${VENDOR:-}
-  LICENSE=$(\
+  LICENSE=${LICENSE:-$(\
     jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' $PACKAGE_JSON || \
     jq -r -e 'if (.license | type) == "string" then .license else .license.type end | values' package.json || \
     true \
-  )
-  LICENSE_URI=$(\
+  )}
+  LICENSE_URI=${LICENSE_URI:-$(\
     jq -r -e '.license.uri | values' $PACKAGE_JSON 2>/dev/null || \
     jq -r -e '.license.uri | values' package.json 2>/dev/null || \
     [[ "$LICENSE" != "" ]] && echo "https://opensource.org/licenses/$LICENSE" || \
     true \
-  )
-#  @TODO: convert markdown to readme.txt markdown and strip 1st line containing sub package name
-  CHANGELOG=$([[ -f "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ]] && sed 's/^### \(.*\)/*\1*/g;s/^## \(.*\)/= \1 =/g;' "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ||:)
+  )}
+
+  REQUIRES_AT_LEAST_WORDPRESS_VERSION=${REQUIRES_AT_LEAST_WORDPRESS_VERSION:-$WORDPRESS_VERSION}
+
+  #  @TODO: convert markdown to readme.txt markdown and strip 1st line containing sub package name
+  CHANGELOG=${CHANGELOG:-$([[ -f "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ]] && sed 's/^### \(.*\)/*\1*/g;s/^## \(.*\)/= \1 =/g;' "$WP_PLUGIN_DIRECTORY/CHANGELOG.md" ||:)}
 
   local NAMES=( \
     PACKAGE_JSON \
@@ -98,6 +101,7 @@ function kambrium.get_wp_plugin_metadata() {
     LICENSE \
     LICENSE_URI \
     CHANGELOG \
+    REQUIRES_AT_LEAST_WORDPRESS_VERSION \
   )
 
   # print names each on a new line

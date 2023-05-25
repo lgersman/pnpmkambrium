@@ -2,15 +2,15 @@
 
 Contributors:      ${AUTHORS}
 Plugin Name:       ${PACKAGE_NAME}
-Plugin URI:        ${VENDOR}
+Plugin URI:        ${HOMEPAGE}
 Tags:              ${TAGS}
-Requires at least: ${WORDPRESS_VERSION}
+Requires at least: ${REQUIRES_AT_LEAST_WORDPRESS_VERSION}
 Tested up to:      ${WORDPRESS_VERSION}
 Stable tag:        ${PACKAGE_VERSION}
 Version:           ${PACKAGE_VERSION}
 Requires PHP:      ${PHP_VERSION}
-License:           GPLv2 or later
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+License:           ${LICENSE}
+License URI:       ${LICENSE_URI}
 Author:            ${AUTHORS}
 Author URI:        ${VENDOR}
 
