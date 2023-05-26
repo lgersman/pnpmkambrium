@@ -49,9 +49,9 @@ distclean: clean
 clean-%/%: ;
 
 define CLEAN_SUBPACKAGE_RULE_TEMPLATE =
-.PHONY: ${1:%=clean-%}
-${1:%=clean-%}:
-> $(MAKE) clean PACKAGE_DIR=${1:%=packages/%}
+.PHONY: clean-$(1)
+clean-$(1):
+> $(MAKE) clean PACKAGE_DIR=packages/$(1)
 endef
 
-$(foreach sub_package, $(KAMBRIUM_SUB_PACKAGE_PATHS), $(eval $(call CLEAN_SUBPACKAGE_RULE_TEMPLATE, $(sub_package))))
+$(foreach sub_package, $(KAMBRIUM_SUB_PACKAGE_PATHS), $(eval $(call CLEAN_SUBPACKAGE_RULE_TEMPLATE,$(sub_package))))
