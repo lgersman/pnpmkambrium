@@ -176,15 +176,15 @@ packages/wp-plugin/%.po : $$(shell kambrium.get_pot_path $$(@))
 packages/wp-plugin/%/build/block.json: packages/wp-plugin/%/src/block.json
 > cp $< $@
 
+# PLUGIN_SUBPACKAGE_RULE_TEMPLATE is used to create a rule for each wp-{theme,plugin}/*/dist/*/readme.txt file
+DOLLAR := $
+define PLUGIN_SUBPACKAGE_RULE_TEMPLATE =
 # helper target generating/updating dist/readme.txt
-packages/wp-plugin/%/readme.txt: # $$(wildcard packages/wp-plugin/%/readme.txt) packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
-> PACKAGE_DIRECTORY="packages/$$(kambrium.get_sub_package_type_from_path '$@')/$$(kambrium.get_sub_package_name_from_path '$@')"
-> # a bit hackish but works : ensure this target is only used for generating file [subpackage-dir]/dist/[subpackage-name]/readme.txt
-> [[ '$@' !=  "$$PACKAGE_DIRECTORY/dist/$$(kambrium.get_sub_package_name_from_path '$@')/readme.txt" ]] && kambrium.log_error "invalid target '$@' : expected target '$$PACKAGE_DIRECTORY/dist/$$(kambrium.get_sub_package_name_from_path '$@')/readme.txt'" && exit 1
-> kambrium.get_wp_plugin_metadata '$@' >$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables
+packages/$(1)/dist/$(notdir $(1))/readme.txt: $(wildcard packages/$(1)/readme.txt) packages/$(1)/package.json package.json $(wildcard .env packages/$(dir $(1)).env)
+> kambrium.get_wp_plugin_metadata '$$@' >$$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables
 > # prefer plugin specific readme.txt over default fallback
-> if [[ -f "$$PACKAGE_DIRECTORY/readme.txt" ]]; then
->   README_TXT="$$PACKAGE_DIRECTORY/readme.txt"
+> if [[ -f "packages/$(1)/readme.txt" ]]; then
+>   README_TXT="packages/$(1)/readme.txt"
 > else
 >   README_TXT='./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/readme.txt'
 >   # copy dummy screenshots/icon to dist directory
@@ -192,12 +192,14 @@ packages/wp-plugin/%/readme.txt: # $$(wildcard packages/wp-plugin/%/readme.txt) 
 >   #    screenshot-1.png: convert -size 640x480 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Screenshot-1' ./screenshot-1.png
 >   #    banner-772x250.png: convert -size 772x250 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Banner 772 x 250 px' ./banner-772x250.png
 >   #    banner-1544x500.png: convert -size 1544x500 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Banner 1544 x 500 px' ./banner-1544x500.png
->   cp ./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/{*.png,icon.svg} $(@D)
+>   cp ./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/{*.png,icon.svg} $$(@D)
 > fi
 # > convert variables list into envsubst compatible form ("${foo}\n${bar}")
-> VARIABLES=$$(cat $(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$${&}/')
+> VARIABLES=$$$$(cat $$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$$$${&}/')
 > # process readme.txt and write output to dist/readme.txt
-> envsubst "$$VARIABLES" < "$$README_TXT" > $@
+> envsubst "$(DOLLAR)$(DOLLAR)VARIABLES" < "$(DOLLAR)$(DOLLAR)README_TXT" > $$@
+endef
+$(foreach wp_sub_package, $(filter wp-plugin/% wp-theme/%,$(KAMBRIUM_SUB_PACKAGE_PATHS)), $(eval $(call PLUGIN_SUBPACKAGE_RULE_TEMPLATE,$(wp_sub_package))))
 
 # HELP<<EOF
 # create or update a i18n mo file in a wordpress sub package (`packages/wp-plugin/*`)

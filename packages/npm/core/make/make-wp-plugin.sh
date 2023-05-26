@@ -53,7 +53,7 @@ function kambrium.get_wp_plugin_metadata() {
   PACKAGE_AUTHOR="${PACKAGE_AUTHOR:-$(kambrium.author_name $PACKAGE_JSON) <$(kambrium.author_email $PACKAGE_JSON)>}"
   FQ_PACKAGE_NAME=$(jq -r '.name | values' $PACKAGE_JSON | sed -r 's/@//g')
   PACKAGE_NAME=${PACKAGE_NAME:-${FQ_PACKAGE_NAME#*/}}
-  HOMEPAGE=${HOMEPAGE:-$(jq -r -e '.homepage | values' $PACKAGE_JSON || jq -r '.homepage | values' package.json)}
+  HOMEPAGE=${HOMEPAGE:-$(jq -r -e '.homepage | values' $PACKAGE_JSON || jq -r -e '.homepage | values' package.json || echo "${VENDOR:-}")}
   DESCRIPTION=${DESCRIPTION:-$(jq -r -e '.description | values' $PACKAGE_JSON || jq -r '.description | values' package.json)}
   TAGS=${TAGS:-$(jq -r -e '.keywords | values | join(", ")' $PACKAGE_JSON || jq -r '.keywords | values | join(", ")' package.json)}
   PHP_VERSION=${PHP_VERSION:-$(jq -r -e '.config.php_version | values' $PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
