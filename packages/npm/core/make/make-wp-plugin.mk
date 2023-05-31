@@ -196,7 +196,7 @@ packages/$(1)/dist/$(notdir $(1))/readme.txt: $(wildcard packages/$(1)/readme.tx
 >   #    banner-1544x500.png: convert -size 1544x500 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Banner 1544 x 500 px' ./banner-1544x500.png
 >   cp ./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/{*.png,icon.svg} $$(@D)
 > fi
-# > convert variables list into envsubst compatible form ("${foo}\n${bar}")
+> # convert variables list into envsubst compatible form
 > VARIABLES=$$$$(cat $$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$$$${&}/')
 > # process readme.txt and write output to dist/readme.txt
 > envsubst "$(DOLLAR)$(DOLLAR)VARIABLES" < "$(DOLLAR)$(DOLLAR)README_TXT" > $$@
