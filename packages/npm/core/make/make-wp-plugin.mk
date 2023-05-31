@@ -89,19 +89,23 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 # > find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
 # > find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
 > # generate/update readme.txt
-> $(MAKE) --trace $(@D)/dist/$*/readme.txt
-> # - transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
-> # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?
+> $(MAKE) $(@D)/dist/$*/readme.txt
 # > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 # > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 # > # redirecting into the target zip archive frees us from removing an existing archive first
-> (cd $(@D)/dist/$* && zip -9 -r -q - ./* >../$*-$$PACKAGE_VERSION.zip)
+> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
+# make a soft link containing package and php version targeting the default plugin dist folder
+> (cd $(@D)/dist && ln -s $* $*-$${PACKAGE_VERSION}-php$${PHP_VERSION})
+> # @TODO: transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
+> # create zip file for each dist/[plugin]-[version]-[php-version] directory
+> for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
+# > (cd $(@D)/dist/$* && zip -9 -r -q - ./$*/* >../$*-$${PACKAGE_VERSION-php}$${PHP_VERSION}.zip)
 > cat << EOF | tee $@
 > $$(cd $(@D)/dist && ls -1shS *.zip )
 >
 > $$(echo -n "---")
 >
-> $$(unzip -l $(@D)/dist/*.zip)
+> $$(unzip -l $(@D)/dist/*.zip 2>/dev/null ||:)
 > EOF
 
 # HELP<<EOF
