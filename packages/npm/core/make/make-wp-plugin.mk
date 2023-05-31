@@ -95,15 +95,14 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 # > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 # > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 # > # redirecting into the target zip archive frees us from removing an existing archive first
-# > (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
-# > cat << EOF | tee $@
-# > $$(cd $(@D)/dist && ls -1shS *.zip )
-# >
-# > $$(echo -n "---")
-# >
-# > $$(unzip -l $(@D)/dist/*.zip)
-# > EOF
-> touch $@
+> (cd $(@D)/dist/$* && zip -9 -r -q - ./* >../$*-$$PACKAGE_VERSION.zip)
+> cat << EOF | tee $@
+> $$(cd $(@D)/dist && ls -1shS *.zip )
+>
+> $$(echo -n "---")
+>
+> $$(unzip -l $(@D)/dist/*.zip)
+> EOF
 
 # HELP<<EOF
 # create or update the pot file in a wordpress sub package (`packages/wp-plugin/*`)
