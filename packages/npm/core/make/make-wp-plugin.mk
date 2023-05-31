@@ -65,7 +65,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 > # update plugin.php metadata
 > $(MAKE) $(@D)/plugin.php
 >
-> # co &>/dev/nullpy plugin code to dist/[plugin-name]
+> # copy plugin code to dist/[plugin-name]
 > mkdir -p $(@D)/dist/$*
 > rsync -rupE \
     --exclude=node_modules/ \
@@ -82,6 +82,8 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
     --exclude=*.kambrium-template \
     --exclude=cm4all-wp-bundle.json \
     $(@D)/ $(@D)/dist/$*
+> # copy transpiled js/css to target folder
+> rsync -rupE $(@D)/build $(@D)/dist/$*/
 >
 # > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
 # > find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
