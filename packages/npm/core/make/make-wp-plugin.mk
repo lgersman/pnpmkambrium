@@ -81,6 +81,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
     --exclude=.secrets \
     --exclude=*.kambrium-template \
     --exclude=cm4all-wp-bundle.json \
+    --exclude=rector-config-*.php \
     $(@D)/ $(@D)/dist/$*
 > # copy transpiled js/css to target folder
 > rsync -rupE $(@D)/build $(@D)/dist/$*/
@@ -94,8 +95,17 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 # > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
 # > # redirecting into the target zip archive frees us from removing an existing archive first
 > PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
-# make a soft link containing package and php version targeting the default plugin dist folder
+> # make a soft link containing package and php version targeting the default plugin dist folder
 > (cd $(@D)/dist && ln -s $* $*-$${PACKAGE_VERSION}-php$${PHP_VERSION})
+> # process plugin using rector
+> for RECTOR_CONFIG in $(@D)/*-*-php*.php; do
+>   RECTOR_CONFIG=$$(basename "$$RECTOR_CONFIG" '.php')
+>   TARGET_DIR="$(@D)/dist/$*-$${PACKAGE_VERSION}-$${RECTOR_CONFIG#*rector-config-}"
+>   rsync -a '$(@D)/dist/$*/' "$$TARGET_DIR"
+> # docker pull rector/rector:latest
+> # docker run -v $(pwd)/packages/wp-plugin/cm4all-wp-impex/dist/cm4all-wp-impex-1.5.7-php7.4/:/project rector/rector:latest --no-progress-bar process /project --dry-run
+> # see http://mark-story.com/posts/view/using-rector-to-ease-upgrades
+> done
 > # @TODO: transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
 > # create zip file for each dist/[plugin]-[version]-[php-version] directory
 > for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
