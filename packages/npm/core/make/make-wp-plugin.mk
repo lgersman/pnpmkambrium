@@ -100,22 +100,30 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 > # process plugin using rector
 > for RECTOR_CONFIG in $(@D)/*-*-php*.php; do
 >   RECTOR_CONFIG=$$(basename "$$RECTOR_CONFIG" '.php')
->   TARGET_DIR="$(@D)/dist/$*-$${PACKAGE_VERSION}-$${RECTOR_CONFIG#*rector-config-}"
->   rsync -a '$(@D)/dist/$*/' "$$TARGET_DIR"
-> # docker pull rector/rector:latest
-> # docker run -v $(pwd)/packages/wp-plugin/cm4all-wp-impex/dist/cm4all-wp-impex-1.5.7-php7.4/:/project rector/rector:latest --no-progress-bar process /project --dry-run
-> # see http://mark-story.com/posts/view/using-rector-to-ease-upgrades
+>   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-$${RECTOR_CONFIG#*rector-config-}"
+>   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
+>   # call dockerized rector
+>   docker run $(DOCKER_FLAGS) \
+      -it \
+      --rm \
+      --user "$$(id -u $(USER)):$$(id -g $(USER))" \
+      -v $$(pwd)/$(@D):/project \
+      pnpmkambrium/rector-php \
+      --clear-cache \
+      --config "$${RECTOR_CONFIG}.php" \
+      --no-progress-bar \
+      process \
+      $$TARGET_DIR
 > done
-> # @TODO: transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
 > # create zip file for each dist/[plugin]-[version]-[php-version] directory
 > for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
 # > (cd $(@D)/dist/$* && zip -9 -r -q - ./$*/* >../$*-$${PACKAGE_VERSION-php}$${PHP_VERSION}.zip)
 > cat << EOF | tee $@
-> $$(cd $(@D)/dist && ls -1shS *.zip )
+> $$(cd $(@D)/dist && ls -1shS *.zip)
 >
 > $$(echo -n "---")
 >
-> $$(unzip -l $(@D)/dist/*.zip 2>/dev/null ||:)
+> $$(for ZIP_ARCHIVE in $(@D)/dist/*.zip; do (cd $$(dirname $$ZIP_ARCHIVE) && unzip -l $$(basename $$ZIP_ARCHIVE) && echo ""); done)
 > EOF
 
 # HELP<<EOF
