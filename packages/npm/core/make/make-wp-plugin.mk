@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
