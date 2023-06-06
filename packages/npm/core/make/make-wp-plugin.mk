@@ -100,7 +100,8 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 > # process plugin using rector
 > for RECTOR_CONFIG in $(@D)/*-*-php*.php; do
 >   RECTOR_CONFIG=$$(basename "$$RECTOR_CONFIG" '.php')
->   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-$${RECTOR_CONFIG#*rector-config-}"
+>   TARGET_PHP_VERSION="$${RECTOR_CONFIG#*rector-config-php}"
+>   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-php$${TARGET_PHP_VERSION}"
 >   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
 >   # call dockerized rector
 >   docker run $(DOCKER_FLAGS) \
@@ -114,6 +115,9 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
       --no-progress-bar \
       process \
       $$TARGET_DIR
+>   # update version information in readme.txt and plugin.php down/up-graded plugin variant
+>   sed -i "s/^ \* Requires PHP:\([[:space:]]\+\).*/ \* Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/plugin.php"
+>   sed -i "s/^Requires PHP:\([[:space:]]\+\).*/Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/readme.txt"
 > done
 > # create zip file for each dist/[plugin]-[version]-[php-version] directory
 > for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
