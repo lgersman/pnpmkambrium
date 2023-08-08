@@ -10,7 +10,6 @@ KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-github.sh
 # supported variables are :
 #   - `GITHUB_TOKEN` (required) can be the GitHub password (a GitHub token is preferred for security reasons)
 #   - `GITHUB_OWNER` (required) GitHub username
-#   - `GIT_REMOTE_REPOSITORY_NAME` (optional, default=`origin`) the remote repository to push to
 #   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
 #   - `GITHUB_REPO_DESCRIPTION` (optional,default=property `description` in root file `package.json`)
 #   - `GITHUB_REPO_TOPICS` (optional,default=property `keys` in root file `package.json`)
@@ -70,8 +69,6 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >   | jq .
 > echo '[done]'
 
-
-
 # HELP<<EOF
 # creates a GitHub release for the given package
 #   - creates a GitHub release for the given package
@@ -80,7 +77,6 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 # supported variables are :
 #   - `GITHUB_TOKEN` (required) GitHub token
 #   - `GITHUB_OWNER` (required) GitHub username
-#   - `GIT_REMOTE_REPOSITORY_NAME` (optional, default=`origin`) the remote repository to push to
 #   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
 #   - `RELEASE_ASSET_DIR` (optional,default=`dist`) the directory containing the release assets
 #   - `RELEASE_ASSET_SPECIFICATION` (optional,default=`none`) the release asset specification
