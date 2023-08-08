@@ -134,3 +134,6 @@ KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/
 
 .PHONY: kambrium-templates
 kambrium-templates: $(KAMBRIUM_TEMPLATE_TARGETS) ;
+
+# Docker gum to use over regular gum 
+GUM := docker run -ti --rm pnpmkambrium/gum
