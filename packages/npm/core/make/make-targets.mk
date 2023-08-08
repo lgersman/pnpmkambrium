@@ -23,3 +23,6 @@ packages/: $$(wildcard $$(@D)/*/) ;
 >   echo "$< => $@" && \
 >   "$<" > "$@" || \
 >   (echo "template(=$<) is no executable : don't know how to generate target file(=$@)" >&2 && false)
+
+# this snippet is just for illustrating how to call eval inline to create a target
+# $(foreach sub_package, $(KAMBRIUM_SUB_PACKAGE_PATHS), $(eval ${sub_package:%=packages/%/.env}: ;))

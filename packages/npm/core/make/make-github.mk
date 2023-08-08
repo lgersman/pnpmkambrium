@@ -67,7 +67,7 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 >    https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/topics \
 >   --data "$$DATA" \
 >   | jq .
-> echo '[done]'
+> kambrium.log_done
 
 # HELP<<EOF
 # creates a GitHub release for the given package
@@ -177,4 +177,4 @@ $${GITHUB_REPO_URL}/releases \
 > else \
 > printf "[INFO] Skipping Asset Upload\n" ;
 > fi
-
+> kambrium.log_done

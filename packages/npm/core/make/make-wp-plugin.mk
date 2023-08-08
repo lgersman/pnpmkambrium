@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
@@ -45,39 +45,89 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   # transpile src/{*.js,*.css} files
 >   if [[ -d $(@D)/src ]]; then
 >     $(MAKE) $$(find $(@D)/src -maxdepth 1 -type f -name '*.mjs' | sed -e 's/src/build/g' -e 's/.mjs/.js/g')
->     $(MAKE) $(@D)/build/block.json
+>     [[ -f $(@D)/src/block.json ]] && $(MAKE) $(@D)/build/block.json
 >   else
->     echo "[skipped]: js/css transpilation skipped - no ./src directory found"
+>     kambrium.log_skipped "js/css transpilation skipped - no ./src directory found"
 >   fi
 >
 >   # compile pot -> po -> mo files
 >   if [[ -d $(@D)/languages ]]; then
->     $(MAKE) packages/wp-plugin/$*/languages/$*.pot
->     # @TODO: compile mo/json files
+>     $(MAKE) \
+        packages/wp-plugin/$*/languages/$*.pot \
+        $(patsubst %.po,%.mo,$(wildcard packages/wp-plugin/$*/languages/*.po))
 >   else
->     echo "[skipped]: i18n transpilation skipped - no ./languages directory found"
+>     kambrium.log_skipped "i18n transpilation skipped - no ./languages directory found"
 >   fi
 > fi
 >
-> # build js/css in src/ (take package.json src/entry info into account)
-> # - generate/update i18n resources pot/mo/po
-> # - update plugin.php readme.txt or use readme.txt.template => readme.txt mechnic
-> # - resize/generate wordpress.org plugin images
-> # - update plugin.php metadata
-> # - transpile build/php sources down to 7.4. if needed (lookup required php version from plugin.php)
-> # how do we store the original plugin.zip and the transpiled plugin within build/ folder ?
 > $(PNPM) -r --filter "$$(jq -r '.name | values' $$PACKAGE_JSON)" --if-present run post-build
-> [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
-> find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
-> mkdir -p $(@D)/dist
-> # redirecting into the target zip archive frees us from removing an existing archive first
-> (cd $(@D)/build && zip -9 -r -q - ./* >../dist/$*-$$PACKAGE_VERSION.zip)
+>
+> # update plugin.php metadata
+> $(MAKE) $(@D)/plugin.php
+>
+> # copy plugin code to dist/[plugin-name]
+> mkdir -p $(@D)/dist/$*
+> rsync -rupE \
+    --exclude=node_modules/ \
+    --exclude=package.json \
+    --exclude=dist/ \
+    --exclude=build/ \
+    --exclude=tests/ \
+    --exclude=src/ \
+    --exclude=composer.* \
+    --exclude=vendor/ \
+    --exclude=readme.txt \
+    --exclude=.env \
+    --exclude=.secrets \
+    --exclude=*.kambrium-template \
+    --exclude=cm4all-wp-bundle.json \
+    --exclude=rector-config-*.php \
+    $(@D)/ $(@D)/dist/$*
+> # copy transpiled js/css to target folder
+> rsync -rupE $(@D)/build $(@D)/dist/$*/
+>
+# > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
+# > find $(@D)/dist/$* -executable -name "*.kambrium-template" | xargs -L1 -I{} make $$(basename "{}")
+# > find $(@D)/dist/$* -name "*.kambrium-template" -exec rm -v -- {} +
+> # generate/update readme.txt
+> $(MAKE) $(@D)/dist/$*/readme.txt
+# > [[ -d '$(@D)/build' ]] || (echo "don't unable to archive build directory(='$(@D)/build') : directory does not exist" >&2 && false)
+# > find $(@D)/build -name "*.kambrium-template" -exec rm -v -- {} \;
+# > # redirecting into the target zip archive frees us from removing an existing archive first
+> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
+> # make a soft link containing package and php version targeting the default plugin dist folder
+> (cd $(@D)/dist && ln -s $* $*-$${PACKAGE_VERSION}-php$${PHP_VERSION})
+> # process plugin using rector
+> for RECTOR_CONFIG in $(@D)/*-*-php*.php; do
+>   RECTOR_CONFIG=$$(basename "$$RECTOR_CONFIG" '.php')
+>   TARGET_PHP_VERSION="$${RECTOR_CONFIG#*rector-config-php}"
+>   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-php$${TARGET_PHP_VERSION}"
+>   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
+>   # call dockerized rector
+>   docker run $(DOCKER_FLAGS) \
+      -it \
+      --rm \
+      --user "$$(id -u $(USER)):$$(id -g $(USER))" \
+      -v $$(pwd)/$(@D):/project \
+      pnpmkambrium/rector-php \
+      --clear-cache \
+      --config "$${RECTOR_CONFIG}.php" \
+      --no-progress-bar \
+      process \
+      $$TARGET_DIR
+>   # update version information in readme.txt and plugin.php down/up-graded plugin variant
+>   sed -i "s/^ \* Requires PHP:\([[:space:]]\+\).*/ \* Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/plugin.php"
+>   sed -i "s/^Requires PHP:\([[:space:]]\+\).*/Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/readme.txt"
+> done
+> # create zip file for each dist/[plugin]-[version]-[php-version] directory
+> for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
+# > (cd $(@D)/dist/$* && zip -9 -r -q - ./$*/* >../$*-$${PACKAGE_VERSION-php}$${PHP_VERSION}.zip)
 > cat << EOF | tee $@
-> $$(cd $(@D)/dist && ls -1shS *.zip )
+> $$(cd $(@D)/dist && ls -1shS *.zip)
 >
 > $$(echo -n "---")
 >
-> $$(unzip -l $(@D)/dist/*.zip)
+> $$(for ZIP_ARCHIVE in $(@D)/dist/*.zip; do (cd $$(dirname $$ZIP_ARCHIVE) && unzip -l $$(basename $$ZIP_ARCHIVE) && echo ""); done)
 > EOF
 
 # HELP<<EOF
@@ -88,6 +138,36 @@ packages/wp-plugin/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 #   will create (if not exist) or update (if any of the plugin source files changed) the pot file `packages/wp-plugin/foo/languages/foo.pot`
 # EOF
 packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
+
+# update plugin.php metadata if any of its metadata sources changed
+packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
+> kambrium.get_wp_plugin_metadata $@ &>/dev/null
+> # update plugin name
+> sed -i "s/^ \* Plugin Name: .*/ \* Plugin Name: $$PACKAGE_NAME/" $@
+> # update plugin uri
+> # we need to escape slashes in the injected variables to not confuse sed (=> $${VAR//\//\\/})
+> sed -i "s/^ \* Plugin URI: .*/ \* Plugin URI: $${HOMEPAGE//\//\\/}/" $@
+> # update description
+> sed -i "s/^ \* Description: .*/ \* Description: $${DESCRIPTION//\//\\/}/" $@
+> # update version
+> sed -i "s/^ \* Version: .*/ \* Version: $$PACKAGE_VERSION/" $@
+> # update tags
+> sed -i "s/^ \* Tags: .*/ \* Tags: $${TAGS//\//\\/}/" $@
+> # update required php version
+> sed -i "s/^ \* Requires PHP: .*/ \* Requires PHP: $$PHP_VERSION/" $@
+> # update requires at least wordpress version if provided
+> # @TODO: a plugin can be directly started using wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#starting-the-environment)
+> [[ "$$WORDPRESS_VERSION" != "" ]] && sed -i "s/^ \* Requires at least: .*/ \* Requires at least: $$WORDPRESS_VERSION/" $@
+> # update author
+> [[ "$$AUTHORS" != "" ]] && sed -i "s/^ \* Author: .*/ \* Author: $${AUTHORS//\//\\/}/" $@
+> # update author uri
+> VENDOR=$${VENDOR:-}
+> [[ "$$VENDOR" != "" ]] && sed -i "s/^ \* Author URI: .*/ \* Author URI: $${VENDOR//\//\\/}/" $@
+> # update license
+> [[ "$$LICENSE" != "" ]] && sed -i "s/^ \* License: .*/ \* License: $$LICENSE/" $@
+> # update license uri
+> [[ "$$LICENSE_URI" != "" ]] && sed -i "s/^ \* License URI: .*/ \* License URI: $${LICENSE_URI//\//\\/}/" $@
+> kambrium.log_done "$(@D) : updated wordpress header in plugin.php"
 
 # dynamic definition of dockerized wp-cli
 KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
@@ -100,7 +180,7 @@ KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
 .PRECIOUS: packages/wp-plugin/%.pot
 # create or update a i18n plugin pot file
 packages/wp-plugin/%.pot : $$(shell kambrium.get_pot_dependencies $$@)
-> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --debug --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
 
 # HELP<<EOF
 # create or update a i18n po file in a wordpress sub package (`packages/wp-plugin/*`)
@@ -123,6 +203,31 @@ packages/wp-plugin/%.po : $$(shell kambrium.get_pot_path $$(@))
 packages/wp-plugin/%/build/block.json: packages/wp-plugin/%/src/block.json
 > cp $< $@
 
+# PLUGIN_SUBPACKAGE_RULE_TEMPLATE is used to create a rule for each wp-{theme,plugin}/*/dist/*/readme.txt file
+DOLLAR := $
+define PLUGIN_SUBPACKAGE_RULE_TEMPLATE =
+# helper target generating/updating dist/readme.txt
+packages/$(1)/dist/$(notdir $(1))/readme.txt: $(wildcard packages/$(1)/readme.txt) packages/$(1)/package.json package.json $(wildcard .env packages/$(dir $(1)).env)
+> kambrium.get_wp_plugin_metadata '$$@' >$$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables
+> # prefer plugin specific readme.txt over default fallback
+> if [[ -f "packages/$(1)/readme.txt" ]]; then
+>   README_TXT="packages/$(1)/readme.txt"
+> else
+>   README_TXT='./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/readme.txt'
+>   # copy dummy screenshots/icon to dist directory
+>   # generate dummy images:
+>   #    screenshot-1.png: convert -size 640x480 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Screenshot-1' ./screenshot-1.png
+>   #    banner-772x250.png: convert -size 772x250 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Banner 772 x 250 px' ./banner-772x250.png
+>   #    banner-1544x500.png: convert -size 1544x500 +delete xc:white -background lightgrey -fill gray -pointsize 24 -gravity center label:'Banner 1544 x 500 px' ./banner-1544x500.png
+>   cp ./node_modules/@pnpmkambrium/core/presets/default/wp-plugin/{*.png,icon.svg} $$(@D)
+> fi
+> # convert variables list into envsubst compatible form
+> VARIABLES=$$$$(cat $$(KAMBRIUM_TMPDIR)/wp_plugin_readme_txt_variables | sed 's/.*/$$$${&}/')
+> # process readme.txt and write output to dist/readme.txt
+> envsubst "$(DOLLAR)$(DOLLAR)VARIABLES" < "$(DOLLAR)$(DOLLAR)README_TXT" > $$@
+endef
+$(foreach wp_sub_package, $(filter wp-plugin/% wp-theme/%,$(KAMBRIUM_SUB_PACKAGE_PATHS)), $(eval $(call PLUGIN_SUBPACKAGE_RULE_TEMPLATE,$(wp_sub_package))))
+
 # HELP<<EOF
 # create or update a i18n mo file in a wordpress sub package (`packages/wp-plugin/*`)
 #
@@ -132,21 +237,22 @@ packages/wp-plugin/%/build/block.json: packages/wp-plugin/%/src/block.json
 # EOF
 packages/wp-plugin/%.mo: packages/wp-plugin/%.po
 > $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-mo languages/$(<F)
-> # if a src directory exists we assume that the i18n json files schould also be created
+> # if a src directory exists we assume that the i18n json files should also be created
 > if [[ -d $$(dirname $(@D))/src ]]; then
 >   $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-json languages/$(<F) --no-purge --pretty-print
 > fi
 
+# tell make that transpiled js files should be kept
+.PRECIOUS: packages/wp-plugin/build/%.js
 # generic rule to transpile a single wp-plugin/*/src/*.mjs source into its transpiled result
 packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
-> if [[ -f $(@D)/../cm4all-wp-bundle.json ]]; then
+> if [[ -f "$(<D)/../cm4all-wp-bundle.json" ]]; then
 >   # using cm4all-wp-bundle if a configuration file exists
->   CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
+>   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(<D)/../cm4all-wp-bundle.json | jq .)
 >   GLOBAL_NAME=$$(basename -s .mjs $<)
 >   # if make was called from GitHub action we need to run cm4all-wp-bundle using --user root to have write permissions to checked out repository
 >   # (the cm4all-wp-bundle image will by default use user "node" instead of "root" for security purposes)
 >   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
->   BUNDLER_CONFIG=$$(sed 's/^ *\/\/.*//' $(@D)/../cm4all-wp-bundle.json | jq .)
 >   for mode in 'development' 'production' ; do
 >     printf "$$BUNDLER_CONFIG" | \
       docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
@@ -214,7 +320,7 @@ wp-plugin-push-%: packages/wp-plugin/$$*/
 > if [[ "$$(jq -r '.private | values' $$PACKAGE_JSON)" != "true" ]]; then
 >   PACKAGE_VERSION=$$(jq -r '.version | values' $$PACKAGE_JSON)
 >   # @TODO: push plugin to wordpress.org
->   echo '[done]'
+>   kambrium.log_done
 > else
->   echo "[skipped]: package.json is marked as private"
+>   kambrium.log_skipped "package.json is marked as private"
 > fi

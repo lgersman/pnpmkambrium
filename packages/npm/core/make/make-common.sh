@@ -3,6 +3,33 @@
 #
 
 #
+# echoes a message prefixed with "[done]"
+#
+# @param $1 the message to log
+#
+function kambrium.log_done() {
+  echo "${TERMINAL_YELLOW:-}[done]${TERMINAL_RESET:-} ${1:-}"
+}
+
+#
+# echoes a error message prefixed with "[error]"
+#
+# @param $1 the error message to log
+#
+function kambrium.log_error() {
+  echo "${TERMINAL_RED:-}[error]${TERMINAL_RESET:-} ${1:-}"
+}
+
+#
+# echoes a message prefixed with "[skipped]"
+#
+# @param $1 the message to log
+#
+function kambrium.log_skipped() {
+  echo "${TERMINAL_YELLOW:-}[skipped]${TERMINAL_RESET:-} ${1:-}"
+}
+
+#
 # extract the kambrium sub package name from path a argument
 #
 # @param $1 path to a file/dir within a sub package
@@ -55,6 +82,7 @@ function kambrium.author_name() {
 
   echo "$VAL"
 }
+export -f kambrium.author_name
 
 #
 # load the `.env` and `.secrets` file from path in parameter $1 if `.env`/`.secrets` file exists.
@@ -66,17 +94,17 @@ function kambrium.author_name() {
 #
 function kambrium.load_env() {
   local path=$(realpath "${1:-$(pwd)}")
-
+  local CURRENT_ALLEXPORT_STATE="$(shopt -po allexport)"
+  # enable export all variables bash feature
+  set -a
   for file in "$path/"{.env,.secrets}; do
     if [[ -f "$file" ]]; then
-      # enable export all variables bash feature
-      set -a
       # include .env/.secret files into current bash process
       source "$file"
-      # disabled export all variables bash feature
-      set +a
     fi
   done
+  # restore the value of allexport option to its original value.
+  eval "$CURRENT_ALLEXPORT_STATE" >/dev/null
 }
 
 #
@@ -105,6 +133,7 @@ function kambrium.author_email() {
 
   echo "$VAL"
 }
+export -f kambrium.author_email
 
 # load and export project root .env/.secret files
 kambrium.load_env

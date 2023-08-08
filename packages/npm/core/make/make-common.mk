@@ -44,8 +44,12 @@ MAKEFLAGS += --no-print-directory
 .DEFAULT_GOAL := help
 
 TERMINAL_GREY != tput setaf 2
+TERMINAL_RED != tput setaf 1
+export TERMINAL_RED
 TERMINAL_YELLOW != tput setaf 3
+export TERMINAL_YELLOW
 TERMINAL_RESET  != tput sgr0
+export TERMINAL_RESET
 
 # use curl always with these options
 # if we have curl version higher than 7.76.0 we use --fail-with-body instead of --fail
@@ -75,6 +79,37 @@ CURL := curl -s --show-error $(shell $$(curl --fail-with-body --help >/dev/null 
 
 KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-common.sh
 
+# ensure pnpm is available
+ifeq (,$(shell command -v pnpm))
+  define PNPM_NOT_FOUND
+pnpm is not installed or not in PATH.
+Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
+(windows : 'iwr https://get.pnpm.io/install.ps1 -useb | iex')
+
+See more here : https://docs.npmjs.com/getting-started/installing-node
+  endef
+  $(error $(PNPM_NOT_FOUND))
+else
+  PNPM != command -v pnpm
+endif
+
+# ensure a recent nodejs version is available
+# (required by pnpm)
+ifeq (,$(shell command -v node))
+  define NODEJS_NOT_FOUND
+node is not installed or not in PATH.
+See more here : https://nodejs.org/en/download/
+  endef
+  $(error $(NODEJS_NOT_FOUND))
+endif
+
+# pnpm env use --global $(grep -oP '(?<=use-node-version=).*' ./.npmrc1)
+# node version to use by pnpm (defined in .npmrc)
+NODE_VERSION != sed -n '/^use-node-version=/ {s///p;q;}' .npmrc
+
+# path to node binary configured in .npmrc
+NODE := $(HOME)/.local/share/pnpm/nodejs/$(NODE_VERSION)/bin/node
+
 ENV_FILES := $(shell find . -type f -name '.env')
 
 # find all *.kambrium-template marked as executable
@@ -84,10 +119,12 @@ KAMBRIUM_TEMPLATE_TARGETS := $(patsubst %.kambrium-template, %, $(KAMBRIUM_TEMPL
 
 # generic dependency for sub package build-info targets (package/*/*/build-info)
 # this variables is dynamic (i.e. evaluated per use) and requires make .SECONDEXPANSION feature to be enabled
-KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/build-info' -type f) \
+KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' ! -path '*/build/*' ! -path '*/tests/*' ! -path '*/build-info' -type f) \
  $(KAMBRIUM_TEMPLATE_TARGETS) \
  $(wildcard *.env) \
  package.json
+
+KAMBRIUM_SUB_PACKAGE_PATHS := $(shell $(PNPM) list --recursive --filter='*/*' --json | jq -r  '.[].path' | xargs -I '{}' -r realpath --relative-base $$(pwd)/packages {})
 
 # generic dependency for sub package targets (package/*/*/)
 KAMBRIUM_SUB_PACKAGE_DEPS = $$(@D)/build-info

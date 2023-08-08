@@ -47,5 +47,8 @@
   "eslint.packageManager": "pnpm",
   "cSpell.allowCompoundWords": true,
   "cSpell.language": "en,en-US",
-  "cSpell.ignoreWords": ["mdbook"]
+  "cSpell.ignoreWords": ["mdbook"],
+  "stylelint.config": {
+    "configBasedir": "${workspaceFolder}"
+  }
 }
