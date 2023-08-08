@@ -108,6 +108,7 @@ release-packages/% : packages/$$*
 > PACKAGE_NAME=$$(jq -r '.name | values' packages/$*/package.json)
 > PACKAGE_VERSION=$$(jq -r '.version | values' packages/$*/package.json)
 > RELEASE_TITLE=$${PACKAGE_NAME}/v$${PACKAGE_VERSION}
+> LAST_COMMIT_SHA=$$(git rev-parse HEAD)
 >
 # asset configuration
 > ASSET_UPLOAD=$${ASSET_UPLOAD:-"true"}
@@ -152,8 +153,8 @@ release-packages/% : packages/$$*
 > RELEASE_PAYLOAD=`jq -n \
 > --arg tag_name "$$RELEASE_TITLE" \
 > --arg desc "" \
-> '{tag_name: $$tag_name ,name: $$tag_name ,body: $$desc,draft: false,prerelease: false,generate_release_notes: true}'`
->
+> --arg target_commit "$$LAST_COMMIT_SHA" \
+> '{tag_name: $$tag_name ,"target_commitish":$$target_commit ,name: $$tag_name ,body: $$desc,draft: false,prerelease: false,generate_release_notes: true}'`
 > RELEASE_DATA=$$($(CURL) \
 -X POST \
 -H "Accept: application/vnd.github+json" \
