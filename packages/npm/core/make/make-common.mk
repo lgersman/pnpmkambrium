@@ -86,21 +86,11 @@ pnpm is not installed or not in PATH.
 Install it using "wget -qO- 'https://get.pnpm.io/install.sh' | sh -"
 (windows : 'iwr https://get.pnpm.io/install.ps1 -useb | iex')
 
-See more here : https://docs.npmjs.com/getting-started/installing-node
+See more here : https://pnpm.io/installation
   endef
   $(error $(PNPM_NOT_FOUND))
 else
   PNPM != command -v pnpm
-endif
-
-# ensure a recent nodejs version is available
-# (required by pnpm)
-ifeq (,$(shell command -v node))
-  define NODEJS_NOT_FOUND
-node is not installed or not in PATH.
-See more here : https://nodejs.org/en/download/
-  endef
-  $(error $(NODEJS_NOT_FOUND))
 endif
 
 # pnpm env use --global $(grep -oP '(?<=use-node-version=).*' ./.npmrc1)
@@ -135,5 +125,5 @@ KAMBRIUM_SUB_PACKAGE_FLAVOR_DEPS = $$(addsuffix build-info,$$(wildcard $$(@D)/*/
 .PHONY: kambrium-templates
 kambrium-templates: $(KAMBRIUM_TEMPLATE_TARGETS) ;
 
-# Docker gum to use over regular gum 
+# Docker gum to use over regular gum
 GUM := docker run -ti --rm pnpmkambrium/gum

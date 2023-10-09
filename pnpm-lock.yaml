@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -56,6 +60,8 @@ importers:
   packages/docker/gum: {}
 
   packages/docker/mdbook: {}
+
+  packages/docker/rector-php: {}
 
   packages/docker/shaunch: {}
 
