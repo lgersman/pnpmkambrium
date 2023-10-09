@@ -12,6 +12,6 @@ fi
 if [[ ! -d /app ]]; then
   echo "mount point '/app' is not bound to a host directory. Run 'docker ... --mount type=bind,source=<host-repo-directory>,target=/app ...'"
   exit 1
-fi 
+fi
 
-cd /app && $(which gitlog-per-package.sh)
+cd /app && $(command -v gitlog-per-package.sh)
