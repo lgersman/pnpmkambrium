@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot $$(@D)/wp-env-home), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
@@ -329,3 +329,24 @@ wp-plugin-push-%: packages/wp-plugin/$$*/
 > else
 >   kambrium.log_skipped "package.json is marked as private"
 > fi
+
+# HELP<<EOF
+# start wp-env with a single wordpress plugin
+#
+# environment variables can be provided using:
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
+#
+# example: `make wp-env-plugin-foo`
+#
+#    will build (if outdated) the wordpress plugin packages/wp-plugin/foo and start wp-env with it
+# EOF
+.PHONY: wp-env-plugin-%
+wp-env-plugin-%: ARGS ?= start
+wp-env-plugin-%: packages/wp-plugin/$$*/
+> kambrium.get_wp_plugin_metadata packages/wp-plugin/$* &>/dev/null
+> kambrium.load_env packages/wp-plugin/$*
+> PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
+> WP_ENV_HOME=$$(pwd)/packages/wp-plugin/$*/wp-env-home WP_ENV_PHP_VERSION=$${PHP_VERSION} pnpm --dir packages/wp-plugin/$* exec wp-env $(ARGS)
