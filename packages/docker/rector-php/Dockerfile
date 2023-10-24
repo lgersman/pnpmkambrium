@@ -1,7 +1,12 @@
 # syntax=docker/dockerfile:1.4
 
+# php version of the docker image
 ARG PHP_VERSION=8.0
+
 FROM php:${PHP_VERSION}-cli as base
+
+# rector version to use in docker image
+ENV RECTOR_VERSION=0.18.5
 
 # Fix add-apt-repository is broken with non-UTF-8 locales, see https://github.com/oerdnj/deb.sury.org/issues/56
 ENV LC_ALL C.UTF-8
@@ -21,7 +26,8 @@ RUN apt-get update && \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 USER php
-RUN cd ~ && pwd && composer require --dev 'rector/rector'
+RUN echo "RECTOR_VERSION=${RECTOR_VERSION}"
+RUN cd ~ && pwd && composer require --dev "rector/rector:${RECTOR_VERSION}"
 
 VOLUME ["/project"]
 WORKDIR /project
