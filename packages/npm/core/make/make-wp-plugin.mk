@@ -355,7 +355,6 @@ wp-env-plugin-%: packages/wp-plugin/$$*/
 # generates wp-env configuration file '.wp-env.json'
 #
 .wp-env.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
-> echo $^
 > PLUGINS='[]'
 > THEMES='[]'
 > for plugin_or_theme in $^; do
@@ -364,7 +363,6 @@ wp-env-plugin-%: packages/wp-plugin/$$*/
 >   else
 >     THEMES=$$(echo "$$THEMES" | jq --arg theme "$$plugin_or_theme" '. += [$$theme]')
 >   fi
->   echo "plugin_or_theme: $$plugin_or_theme"
 > done
 > jq -n \
     --arg wordpress_image "WordPress/WordPress#$${REQUIRES_AT_LEAST_WORDPRESS_VERSION:-latest}" \
