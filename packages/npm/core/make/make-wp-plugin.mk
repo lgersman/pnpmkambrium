@@ -350,3 +350,28 @@ wp-env-plugin-%: packages/wp-plugin/$$*/
 > kambrium.load_env packages/wp-plugin/$*
 > PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
 > WP_ENV_HOME=$$(pwd)/packages/wp-plugin/$*/wp-env-home WP_ENV_PHP_VERSION=$${PHP_VERSION} pnpm --dir packages/wp-plugin/$* exec wp-env $(ARGS)
+
+#
+# generates wp-env configuration file '.wp-env.json'
+#
+.wp-env.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
+> echo $^
+> PLUGINS='[]'
+> THEMES='[]'
+> for plugin_or_theme in $^; do
+>   if [[ "$$plugin_or_theme" =~ \/wp-plugin\/ ]]; then
+>     PLUGINS=$$(echo "$$PLUGINS" | jq --arg plugin "$$plugin_or_theme" '. += [$$plugin]')
+>   else
+>     THEMES=$$(echo "$$THEMES" | jq --arg theme "$$plugin_or_theme" '. += [$$theme]')
+>   fi
+>   echo "plugin_or_theme: $$plugin_or_theme"
+> done
+> jq -n \
+    --arg wordpress_image "WordPress/WordPress#$${REQUIRES_AT_LEAST_WORDPRESS_VERSION:-latest}" \
+    --arg phpVersion "$${PHP_VERSION:-8.0}" \
+    --argjson plugins "$${PLUGINS}" \
+    --argjson themes "$${THEMES}" \
+    '{core: $$wordpress_image, phpVersion: $$phpVersion, plugins : $$plugins, themes : $$themes}' \
+  > $@
+
+
