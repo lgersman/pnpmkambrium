@@ -1,6 +1,6 @@
 {
   "name": "@pnpmkambrium/rector-php",
-  "description": "This image provides the most recent [rector](https://github.com/rectorphp/rector) in a docker image.",
+  "description": "This image provides [rector](https://github.com/rectorphp/rector) 0.18.5 in a docker image.",
   "version": "1.0.0",
   "scripts": {},
   "keywords": [
@@ -9,6 +9,7 @@
     "upgrade",
     "downgrade"
   ],
+  "license": "MIT",
   "author": {
     "email": "lars.gersmann@cm4all.com",
     "name": "lars gersmann"
