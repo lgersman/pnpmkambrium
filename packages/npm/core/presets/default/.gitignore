@@ -19,4 +19,4 @@ build-info
 vendor
 **/languages/*.mo
 **/languages/*.json
-**/wp-env-home/
+/wp-env-home
