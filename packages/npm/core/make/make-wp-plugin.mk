@@ -97,6 +97,10 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 > PHP_VERSION=$${PHP_VERSION:-$$(jq -r -e '.config.php_version | values' $$PACKAGE_JSON || jq -r '.config.php_version | values' package.json)}
 > # make a soft link containing package and php version targeting the default plugin dist folder
 > (cd $(@D)/dist && ln -s $* $*-$${PACKAGE_VERSION}-php$${PHP_VERSION})
+> (
+> # we wrap the loop in a subshell call because of the nullglob shell behaviour change
+> # nullglob is needed because we want to skip the loop if no rector-config-php*.php files are found
+> shopt -s nullglob
 > # process plugin using rector
 > for RECTOR_CONFIG in $(@D)/*-*-php*.php; do
 >   RECTOR_CONFIG=$$(basename "$$RECTOR_CONFIG" '.php')
@@ -119,6 +123,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >   sed -i "s/^ \* Requires PHP:\([[:space:]]\+\).*/ \* Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/plugin.php"
 >   sed -i "s/^Requires PHP:\([[:space:]]\+\).*/Requires PHP:\1$${TARGET_PHP_VERSION}/" "$(@D)/$$TARGET_DIR/readme.txt"
 > done
+> )
 > # create zip file for each dist/[plugin]-[version]-[php-version] directory
 > for DIR in $(@D)/dist/*-*-php*/; do (cd $$DIR && zip -9 -r -q - . >../$$(basename $$DIR).zip); done
 # > (cd $(@D)/dist/$* && zip -9 -r -q - ./$*/* >../$*-$${PACKAGE_VERSION-php}$${PHP_VERSION}.zip)
