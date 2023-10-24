@@ -13,3 +13,9 @@ I needed a way to provide [rector](https://github.com/rectorphp/rector) on deman
 @TODO: add usage documentation
 
 See [rector](https://github.com/rectorphp/rector) homepage for all options.
+
+# Snippets
+
+- jump into docker image using bash : `docker run -q -it --rm --user "$(id -u $USER):$(id -g $USER)" --entrypoint /bin/bash pnpmkambrium/rector-php`
+
+- show rector version : `docker run -q -it --rm --user "$(id -u $USER):$(id -g $USER)" pnpmkambrium/rector-php --version`
