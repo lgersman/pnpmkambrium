@@ -19,6 +19,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-lint.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-clean.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docker.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-wp-plugin.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-wp-env.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-npm.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-generic.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
