@@ -155,7 +155,7 @@ wp-env-clean:
 # EOF
 .PHONY: wp-env-start
 wp-env-start: ARGS ?=
-wp-env-start: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
+wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
 > # we always stop wp-env before start to ensure changed wp-env config files will always take effect
 > $(MAKE) wp-env-stop >/dev/null 2>&1 |:
 > $(MAKE) wp-env COMMAND=start ARGS='$(ARGS)'
