@@ -1,5 +1,5 @@
 # contains wp-env related make settings and rules
-# KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-wp-env.sh
+KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-wp-env.sh
 
 WP_ENV_HOME := $(shell pwd)/wp-env-home
 
@@ -8,7 +8,7 @@ WP_ENV_HOME := $(shell pwd)/wp-env-home
 # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json)
 #
 .wp-env.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*)) $(wildcard .env .secrets)
-> # nullglob is needed because we want to skip the loop if no rector-config-php*.php files are found
+> # nullglob is needed because we want to skip the loop if no plugins/theme packages are found
 > shopt -s nullglob
 >
 > PLUGINS='[]'
@@ -159,5 +159,10 @@ wp-env-start: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*)
 > # we always stop wp-env before start to ensure changed wp-env config files will always take effect
 > $(MAKE) wp-env-stop >/dev/null 2>&1 |:
 > $(MAKE) wp-env COMMAND=start ARGS='$(ARGS)'
-> # generate/update .vscode/launch.json
-> # update .vscode/settings.json to point to wp-env-home wordpress version
+> # generates vscode launch configuration for wp-env
+> # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#xdebug-ide-support)
+> kambrium.wp-env.generate_launch.json
+
+.PHONY: foo
+foo:
+> kambrium.wp-env.generate_launch.json

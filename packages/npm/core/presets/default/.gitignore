@@ -21,3 +21,4 @@ vendor
 **/languages/*.json
 /wp-env-home/
 /.wp-env.json
+/.vscode/launch.json
