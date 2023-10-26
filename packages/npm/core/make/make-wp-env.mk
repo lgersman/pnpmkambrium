@@ -3,6 +3,9 @@ KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-wp-env.sh
 
 export WP_ENV_HOME := $(shell pwd)/wp-env-home
 
+# dynamic variable to retrieve the wp-env install path
+WP_ENV_INSTALL_PATH = $(shell $(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)
+
 #
 # generates wp-env configuration file '.wp-env.json'
 # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json)
@@ -125,6 +128,22 @@ wp-env-clean: ARGS ?= all
 wp-env-clean:
 > $(MAKE) wp-env COMMAND=clean ARGS='$(ARGS)'
 
+# HELP<<EOF
+# spit a diffable dump from a wp-env database container to stdout
+#
+# supported make variables:
+#   - DB (default=`development`) the database to dump (possible values are `development`, `tests`)
+#
+# example: `make -s wp-env-db-dump DB='tests' > ./test-db.sql`
+#
+#    writes the test database dump to file `./test-db.sql`
+# EOF
+.PHONY: wp-env-db-dump
+wp-env-db-dump: DB ?= development
+wp-env-db-dump:
+> docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T mysql \
+>   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
+> | kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first."
 
 # HELP<<EOF
 # starts wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-start)
@@ -158,11 +177,11 @@ wp-env-clean:
 wp-env-start: ARGS ?=
 wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
 > # we always stop wp-env before start to ensure changed wp-env config files will always take effect
-> $(MAKE) wp-env-stop >/dev/null 2>&1 |:
+> $(MAKE) -s -i wp-env-stop >/dev/null 2>&1
 > $(MAKE) wp-env COMMAND=start ARGS='$(ARGS)'
 > # generates vscode launch configuration for wp-env
 > # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#xdebug-ide-support)
-# > kambrium.wp-env.generate_launch.json
+> kambrium.wp-env.generate_launch.json
 
 .PHONY: foo
 foo:
