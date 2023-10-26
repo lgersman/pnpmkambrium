@@ -37,6 +37,7 @@ export WP_ENV_HOME := $(shell pwd)/wp-env-home
 #   - ARGS the wp-env command arguments
 #
 .PHONY: wp-env
+wp-env: ARGS ?=
 wp-env: .wp-env.json
 > WP_ENV_HOME=$(WP_ENV_HOME) $(PNPM) exec wp-env $(COMMAND) $(ARGS)
 
