@@ -22,12 +22,12 @@ export WP_ENV_HOME := $(shell pwd)/wp-env-home
 > done
 >
 > jq -n \
-    --arg wordpress_image "WordPress/WordPress#$${REQUIRES_AT_LEAST_WORDPRESS_VERSION:-latest}" \
-    --arg phpVersion "$${PHP_VERSION:-8.0}" \
-    --argjson plugins "$${PLUGINS}" \
-    --argjson themes "$${THEMES}" \
-    '{core: $$wordpress_image, phpVersion: $$phpVersion, plugins : $$plugins, themes : $$themes}' \
-  > $@
+>   --arg wordpress_image "WordPress/WordPress#$${REQUIRES_AT_LEAST_WORDPRESS_VERSION:-latest}" \
+>   --arg phpVersion "$${PHP_VERSION:-8.0}" \
+>   --argjson plugins "$${PLUGINS}" \
+>   --argjson themes "$${THEMES}" \
+>   '{core: $$wordpress_image, phpVersion: $$phpVersion, plugins : $$plugins, themes : $$themes}' \
+> > $@
 
 #
 # generic target acting as entrypoint to wp-env functionality
