@@ -1,7 +1,7 @@
 # contains wp-env related make settings and rules
 KAMBRIUM_SHELL_ALWAYS_PRELOAD += $(KAMBRIUM_MAKEFILE_DIR)/make-wp-env.sh
 
-WP_ENV_HOME := $(shell pwd)/wp-env-home
+export WP_ENV_HOME := $(shell pwd)/wp-env-home
 
 #
 # generates wp-env configuration file '.wp-env.json'
@@ -161,7 +161,7 @@ wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* 
 > $(MAKE) wp-env COMMAND=start ARGS='$(ARGS)'
 > # generates vscode launch configuration for wp-env
 > # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#xdebug-ide-support)
-> kambrium.wp-env.generate_launch.json
+# > kambrium.wp-env.generate_launch.json
 
 .PHONY: foo
 foo:
