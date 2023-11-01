@@ -152,6 +152,32 @@ wp-env-clean:
 > $(MAKE) wp-env COMMAND=clean ARGS='$(ARGS)'
 
 # HELP<<EOF
+# backup database and uploads folder of a wp-env instance
+#
+# supported make variables:
+#   - ARGS (default=`development`, the development instance). Possible values are `development`, `tests`
+#   - DIR (default=`./wp-env-backup`) the directory to store the backup
+#
+# example: `make wp-env-backup`
+#
+#    backup the development instance data of wp-env into directory `wp-env-backup`
+#
+# example: `make wp-env-backup ARGS='tests' DIR='./my-other-backup'`
+#
+#    backup the tests instance data of wp-env into directory `my-other-backup`
+# EOF
+.PHONY: wp-env-backup
+wp-env-backup: ARGS ?= development
+wp-env-backup: DIR ?= ./wp-env-backup
+wp-env-backup:
+> rm -rf "$(DIR)"
+> mkdir -p "$(DIR)"
+> $(MAKE) -s wp-env-db-export DB=$(ARGS) > "$(DIR)/db.sql"
+> CONTAINER=$$([[ '$(ARGS)' == 'tests' ]] && echo 'tests-wordpress' || echo 'wordpress')
+> docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" cp $$CONTAINER:/var/www/html/wp-content/uploads "$(DIR)"
+
+
+# HELP<<EOF
 # spit a diffable dump from a wp-env database container to stdout
 #
 # supported make variables:
