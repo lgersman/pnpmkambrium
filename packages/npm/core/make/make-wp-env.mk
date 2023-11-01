@@ -145,10 +145,11 @@ wp-env-clean:
 .PHONY: wp-env-db-dump
 wp-env-db-dump: DB ?= development
 wp-env-db-dump:
-> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T mysql \
+> DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
+> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
 >   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
 > ) \
-> || kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first."
+> || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
 # HELP<<EOF
 # starts wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-start)
