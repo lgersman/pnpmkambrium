@@ -23,6 +23,8 @@ MAKEFLAGS += --no-builtin-variables
 
 export DOCKER_FLAGS := -q
 
+export DOCKER_COMPOSE_FLAGS := --progress=quiet
+
 #
 # warn if unused variables in use
 #
