@@ -133,7 +133,7 @@ wp-env-clean:
 #
 # supported make variables:
 #   - DB (default=`development`) the database to dump (possible values are `development`, `tests`)
-#   - ARGS (default=all tables will be exported) the database tables to include in the export
+#   - ARGS (default=all tables will be dumped) the database tables to include in the export
 #
 # example: `make -s wp-env-db-dump`
 #
@@ -143,9 +143,10 @@ wp-env-clean:
 #
 #    writes the test database dump to file `./test-db.sql` (note the `-s` flag to suppress verbose make output)
 #
-# example: `make wp-env-db-dump DB=tests ARGS='wp_users wp_terms' > ./partial-diffable-wp-dump.sql`
+# example: `make -s wp-env-db-dump DB=tests ARGS='wp_users wp_terms' > ./partial-diffable-wp-dump.sql`
 #
 #   writes a partial dump (only tables `wp_users` and `wp_terms`) of the wp-env tests database to file `./partial-diffable-wp-dump.sql
+#   (note the `-s` flag to suppress verbose make output)
 #
 # EOF
 .PHONY: wp-env-db-dump
