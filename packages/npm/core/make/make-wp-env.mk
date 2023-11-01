@@ -176,6 +176,34 @@ wp-env-backup:
 > CONTAINER=$$([[ '$(ARGS)' == 'tests' ]] && echo 'tests-wordpress' || echo 'wordpress')
 > docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" cp $$CONTAINER:/var/www/html/wp-content/uploads "$(DIR)"
 
+# HELP<<EOF
+# restore database and uploads folder of a wp-env instance
+#
+# supported make variables:
+#   - ARGS (default=`development`, the development instance). Possible values are `development`, `tests`
+#   - DIR (default=`./wp-env-backup`) the directory to store the backup
+#
+# example: `make wp-env-restore`
+#
+#    restore the development instance data of wp-env into directory `wp-env-backup`
+#
+# example: `make wp-env-restore ARGS='tests' DIR='./my-other-backup'`
+#
+#    restore the tests instance data of wp-env into directory `my-other-backup`
+# EOF
+.PHONY: wp-env-restore
+wp-env-restore: ARGS ?= development
+wp-env-restore: DIR ?= ./wp-env-backup
+wp-env-restore:
+> CONTAINER=$$([[ '$(ARGS)' == 'tests' ]] && echo 'tests-wordpress' || echo 'wordpress')
+> if [[ -d "$(DIR)" ]]; then
+>   docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$CONTAINER rm -rf /var/www/html/wp-content/uploads
+>   $(MAKE) wp-env-db-import DB=$(ARGS) < "$(DIR)/db.sql"
+>   docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" cp "$(DIR)/uploads" $$CONTAINER:/var/www/html/wp-content
+> else
+>   kambrium.log_error "import directory(='$$DIR') does not exist" && exit 1
+> fi
+
 
 # HELP<<EOF
 # spit a diffable dump from a wp-env database container to stdout
