@@ -191,6 +191,37 @@ wp-env-db-export:
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
 # HELP<<EOF
+# imports a wp-env database export from stdin into a wp-env database
+#
+# supported make variables:
+#   - DB (default=`development`) the database to dump (possible values are `development`, `tests`)
+#   - ARGS (default='') additional arguments for the mariadb command
+#
+# example: `make wp-env-db-import < ./myexport.sql`
+#
+#    imports the database export file `./myexport.sql` into the wp-env development database
+#
+# example: `make wp-env-db-import DB='tests' < ./myexport.sql`
+#
+#    imports the database export file `./myexport.sql` into the wp-env tests database
+#
+# example: `make wp-env-db-import DB=tests ARGS='-v' < ./myexport.sql`
+#
+#   imports the database export file `./myexport.sql` into the wp-env development database.
+#   the `-v` flag in ARGS tells mariadb to be verbose while importing
+#
+# EOF
+.PHONY: wp-env-db-import
+wp-env-db-import: DB ?= development
+wp-env-db-import: ARGS ?=
+wp-env-db-import:
+> DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
+> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
+>   sh -c 'mariadb $(ARGS) --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
+> ) \
+> || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
+
+# HELP<<EOF
 # starts wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-start)
 # will build (if outdated) the wordpress plugins/themes before starting up wp-env
 # the wp-env folder will be located in `./wp-env-home`
