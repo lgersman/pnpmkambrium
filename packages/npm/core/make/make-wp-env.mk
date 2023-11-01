@@ -134,16 +134,21 @@ wp-env-clean:
 # supported make variables:
 #   - DB (default=`development`) the database to dump (possible values are `development`, `tests`)
 #
+# example: `make -s wp-env-db-dump`
+#
+#    writes the development database dump to stdout (note the `-s` flag to suppress verbose make output)
+#
 # example: `make -s wp-env-db-dump DB='tests' > ./test-db.sql`
 #
-#    writes the test database dump to file `./test-db.sql`
+#    writes the test database dump to file `./test-db.sql` (note the `-s` flag to suppress verbose make output)
 # EOF
 .PHONY: wp-env-db-dump
 wp-env-db-dump: DB ?= development
 wp-env-db-dump:
-> docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T mysql \
+> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T mysql \
 >   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
-> | kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first."
+> ) \
+> || kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first."
 
 # HELP<<EOF
 # starts wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-start)
