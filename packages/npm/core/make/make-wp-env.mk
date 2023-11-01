@@ -76,6 +76,25 @@ wp-env-destroy:
 > rm -r $(WP_ENV_HOME)
 
 # HELP<<EOF
+# runs a shell command within a wp-env container
+#
+# supported make variables:
+#   - CONTAINER (default=`cli`) the wp-env container to run the command in,
+#     possible values are `mysql`, `tests-mysql`, `wordpress`, `tests-wordpress`, `cli`, `tests-cli`
+#
+#   - ARGS (default=``) the wp-env containers shell command
+#
+# example: `make wp-env-sh CONTAINER="tests-cli" ARGS="wp post list --field=ID --post_type=page,post,attachment | xargs wp post delete --force"`
+#
+#    deletes all posts, pages and attachments from the wp-env tests instance
+# EOF
+.PHONY: wp-env-sh
+wp-env-sh: ARGS ?=
+wp-env-sh: CONTAINER ?= cli
+wp-env-sh:
+> WP_ENV_HOME=$(WP_ENV_HOME) $(PNPM) exec wp-env run $(CONTAINER) sh -c '$(ARGS)'
+
+# HELP<<EOF
 # show wp-env logs (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-logs-environment)
 #
 # supported make variables:
