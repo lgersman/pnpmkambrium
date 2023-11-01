@@ -160,6 +160,37 @@ wp-env-db-dump:
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
 # HELP<<EOF
+# exports a wp-env database to stdout
+#
+# supported make variables:
+#   - DB (default=`development`) the database to export (possible values are `development`, `tests`)
+#   - ARGS (default=all tables will be exported) the database tables to include in the export
+#
+# example: `make -s wp-env-db-import`
+#
+#    exports the development database to stdout (note the `-s` flag to suppress verbose make output)
+#
+# example: `make -s wp-env-db-export DB='tests' > ./test-db.sql`
+#
+#    writes the test database export to file `./test-db.sql` (note the `-s` flag to suppress verbose make output)
+#
+# example: `make -s wp-env-db-export DB=tests ARGS='wp_users wp_terms' > ./partial-diffable-wp-dump.sql`
+#
+#   writes a partial export (only tables `wp_users` and `wp_terms`) of the wp-env tests database to file `./partial-diffable-wp-dump.sql
+#   (note the `-s` flag to suppress verbose make output)
+#
+# EOF
+.PHONY: wp-env-db-export
+wp-env-db-export: DB ?= development
+wp-env-db-export: ARGS ?=
+wp-env-db-export:
+> DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
+> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
+>   sh -c 'mariadb-dump --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE $(ARGS)' \
+> ) \
+> || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
+
+# HELP<<EOF
 # starts wp-env (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-start)
 # will build (if outdated) the wordpress plugins/themes before starting up wp-env
 # the wp-env folder will be located in `./wp-env-home`
