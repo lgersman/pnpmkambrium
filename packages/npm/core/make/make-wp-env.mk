@@ -91,7 +91,7 @@ wp-env-logs:
 > $(MAKE) wp-env COMMAND=logs ARGS='$(ARGS)'
 
 # HELP<<EOF
-# run command insode a wp-env container (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-run-container-command)
+# run command inside a wp-env container (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-run-container-command)
 #
 # supported make variables:
 #   - ARGS (default=`cli bash`) the wp-env command arguments
