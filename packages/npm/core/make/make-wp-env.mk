@@ -133,6 +133,7 @@ wp-env-clean:
 #
 # supported make variables:
 #   - DB (default=`development`) the database to dump (possible values are `development`, `tests`)
+#   - ARGS (default=all tables will be exported) the database tables to include in the export
 #
 # example: `make -s wp-env-db-dump`
 #
@@ -141,13 +142,19 @@ wp-env-clean:
 # example: `make -s wp-env-db-dump DB='tests' > ./test-db.sql`
 #
 #    writes the test database dump to file `./test-db.sql` (note the `-s` flag to suppress verbose make output)
+#
+# example: `make wp-env-db-dump DB=tests ARGS='wp_users wp_terms' > ./partial-diffable-wp-dump.sql`
+#
+#   writes a partial dump (only tables `wp_users` and `wp_terms`) of the wp-env tests database to file `./partial-diffable-wp-dump.sql
+#
 # EOF
 .PHONY: wp-env-db-dump
 wp-env-db-dump: DB ?= development
+wp-env-db-dump: ARGS ?=
 wp-env-db-dump:
 > DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
 > (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
->   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
+>   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE $(ARGS)' \
 > ) \
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
