@@ -177,7 +177,7 @@ wp-env-db-dump: DB ?= development
 wp-env-db-dump: ARGS ?=
 wp-env-db-dump:
 > DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
-> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
+> (docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
 >   sh -c 'mariadb-dump --compact --skip-comments --skip-extended-insert --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE $(ARGS)' \
 > ) \
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
@@ -189,7 +189,7 @@ wp-env-db-dump:
 #   - DB (default=`development`) the database to export (possible values are `development`, `tests`)
 #   - ARGS (default=all tables will be exported) the database tables to include in the export
 #
-# example: `make -s wp-env-db-import`
+# example: `make -s wp-env-db-export`
 #
 #    exports the development database to stdout (note the `-s` flag to suppress verbose make output)
 #
@@ -208,7 +208,7 @@ wp-env-db-export: DB ?= development
 wp-env-db-export: ARGS ?=
 wp-env-db-export:
 > DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
-> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
+> (docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
 >   sh -c 'mariadb-dump --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE $(ARGS)' \
 > ) \
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
@@ -239,7 +239,7 @@ wp-env-db-import: DB ?= development
 wp-env-db-import: ARGS ?=
 wp-env-db-import:
 > DATABASE_CONTAINER=$$([[ '$(DB)' == 'tests' ]] && echo 'tests-mysql' || echo 'mysql')
-> (docker compose -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
+> (docker compose $(DOCKER_COMPOSE_FLAGS) -f "$(WP_ENV_INSTALL_PATH)/docker-compose.yml" exec -T $$DATABASE_CONTAINER \
 >   sh -c 'mariadb $(ARGS) --password="$$MYSQL_ROOT_PASSWORD" $$MYSQL_DATABASE' \
 > ) \
 > || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
