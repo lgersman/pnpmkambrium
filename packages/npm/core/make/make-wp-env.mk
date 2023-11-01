@@ -119,6 +119,10 @@ wp-env-logs:
 #
 #    open bash shell of the wp-env wordpress (development) container
 #
+# example: `make wp-env-run ARGS='mysql sh'`
+#
+#    open a shell of the wp-env mysql (development) container
+#
 # example: `make wp-env-run ARGS='cli wp plugin list --debug'`
 #
 #    call wp-cli of the wp-env wordpress (development) container and list all installed plugins with verbose output
