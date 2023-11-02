@@ -31,7 +31,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-help.mk
 _ := $(call ensure-commands-exists, sed git touch jq docker tee awk msginit)
 
 # pick up npm scope from package.json name
-MONOREPO_SCOPE != jq -r '.name | values' package.json
+KAMBRIUM_MONOREPO_SCOPE != jq -r '.name | values' package.json
 
 # project (path) specific temp directory outside of the checked out repository
 KAMBRIUM_TMPDIR := $(shell mktemp -d --suffix ".pnpmkambrium-$$(basename $(CURDIR))")
