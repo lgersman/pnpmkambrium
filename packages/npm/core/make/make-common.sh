@@ -82,7 +82,6 @@ function kambrium.author_name() {
 
   echo "$VAL"
 }
-export -f kambrium.author_name
 
 #
 # load the `.env` and `.secrets` file from path in parameter $1 if `.env`/`.secrets` file exists.
@@ -133,7 +132,6 @@ function kambrium.author_email() {
 
   echo "$VAL"
 }
-export -f kambrium.author_email
 
 # load and export project root .env/.secret files
 kambrium.load_env
