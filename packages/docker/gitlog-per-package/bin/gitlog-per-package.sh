@@ -2,10 +2,10 @@
 
 # Desc: Lists the git commits by monorepo package
 #
-# Usage: execute git-log-by-monorepo-package.sh in the root of a monorepo 
+# Usage: execute git-log-by-monorepo-package.sh in the root of a monorepo
 #
-# script supports git log command customization using environment variable GIT_LOG_OPTIONS. 
-# Example: 
+# script supports git log command customization using environment variable GIT_LOG_OPTIONS.
+# Example:
 # GIT_LOG_OPTIONS="--stat --abbrev-commit" ./packages/docker/gitlog-per-package/bin/gitlog-per-package.sh
 #
 # Requires: git, pnpm, wget, fzf >= 0.29.0 (will be installed if not present)
@@ -33,7 +33,7 @@ _command_info() {
   local package="$1"
   local filter=${2:-''}
   local path="$(_package2path "$package")"
-  
+
   git --no-pager log --color $GIT_LOG_OPTIONS --grep "$filter" -- $path
 }
 
@@ -71,6 +71,7 @@ fi
 
 PREVIEW_CMD="'${BASH_SOURCE[0]}' _command_info '{}' '{q}'"
 package=$("$script_dir/fzf" \
+  --no-mouse \
   --reverse \
   --no-sort \
   --select-1 \
@@ -88,6 +89,6 @@ package=$("$script_dir/fzf" \
 monorepo package
 
 $(pnpm list --recursive --filter='*/*' --json | jq -r  '.[].name | select( . != null )')")
-)  
+)
 
 echo "git --no-pager log --color $GIT_LOG_OPTIONS -- $(_package2path $package)"
