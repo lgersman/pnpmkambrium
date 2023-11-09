@@ -10,7 +10,7 @@ dist
 .pnpm-debug.log
 build
 build-info
-/.pnpm-store
+.pnpm-store
 # never ever track .secrets files since they are proposed to keep sensitive data
 .secrets
 # force addition of .env files since some people add .env to their user .gitignore
