@@ -73,7 +73,7 @@ wp-env-stop:
 wp-env-destroy: ARGS ?=
 wp-env-destroy:
 > $(MAKE) wp-env COMMAND=destroy ARGS='$(ARGS)'
-> rm -r $(WP_ENV_HOME)
+> rm -rf $(WP_ENV_HOME)
 
 # HELP<<EOF
 # runs a shell command within a wp-env container
