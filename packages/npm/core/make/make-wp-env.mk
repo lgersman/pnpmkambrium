@@ -10,7 +10,7 @@ WP_ENV_INSTALL_PATH = $(shell $(MAKE) -s wp-env COMMAND=install-path 2> /dev/nul
 # generates wp-env configuration file '.wp-env.json'
 # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json)
 #
-.wp-env.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*)) $(wildcard .env .secrets)
+.wp-env.json:
 > # nullglob is needed because we want to skip the loop if no plugins/theme packages are found
 > shopt -s nullglob
 >
@@ -328,7 +328,7 @@ wp-env-db-import:
 # EOF
 .PHONY: wp-env-start
 wp-env-start: ARGS ?=
-wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*))
+wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* packages/wp-theme/*)) $(wildcard .env .secrets)
 > # we always stop wp-env before start to ensure changed wp-env config files will always take effect
 > $(MAKE) -s -i wp-env-stop >/dev/null 2>&1
 > $(MAKE) wp-env COMMAND=start ARGS='$(ARGS)'
