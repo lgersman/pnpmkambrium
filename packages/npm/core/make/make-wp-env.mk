@@ -338,5 +338,4 @@ wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* 
 > #   we cannot use WP_ENV_INSTALL_PATH here - its computed by make *before* executing the target
 > #   calling `kambrium.wp-env.generate_launch.json "$(WP_ENV_INSTALL_PATH)"` will fail because WP_ENV_INSTALL_PATH computed by make is "" at this point
 > #   thats why we need to call wp-env COMMAND=install-path manually
-> echo "$$($(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)"
 > kambrium.wp-env.generate_launch.json "$$($(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)"
