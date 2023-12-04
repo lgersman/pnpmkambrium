@@ -324,7 +324,7 @@ wp-env-db-import:
 #
 # example: `make wp-env-start ARGS='--debug --xdebug'`
 #
-#    start wp-env with it option xdebug and debug enabled
+#    start wp-env with option xdebug and debug enabled
 # EOF
 .PHONY: wp-env-start
 wp-env-start: ARGS ?=
@@ -339,3 +339,28 @@ wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* 
 > #   calling `kambrium.wp-env.generate_launch.json "$(WP_ENV_INSTALL_PATH)"` will fail because WP_ENV_INSTALL_PATH computed by make is "" at this point
 > #   thats why we need to call wp-env COMMAND=install-path manually
 > kambrium.wp-env.generate_launch.json "$$($(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)"
+
+# HELP<<EOF
+# starts wp-env using `make wp-env-start` (see target `wp-env-start` for details)
+#
+# a vscode launch configuration will be generated for debugging tests
+#
+# wp-env settings can be customized by providing file `.wp-env-override.json`
+# (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-override-json)
+#
+# environment variables can be provided using:
+#   - make variables provided at commandline
+#   - `.env` file from monorepo root
+#   - environment
+#
+# supported make variables:
+#   - ARGS (default=``) the wp-env command arguments
+#
+# example: `make wp-env-test ARGS='--debug --xdebug'`
+#
+#    start wp-env with option xdebug and debug enabled
+# EOF
+.PHONY: wp-env-test
+wp-env-test: ARGS ?=
+wp-env-test: wp-env-start
+> echo started
