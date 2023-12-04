@@ -169,3 +169,16 @@ docker-push-%: packages/docker/$$*/
 > else
 >   kambrium.log_skipped "package.json is marked as private"
 > fi
+
+# HELP<<EOF
+# this target will cleanup local docker artefacts by removing
+#  - all stopped containers
+#  - all networks not used by at least one container
+#  - all dangling images
+#  - all dangling build cache
+#
+# example: `make docker-prune`
+# EOF
+.PHONY: docker-prune
+docker-prune:
+> docker system prune
