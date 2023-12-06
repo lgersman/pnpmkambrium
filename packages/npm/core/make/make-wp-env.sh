@@ -50,7 +50,7 @@ function kambrium.wp-env.generate_launch.json() {
       "name": "impex phpunit tests (wp-env)",
       "type": "php",
       "request": "launch",
-      "port": 9004,
+      "port": 9003,
       "stopOnEntry": false, // set to true for debugging this launch configuration
       "log": false,         // set to true to get extensive xdebug logs
       // pathMappings derived from wp-env generated docker-compose.yml

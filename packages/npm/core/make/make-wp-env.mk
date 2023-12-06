@@ -91,8 +91,15 @@ wp-env-destroy:
 .PHONY: wp-env-sh
 wp-env-sh: ARGS ?=
 wp-env-sh: CONTAINER ?= cli
-wp-env-sh:
+wp-env-sh: wp-env-is-started
 > WP_ENV_HOME=$(WP_ENV_HOME) $(PNPM) exec wp-env run $(CONTAINER) sh -c '$(ARGS)'
+
+# runs wp-env-start target if wp-env is not yet started
+# (we cannot use target wp-env-start as dependecy becauce wp-env-start will everytime explicitly called shutdown and start wp-env again)
+# thats why we check if wp-env docker containers are running an if not call wp-env-start
+.PHONY: wp-env-is-started
+wp-env-is-started:
+> [[ "$$(docker ps | grep wordpress | wc -l)" == "2" ]] || $(MAKE) -s -i wp-env-start
 
 # HELP<<EOF
 # show wp-env logs (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-logs-environment)
@@ -360,7 +367,7 @@ wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* 
 #
 #    start wp-env with option xdebug and debug enabled
 # EOF
-.PHONY: wp-env-test
-wp-env-test: ARGS ?=
-wp-env-test: wp-env-start
-> echo started
+.PHONY: wp-env-phpunit
+wp-env-phpunit: ARGS ?=
+wp-env-phpunit: wp-env-is-started
+> $(MAKE) wp-env-sh CONTAINER='tests-wordpress' ARGS='XDEBUG_CONFIG="client_host=host.docker.internal" phpunit -c /var/www/html/wp-content/plugins/cm4all-wp-impex/tests/phpunit/phpunit.xml'

@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot $$(@D)/wp-env-home), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot $$(@D)/wp-env-home), $$(@D)/vendor/autoload.php $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS))
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
@@ -78,6 +78,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
     --exclude=vendor/ \
     --exclude=readme.txt \
     --exclude=.env \
+    --exclude=vendor \
     --exclude=.secrets \
     --exclude=*.kambrium-template \
     --exclude=cm4all-wp-bundle.json \
@@ -108,6 +109,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-php$${TARGET_PHP_VERSION}"
 >   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
 >   # call dockerized rector
+>   set -x
 >   docker run $(DOCKER_FLAGS) \
       -it \
       --rm \
@@ -143,6 +145,28 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 #   will create (if not exist) or update (if any of the plugin source files changed) the pot file `packages/wp-plugin/foo/languages/foo.pot`
 # EOF
 packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
+
+.PRECIOUS: packages/wp-plugin/%/composer.json
+packages/wp-plugin/%/composer.json :
+> cat << EOF > $@
+> {
+>  "require-dev": {
+>    "yoast/phpunit-polyfills": "^2.0"
+>  }
+> }
+> EOF
+
+packages/wp-plugin/%/vendor/autoload.php : packages/wp-plugin/$$*/composer.lock
+> docker run --rm --volume $$(pwd)/$$(dirname $(@D)):/app --user $$(id -u):$$(id -g) composer install --no-interaction --ignore-platform-reqs
+> touch $@
+
+.PRECIOUS: packages/wp-plugin/%/composer.lock
+packages/wp-plugin/%/composer.lock : packages/wp-plugin/$$*/composer.json
+> docker run --rm --volume $$(pwd)/$(@D):/app --user $$(id -u):$$(id -g) composer update --no-interaction --ignore-platform-reqs --no-install
+> touch $@
+
+
+
 
 # update plugin.php metadata if any of its metadata sources changed
 packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
