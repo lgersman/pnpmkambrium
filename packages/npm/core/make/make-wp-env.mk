@@ -114,7 +114,7 @@ wp-env-is-started:
 .PHONY: wp-env-logs
 wp-env-logs: ARGS ?= development
 wp-env-logs:
-> $(MAKE) wp-env COMMAND=logs ARGS='$(ARGS)'
+> $(MAKE) wp-env COMMAND=logs ARGS='$(ARGS)' || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
 # HELP<<EOF
 # run command inside a wp-env container (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-run-container-command)
@@ -156,7 +156,7 @@ wp-env-run:
 .PHONY: wp-env-clean
 wp-env-clean: ARGS ?= all
 wp-env-clean:
-> $(MAKE) wp-env COMMAND=clean ARGS='$(ARGS)'
+> $(MAKE) wp-env COMMAND=clean ARGS='$(ARGS)' || (kambrium.log_error "wp-env is not started. consider executing 'make wp-env-start' first." && exit 1)
 
 # HELP<<EOF
 # backup database and uploads folder of a wp-env instance
