@@ -109,7 +109,6 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >   TARGET_DIR="dist/$*-$${PACKAGE_VERSION}-php$${TARGET_PHP_VERSION}"
 >   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
 >   # call dockerized rector
->   set -x
 >   docker run $(DOCKER_FLAGS) \
       -it \
       --rm \
@@ -156,6 +155,7 @@ packages/wp-plugin/%/composer.json :
 > }
 > EOF
 
+.PRECIOUS: packages/wp-plugin/%/vendor/autoload.php
 packages/wp-plugin/%/vendor/autoload.php : packages/wp-plugin/$$*/composer.lock
 > docker run --rm --volume $$(pwd)/$$(dirname $(@D)):/app --user $$(id -u):$$(id -g) composer install --no-interaction --ignore-platform-reqs
 > touch $@
@@ -164,9 +164,6 @@ packages/wp-plugin/%/vendor/autoload.php : packages/wp-plugin/$$*/composer.lock
 packages/wp-plugin/%/composer.lock : packages/wp-plugin/$$*/composer.json
 > docker run --rm --volume $$(pwd)/$(@D):/app --user $$(id -u):$$(id -g) composer update --no-interaction --ignore-platform-reqs --no-install
 > touch $@
-
-
-
 
 # update plugin.php metadata if any of its metadata sources changed
 packages/wp-plugin/%/plugin.php : packages/wp-plugin/%/package.json package.json $$(wildcard .env packages/wp-plugin/$$*/.env)
