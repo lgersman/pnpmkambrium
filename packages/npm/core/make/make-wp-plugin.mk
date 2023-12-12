@@ -149,9 +149,9 @@ packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
 packages/wp-plugin/%/composer.json :
 > cat << EOF > $@
 > {
->  "require-dev": {
->    "yoast/phpunit-polyfills": "^2.0"
->  }
+>   "require-dev": {
+>     "yoast/phpunit-polyfills": "^2.0"
+>   }
 > }
 > EOF
 
