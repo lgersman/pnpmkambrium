@@ -42,7 +42,7 @@ packages/docs/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS);
 # we utilize file "build-info" to track if the package was build/is up to date
 #
 # target depends on root located package.json and every file located in packages/docs/% except build-info
-packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS) ;
+packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
