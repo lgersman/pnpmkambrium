@@ -47,7 +47,7 @@ function kambrium.wp-env.generate_launch.json() {
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "impex phpunit tests (wp-env)",
+      "name": "wp-env/phpunit",
       "type": "php",
       "request": "launch",
       "port": 9003,
@@ -55,16 +55,6 @@ function kambrium.wp-env.generate_launch.json() {
       "log": false,         // set to true to get extensive xdebug logs
       // pathMappings derived from wp-env generated docker-compose.yml
       "pathMappings": ${DEVELOPMENT_LAUNCH_PATH_MAPPINGS}
-    },
-    {
-      "name": "impex (wp-env)",
-      "type": "php",
-      "request": "launch",
-      "port": 9003,
-      "stopOnEntry": false, // set to true for debugging this launch configuration
-      "log": false,         // set to true to get extensive xdebug logs
-      // pathMappings derived from wp-env generated docker-compose.yml
-      "pathMappings": ${TESTS_LAUNCH_PATH_MAPPINGS}
     }
   ]
 }
