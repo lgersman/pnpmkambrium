@@ -347,27 +347,3 @@ wp-env-start .vscode/launch.json: $(addsuffix /,$(wildcard packages/wp-plugin/* 
 > #   thats why we need to call wp-env COMMAND=install-path manually
 > kambrium.wp-env.generate_launch.json "$$($(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)"
 
-# HELP<<EOF
-# starts wp-env using `make wp-env-start` (see target `wp-env-start` for details)
-#
-# a vscode launch configuration will be generated for debugging tests
-#
-# wp-env settings can be customized by providing file `.wp-env-override.json`
-# (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-override-json)
-#
-# environment variables can be provided using:
-#   - make variables provided at commandline
-#   - `.env` file from monorepo root
-#   - environment
-#
-# supported make variables:
-#   - ARGS (default=``) the wp-env command arguments
-#
-# example: `make wp-env-test ARGS='--debug --xdebug'`
-#
-#    start wp-env with option xdebug and debug enabled
-# EOF
-.PHONY: wp-env-phpunit
-wp-env-phpunit: ARGS ?=
-wp-env-phpunit: wp-env-is-started
-> $(MAKE) wp-env-sh CONTAINER='tests-wordpress' ARGS='XDEBUG_CONFIG="client_host=host.docker.internal" phpunit -c /var/www/html/wp-content/plugins/cm4all-wp-impex/tests/phpunit/phpunit.xml'
