@@ -110,6 +110,7 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 >   rsync -a '$(@D)/dist/$*/' "$(@D)/$$TARGET_DIR"
 >   # call dockerized rector
 >   docker run $(DOCKER_FLAGS) \
+      --pull=always \
       -it \
       --rm \
       --user "$$(id -u $(USER)):$$(id -g $(USER))" \
@@ -278,7 +279,7 @@ packages/wp-plugin/%.js : $$(subst /build/,/src/,packages/wp-plugin/$$*.mjs)
 >   GITHUB_ACTION_DOCKER_USER=$$( [ "$${GITHUB_ACTIONS:-false}" == "true" ] && echo '--user root' || echo '')
 >   for mode in 'development' 'production' ; do
 >     printf "$$BUNDLER_CONFIG" | \
-      docker run -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
+      docker run --pull=always -i --rm $$GITHUB_ACTION_DOCKER_USER --mount type=bind,source=$$(pwd),target=/app $(KAMBRIUM_WP_PLUGIN_DOCKER_IMAGE_JS_BUNDLER) \
         --analyze \
         --global-name="$$GLOBAL_NAME" \
         --mode="$$mode" \

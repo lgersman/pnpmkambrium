@@ -88,7 +88,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
 >   MDBOOK_GIT_REPOSITORY_ICON="$${MDBOOK_GIT_REPOSITORY_ICON:-fa-code-fork}"
 >   MDBOOK_NO_SECTION_LABEL="$${MDBOOK_NO_SECTION_LABEL:-true}"
 >   if [[ "$${KAMBRIUM_DEV_MODE:-}" == "true" ]]; then
->     docker run --rm -it \
+>     docker run --pull=always --rm -it \
         -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
         -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \
@@ -99,7 +99,7 @@ packages/docs/%/build-info: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
         -p 3000:3000 -p 3001:3001 \
         pnpmkambrium/mdbook mdbook serve $(@D) -n 0.0.0.0 --dest-dir ./build
 >   fi
->   docker run --rm -it \
+>   docker run --pull=always --rm -it \
       -e "MDBOOK_BOOK=$$MDBOOK_BOOK" \
       -e "MDBOOK_OUTPUT__HTML__git_repository_url=$$MDBOOK_GIT_REPOSITORY_URL" \
       -e "MDBOOK_OUTPUT__HTML__git_repository_icon=$$MDBOOK_GIT_REPOSITORY_ICON" \

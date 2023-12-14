@@ -60,7 +60,7 @@ interactive:
 > if command -v ./packages/docker/shaunch/bin/shaunch.sh >/dev/null; then
 >   ./packages/docker/shaunch/bin/shaunch.sh --border-label " Make " --preview-label " Info " --title "Targets" -c "$$HELP_FILE" ||:
 > else
->   docker run -it --rm -v $$(dirname $$HELP_FILE):/app pnpmkambrium/shaunch --border-label " Make " --preview-label " Info " --title "Targets" -c "/app/$$(basename $$HELP_FILE)" ||:
+>   docker run -it --rm --pull=always -v $$(dirname $$HELP_FILE):/app pnpmkambrium/shaunch --border-label " Make " --preview-label " Info " --title "Targets" -c "/app/$$(basename $$HELP_FILE)" ||:
 > fi
 > trap "rm -f -- $$HELP_FILE" EXIT
 
