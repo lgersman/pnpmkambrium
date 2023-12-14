@@ -116,6 +116,18 @@ KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS = $$(shell find $$(@D) ! -path '*/dist/*' !
  $(wildcard *.env) \
  package.json
 
+#
+# kambrium debugging helper function echoing the currrent target and its dependencies
+#
+# example usage :
+#   packages/wp-plugin/%/foo: $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)
+#   > $(call KAMBRIUM_TARGET_DEPENDENCIES)
+#
+define KAMBRIUM_TARGET_DEPENDENCIES
+  echo "Target $@ depends on prerequisites :"
+  echo "$^" | tr ' ' '\n'
+endef
+
 KAMBRIUM_SUB_PACKAGE_PATHS := $(shell $(PNPM) list --recursive --filter='*/*' --json | jq -r  '.[].path' | xargs -I '{}' -r realpath --relative-base $$(pwd)/packages {})
 
 # generic dependency for sub package targets (package/*/*/)
