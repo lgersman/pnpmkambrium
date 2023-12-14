@@ -147,7 +147,9 @@ packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po
 packages/wp-plugin/%/languages/ : packages/wp-plugin/$$*/languages/$$*.pot;
 
 packages/wp-plugin/%/composer.json :
-> cat << EOF > $@
+> # if 'make' is started with the '-B' option, the target will be executed regardless of whether the file exists.
+> # We need to ensure that an existing file doesn't get overridden in case it already exists.
+> [[ -f "$@" ]] || cat << EOF > $@
 > {
 >   "require-dev": {
 >     "yoast/phpunit-polyfills": "^2.0"
