@@ -155,6 +155,7 @@ packages/wp-plugin/%/composer.json :
 > }
 > EOF
 
+.PRECIOUS: packages/wp-plugin/%/vendor/autoload.php
 packages/wp-plugin/%/vendor/autoload.php : packages/wp-plugin/$$*/composer.lock
 > docker run --rm --volume $$(pwd)/$$(dirname $(@D)):/app --user $$(id -u):$$(id -g) composer install --no-interaction --ignore-platform-reqs
 > touch -m $@
