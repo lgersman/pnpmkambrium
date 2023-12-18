@@ -30,7 +30,7 @@ function kambrium.get_pot_dependencies() {
   local WP_PLUGIN_DIRECTORY="packages/$(kambrium.get_sub_package_type_from_path $1)/$(kambrium.get_sub_package_name_from_path $1)"
 
   find $WP_PLUGIN_DIRECTORY/src -maxdepth 1 -type f -name '*.mjs' -or -name 'block.json' | sed -e 's/src/build/g' -e 's/.mjs/.js/g'
-  find $WP_PLUGIN_DIRECTORY -type f -not -path '*/tests/*' -not -path '*/dist/*' -not -path '*/build/*' -and -name '*.php' -or -name 'theme.json'
+  find $WP_PLUGIN_DIRECTORY -type f ! -path '*/tests/*' ! -path '*/dist/*' ! -path '*/vendor/*' ! -path '*/build/*' -and \( -name '*.php' -or -name 'theme.json' \)
 }
 
 #

@@ -30,7 +30,7 @@ packages/wp-plugin/%/: $(KAMBRIUM_SUB_PACKAGE_DEPS) ;
 # build and zip wordpress plugin
 #
 # we utilize file "build-info" to track if the wordpress plugin was build/is up to date
-packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot $$(@D)/vendor/*), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)) $$(@D)/vendor/autoload.php
+packages/wp-plugin/%/build-info: $$(filter-out $$(wildcard $$(@D)/languages/*.po $$(@D)/languages/*.mo $$(@D)/languages/*.json $$(@D)/languages/*.pot), $(KAMBRIUM_SUB_PACKAGE_BUILD_INFO_DEPS)) $$(@D)/vendor/autoload.php
 > # inject sub package environments from {.env,.secrets} files
 > kambrium.load_env $(@D)
 > PACKAGE_JSON=$(@D)/package.json
@@ -207,7 +207,7 @@ KAMBRIUM_WP_PLUGIN_WPCLI = docker run $(DOCKER_FLAGS) \
 .PRECIOUS: packages/wp-plugin/%.pot
 # create or update a i18n plugin pot file
 packages/wp-plugin/%.pot : $$(shell kambrium.get_pot_dependencies $$@)
-> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --ignore-domain --exclude=tests/,dist/,package.json,*.readme.txt.template ./ languages/$(@F)
+> $(KAMBRIUM_WP_PLUGIN_WPCLI) i18n make-pot --ignore-domain --exclude=tests/,dist/,vendor/,package.json,*.readme.txt.template ./ languages/$(@F)
 
 # HELP<<EOF
 # create or update a i18n po file in a wordpress sub package (`packages/wp-plugin/*`)
