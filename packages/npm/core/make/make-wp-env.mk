@@ -7,10 +7,20 @@ export WP_ENV_HOME := $(shell pwd)/wp-env-home
 WP_ENV_INSTALL_PATH = $(shell $(MAKE) -s wp-env COMMAND=install-path 2> /dev/null)
 
 #
+# generates wp-cli.wp-env.yml referenced in wp-env configuration file '.wp-env.json'
+# this file is needed to enable mod_rewrite capabilities for wp-cli in wp-env apache container
+#
+wp-cli.wp-env.yml:
+> cat << EOF > ./$@
+> apache_modules:
+>   - mod_rewrite
+> EOF
+
+#
 # generates wp-env configuration file '.wp-env.json'
 # (https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json)
 #
-.wp-env.json:
+.wp-env.json: wp-cli.wp-env.yml
 > # nullglob is needed because we want to skip the loop if no plugins/theme packages are found
 > shopt -s nullglob
 >
@@ -29,7 +39,7 @@ WP_ENV_INSTALL_PATH = $(shell $(MAKE) -s wp-env COMMAND=install-path 2> /dev/nul
 >   --arg phpVersion "$${PHP_VERSION:-8.0}" \
 >   --argjson plugins "$${PLUGINS}" \
 >   --argjson themes "$${THEMES}" \
->   '{core: $$wordpress_image, phpVersion: $$phpVersion, plugins : $$plugins, themes : $$themes}' \
+>   '{core: $$wordpress_image, phpVersion: $$phpVersion, plugins : $$plugins, themes : $$themes, mappings: { "wp-cli.yml" : "./wp-cli.wp-env.yml" } }' \
 > > $@
 
 #
