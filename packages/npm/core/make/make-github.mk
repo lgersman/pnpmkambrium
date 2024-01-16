@@ -232,3 +232,6 @@ $${GITHUB_REPO_URL}/releases \
 .PHONY: github-release
 github-release : build
 > echo "depends on $$(find packages/* -name "dist")"
+> # @TODO: add changelog/release-readme parameter and how to compute it
+> # see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#generate-release-notes-content-for-a-release
+> # see https://github.com/evanw/esbuild/blob/main/Makefile
