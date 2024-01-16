@@ -179,3 +179,56 @@ $${GITHUB_REPO_URL}/releases \
 > printf "[INFO] Skipping Asset Upload\n" ;
 > fi
 > kambrium.log_done
+
+# HELP<<EOF
+# creates a GitHub release and uploads the release assets
+# the release tag is derived from root `package.json` property `version`
+#
+# supported variables are :
+#   - `GITHUB_TOKEN` (required) GitHub token
+#   - `GITHUB_OWNER` (required) GitHub username
+#   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
+#   - `GITHUB_RELEASE_ASSETS` (optional, default=all archive files in `dist` directory of public sub packages)
+#
+#     This variable can be used to customize the release assets.
+#     `GITHUB_RELEASE_ASSETS` is expected to be a JSON array|object or a string list of release assets
+#
+#     - space or newline separated list of assets
+#
+#         example :
+#         `'packages/docs/foo/dist/foo-1.0.0.zip packages/npm/a/dist/a-1.0.0.tgz packages/wp-plugin/x/dist/x-1.0.0-php7.4.zip'`
+#
+#     - an JSON array|object string of release assets (key=asset-name, value=asset-path)
+#
+#         array example :
+#         `[`
+#         `  "packages/docs/foo/dist/foo-1.0.0.zip",`
+#         `  "packages/npm/a/dist/a-1.0.0.tgz",`
+#         `  "packages/wp-plugin/x/dist/x-1.0.0-php7.4.zip"`
+#         `]`
+#
+#         object example :
+#         `[``
+#         `  "foo.zip" : "packages/docs/foo/dist/foo-1.0.0.zip",`
+#         `  "a archive" : "packages/npm/a/dist/a-1.0.0.tgz",`
+#         `  "x.zip" : "packages/wp-plugin/x/dist/x-1.0.0-php7.4.zip"`
+#         `]`
+#
+#     If `GITHUB_RELEASE_ASSETS` is not defined, all archive files (zip|tar.gz|tgz)
+#     and executables in `packages/*/*/dist` will be used as release assets.
+#
+# environment variables can be provided using:
+#   - make variables provided at commandline
+#   - `.env` file from sub package
+#   - `.env` file from monorepo root
+#   - environment
+#
+# example: `make github-release`
+#   will build outdated sub packages and create/update a GitHub release
+# example: `GITHUB_RELEASE_ASSETS="$(find packages/*/*/dist -maxdepth 1 -name '*.zip')" make github-release`
+#   will build outdated sub packages and create/update a GitHub release
+#   All zip files in `packages/*/*/dist` will be uploaded as release assets
+# EOF
+.PHONY: github-release
+github-release : build
+> echo "depends on $$(find packages/* -name "dist")"
