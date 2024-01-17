@@ -12,6 +12,15 @@ function kambrium.log_done() {
 }
 
 #
+# echoes a message prefixed with "[tip]"
+#
+# @param $1 the message to log
+#
+function kambrium.log_hint() {
+  echo "${TERMINAL_YELLOW:-}[tip]${TERMINAL_RESET:-} ${1:-}"
+}
+
+#
 # echoes a error message prefixed with "[error]"
 #
 # @param $1 the error message to log
