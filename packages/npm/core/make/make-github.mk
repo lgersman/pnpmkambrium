@@ -180,6 +180,7 @@ $${GITHUB_REPO_URL}/releases \
 > fi
 > kambrium.log_done
 
+DOCKER_IMAGE_GITHUB_RELEASE_GH := maniator/gh
 # HELP<<EOF
 # creates a GitHub release and uploads the release assets
 # the release tag is derived from root `package.json` property `version`
@@ -231,7 +232,35 @@ $${GITHUB_REPO_URL}/releases \
 # EOF
 .PHONY: github-release
 github-release : build
-> echo "depends on $$(find packages/* -name "dist")"
+> # get current branch name
+> branch=$$(git rev-parse --abbrev-ref HEAD) || (
+>   kambrium.log_error "failed to evaluate current git branch"
+>   kambrium.log_hint "check if is current directory is a git repository."
+>   kambrium.log_hint "ensure the at least one commit is available."
+>   exit 1
+> )
+> # check current branch has tracked remote branch
+> git rev-parse --abbrev-ref --symbolic-full-name "$${branch}@{u}" &> /dev/null || (
+>   kambrium.log_error "current branch '$$branch' does not have a remote tracking branch"
+>   kambrium.log_hint "consider pushing the current branch to remote repository to establish a remote tracking branch"
+>   exit 1
+> )
+> # check there are no local uncommitted/untracked changes
+> [[ -n $$(git status --porcelain) ]] && (
+>    kambrium.log_error "[ERROR] There are uncommitted/untracked changes in the current branch '$$branch'"
+>    kambrium.log_hint "consider committing or stashing the changes"
+>    exit 1
+> )
+> # check the current branch is in sync with the remote branch
+> localRef=$$(git rev-parse HEAD)
+> # we use this complicated looking command to (1) avoid fetching from remote repository and (2) see underlying errors in case of ssh issues
+> remoteRef=$$(git -c core.sshCommand='ssh -o LogLevel=error' ls-remote $$(git rev-parse --abbrev-ref @{u} | sed 's/\// /g') | cut -f1)
+> [[ $$localRef == $$remoteRef ]] || (
+>   kambrium.log_error "[ERROR] current branch '$$branch' and remote branch are not in sync"
+>   kambrium.log_hint "consider git pull/push/merge to sync local branch '$$branch' and remote branch"
+>   exit 1
+> )
+> docker run -it --rm -v $(HOME):/root -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
 > # @TODO: add changelog/release-readme parameter and how to compute it
 > # see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#generate-release-notes-content-for-a-release
 > # see https://github.com/evanw/esbuild/blob/main/Makefile
