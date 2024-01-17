@@ -25,6 +25,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-generic.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-docs.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-gh-pages.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-github.mk
+include $(KAMBRIUM_MAKEFILE_DIR)/make-changeset.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-help.mk
 
 # ensure required utilities are installed
