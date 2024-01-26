@@ -247,7 +247,7 @@ github-release : build
 > )
 > # check there are no local uncommitted/untracked changes
 > [[ -n $$(git status --porcelain) ]] && (
->    kambrium.log_error "[ERROR] There are uncommitted/untracked changes in the current branch '$$branch'"
+>    kambrium.log_error "there are uncommitted/untracked changes in the current branch '$$branch'"
 >    kambrium.log_hint "consider committing or stashing the changes"
 >    exit 1
 > )
@@ -256,11 +256,42 @@ github-release : build
 > # we use this complicated looking command to (1) avoid fetching from remote repository and (2) see underlying errors in case of ssh issues
 > remoteRef=$$(git -c core.sshCommand='ssh -o LogLevel=error' ls-remote $$(git rev-parse --abbrev-ref @{u} | sed 's/\// /g') | cut -f1)
 > [[ $$localRef == $$remoteRef ]] || (
->   kambrium.log_error "[ERROR] current branch '$$branch' and remote branch are not in sync"
+>   kambrium.log_error "current branch '$$branch' and remote branch are not in sync"
 >   kambrium.log_hint "consider git pull/push/merge to sync local branch '$$branch' and remote branch"
 >   exit 1
 > )
-> docker run -it --rm -v $(HOME):/root -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
+> # get commit id of the release tag matching the current package.json name and version
+> release_commit=$$(git rev-list -n 1 "$$(jq -r '.name | values' package.json)@$$(jq -r '.version | values' package.json)") || (
+>   kambrium.log_error "failed to get commit id of release tag '$$(jq -r '.name | values' package.json)@$$(jq -r '.version | values' package.json)' matching the current package.json name and version"
+>   kambrium.log_hint "tag the current commit as release using 'pnpm changeset tag'"
+> )
+> # retrieve git tags on this commit (=> they describe which sub packages were released)
+> # - root package tag gets strip (using grep) from the list of tags
+> # - strip the version suffix from the tag (using sed)
+> packageReleases=$$(git tag --points-at $$release_commit | grep -E '^@' | sed 's/@[^@]*$$//' | sort)
+> RELEASE_NOTES=""
+> NL=$$'\n'
+> # iterate over package releases
+> while read -r packageRelease; do
+>   # get the path of the package
+>   # alternatively : $(PNPM) list --json --recursive --only-projects | jq -r ".[] | select(.name==\"$$packageRelease\").path"
+>   packagePath=$$(realpath --relative-to=$$(pwd) ./node_modules/$$packageRelease)
+>   # get changed lines from changelog
+>   # - strip the first 6 lines using tail)
+>   # - strip the first character (+|-) using cut
+>   changedLines=$$(git diff $${release_commit}~1 $$release_commit -- "$$packagePath/CHANGELOG.md" | tail -n +7 | cut -c2-)
+>   # if changedLines is empty => no changes in CHANGELOG.md => no package publish
+>   if [[ "$$changedLines" != '' ]]; then
+>     RELEASE_NOTES="$${RELEASE_NOTES}$${NL}$$changedLines$${NL}"
+>      # @TODO: collect release assets from sub packages
+>   fi
+>     # TODO: compute CHANGELOG by concatenating CHANGELOG.md files from sub packages
+>     # @TODO: collect release assets from sub packages
+> done < <(echo "$$packageReleases")
+>
+> echo "$$RELEASE_NOTES"
+>
+> # docker run -it --rm -v $(HOME):/root -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
 > # @TODO: add changelog/release-readme parameter and how to compute it
 > # see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#generate-release-notes-content-for-a-release
 > # see https://github.com/evanw/esbuild/blob/main/Makefile
