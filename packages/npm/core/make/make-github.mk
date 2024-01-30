@@ -314,7 +314,7 @@ github-release : build
 >   echo "RELEASE_ASSET $$RELEASE_ASSET"
 > done
 >
-> # docker run -it --rm -v $(HOME):/root -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
+> docker run -it --rm -v $(HOME):/root --user "$$(id -u $(USER)):$$(id -g $(USER))" -e GITHUB_TOKEN="$$GITHUB_TOKEN" -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
 > # @TODO: add changelog/release-readme parameter and how to compute it
 > # see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#generate-release-notes-content-for-a-release
 > # see https://github.com/evanw/esbuild/blob/main/Makefile
