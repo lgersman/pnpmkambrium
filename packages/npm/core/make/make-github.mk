@@ -270,27 +270,49 @@ github-release : build
 > # - strip the version suffix from the tag (using sed)
 > packageReleases=$$(git tag --points-at $$release_commit | grep -E '^@' | sed 's/@[^@]*$$//' | sort)
 > NL=$$'\n'
-> # put changes in root CHANGELOG.md on top of RELEASE_NOTES
-> RELEASE_NOTES="$$(git diff $${release_commit}~1 $$release_commit -- 'CHANGELOG.md' | tail -n +7 | cut -c2-)$${NL}"
-> # iterate over package releases
+> RELEASE_NOTES=''
+> declare -a RELEASE_ASSETS=()
+>
+> # consume root package assets and changelog
+> # get changed lines from changelog
+> # - strip the first 6 lines using tail)
+> # - strip the first character (+|-) using cut
+> changedLines="$$(git diff $${release_commit}~1 $$release_commit -- 'CHANGELOG.md' | tail -n +7 | cut -c2-)$${NL}"
+> # if root package is not private
+> if [[ "$$(jq -r '.private | not'  package.json)" == 'true' ]]; then
+>   # if root package has changes in CHANGELOG.md
+>   if [[ "$$changedLines" != '' ]]; then
+>     # put changes in root CHANGELOG.md on top of RELEASE_NOTES
+>     RELEASE_NOTES="$$(git diff $${release_commit}~1 $$release_commit -- 'CHANGELOG.md' | tail -n +7 | cut -c2-)$${NL}"
+>     # add root package dist assets to RELEASE_ASSETS
+>     mapfile -t RELEASE_ASSETS < <(find './dist' -maxdepth 1 -type f -regex '.*\.\(tgz\|zip\|tar\.gz\)$$' 2>/dev/null ||:)
+>   fi
+> fi
+>
+> # iterate over sub package releases
 > while read -r packageRelease; do
 >   # get the path of the package
 >   # alternatively : $(PNPM) list --json --recursive --only-projects | jq -r ".[] | select(.name==\"$$packageRelease\").path"
 >   packagePath=$$(realpath --relative-to=$$(pwd) ./node_modules/$$packageRelease)
->   # get changed lines from changelog
->   # - strip the first 6 lines using tail)
->   # - strip the first character (+|-) using cut
->   changedLines=$$(git diff $${release_commit}~1 $$release_commit -- "$$packagePath/CHANGELOG.md" | tail -n +7 | cut -c2-)
->   # if changedLines is empty => no changes in CHANGELOG.md => no package publish
->   if [[ "$$changedLines" != '' ]]; then
->     RELEASE_NOTES="$${RELEASE_NOTES}$${NL}$$changedLines$${NL}"
->      # @TODO: collect release assets from sub packages
+>   if [[ "$$(jq -r '.private | not'  package.json)" == 'true' ]]; then
+>     # get changed lines from changelog
+>     # - strip the first 6 lines using tail)
+>     # - strip the first character (+|-) using cut
+>     changedLines=$$(git diff $${release_commit}~1 $$release_commit -- "$$packagePath/CHANGELOG.md" | tail -n +7 | cut -c2-)
+>     # if changedLines is empty => no changes in CHANGELOG.md => no package publish
+>     if [[ "$$changedLines" != '' ]]; then
+>       RELEASE_NOTES="$${RELEASE_NOTES}$${NL}$$changedLines$${NL}"
+>       mapfile -t RELEASE_ASSETS_SUB_PACKAGE < <(find "$$packagePath/dist" -maxdepth 1 -type f -regex '.*\.\(tgz\|zip\|tar\.gz\)$$' 2>/dev/null ||:)
+>       RELEASE_ASSETS+=($${RELEASE_ASSETS_SUB_PACKAGE[@]})
+>     fi
 >   fi
->     # TODO: compute CHANGELOG by concatenating CHANGELOG.md files from sub packages
->     # @TODO: collect release assets from sub packages
 > done < <(echo "$$packageReleases")
 >
 > echo "$$RELEASE_NOTES"
+>
+> for RELEASE_ASSET in "$${RELEASE_ASSETS[@]}"; do
+>   echo "RELEASE_ASSET $$RELEASE_ASSET"
+> done
 >
 > # docker run -it --rm -v $(HOME):/root -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
 > # @TODO: add changelog/release-readme parameter and how to compute it
