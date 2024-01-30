@@ -248,7 +248,7 @@ github-release : build
 > # check there are no local uncommitted/untracked changes
 > [[ -n $$(git status --porcelain) ]] && (
 >    kambrium.log_error "there are uncommitted/untracked changes in the current branch '$$branch'"
->    kambrium.log_hint "consider committing or stashing the changes"
+>    kambrium.log_hint "consider committing or stashing the changes and execute target again"
 >    exit 1
 > )
 > # check the current branch is in sync with the remote branch
