@@ -29,7 +29,7 @@ include $(KAMBRIUM_MAKEFILE_DIR)/make-changeset.mk
 include $(KAMBRIUM_MAKEFILE_DIR)/make-help.mk
 
 # ensure required utilities are installed
-_ := $(call ensure-commands-exists, sed git touch jq docker tee awk msginit)
+_ := $(call ensure-commands-exists, sed git touch jq docker tee awk msginit docker-compose)
 
 # pick up npm scope from package.json name
 KAMBRIUM_MONOREPO_SCOPE != jq -r '.name | values' package.json
