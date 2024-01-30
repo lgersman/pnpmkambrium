@@ -269,8 +269,9 @@ github-release : build
 > # - root package tag gets strip (using grep) from the list of tags
 > # - strip the version suffix from the tag (using sed)
 > packageReleases=$$(git tag --points-at $$release_commit | grep -E '^@' | sed 's/@[^@]*$$//' | sort)
-> RELEASE_NOTES=""
 > NL=$$'\n'
+> # put changes in root CHANGELOG.md on top of RELEASE_NOTES
+> RELEASE_NOTES="$$(git diff $${release_commit}~1 $$release_commit -- 'CHANGELOG.md' | tail -n +7 | cut -c2-)$${NL}"
 > # iterate over package releases
 > while read -r packageRelease; do
 >   # get the path of the package
