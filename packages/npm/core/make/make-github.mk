@@ -31,9 +31,10 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > # https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
 > # https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28
 > # https://gist.github.com/btoone/2288960
-# abort if GITHUB_TOKEN is not defined
+
+> # abort if GITHUB_TOKEN is not defined
 > : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
-# abort if GITHUB_OWNER is not defined
+> # abort if GITHUB_OWNER is not defined
 > : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
 > PACKAGE_NAME=$$(jq -r '.name | values' package.json)
 > GITHUB_REPO=$${GITHUB_REPO:-$$PACKAGE_NAME}
@@ -232,6 +233,14 @@ DOCKER_IMAGE_GITHUB_RELEASE_GH := maniator/gh
 # EOF
 .PHONY: github-release
 github-release : build
+> # abort if GITHUB_TOKEN is not defined
+> : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
+> # abort if GITHUB_OWNER is not defined
+> : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
+> PACKAGE_NAME=$$(jq -r '.name | values' package.json)
+> # grab GITHUB_REPO from .env/.secrets or as fallback the root package.name
+> GITHUB_REPO=$${GITHUB_REPO:-$$PACKAGE_NAME}
+>
 > # get current branch name
 > branch=$$(git rev-parse --abbrev-ref HEAD) || (
 >   kambrium.log_error "failed to evaluate current git branch"
@@ -260,9 +269,12 @@ github-release : build
 >   kambrium.log_hint "consider git pull/push/merge to sync local branch '$$branch' and remote branch"
 >   exit 1
 > )
+>
+> # RELEASE_TAG example : 'pnpmkambrium-cm4all-wp-impex@1.0.1'
+> RELEASE_TAG="$$(jq -r '.name | values' package.json)@$$(jq -r '.version | values' package.json)"
 > # get commit id of the release tag matching the current package.json name and version
-> release_commit=$$(git rev-list -n 1 "$$(jq -r '.name | values' package.json)@$$(jq -r '.version | values' package.json)") || (
->   kambrium.log_error "failed to get commit id of release tag '$$(jq -r '.name | values' package.json)@$$(jq -r '.version | values' package.json)' matching the current package.json name and version"
+> release_commit=$$(git rev-list -n 1 "$$RELEASE_TAG") || (
+>   kambrium.log_error "failed to get commit id of release tag '$$RELEASE_TAG' matching the current package.json name and version"
 >   kambrium.log_hint "tag the current commit as release using 'pnpm changeset tag'"
 > )
 > # retrieve git tags on this commit (=> they describe which sub packages were released)
@@ -314,7 +326,42 @@ github-release : build
 >   echo "RELEASE_ASSET $$RELEASE_ASSET"
 > done
 >
-> docker run -it --rm -v $(HOME):/root --user "$$(id -u $(USER)):$$(id -g $(USER))" -e GITHUB_TOKEN="$$GITHUB_TOKEN" -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
-> # @TODO: add changelog/release-readme parameter and how to compute it
-> # see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#generate-release-notes-content-for-a-release
-> # see https://github.com/evanw/esbuild/blob/main/Makefile
+> GITHUB_RELEASE_API="https://api.github.com/repos/$$GITHUB_OWNER/$$GITHUB_REPO/releases"
+> GITHUB_API_VERSION_HEADER='X-GitHub-Api-Version: 2022-11-28'
+> GITHUB_ACCEPT_HEADER='Accept: application/vnd.github+json'
+> GITHUB_AUTHORIZATION_HEADER="Authorization: Bearer $$GITHUB_TOKEN"
+>
+> # check if release tag already exists on GitHub and delete it if it does
+> # we cannot use our $(CURL) wrapper here since it it configured to return exit code!=0 on 404
+> if [[ $$(curl -s -o /dev/null -w "%{http_code}" -H "$$GITHUB_API_VERSION_HEADER" "$$GITHUB_RELEASE_API/tags/$$RELEASE_TAG") != '404' ]]; then
+>   # @TODO: delete existing GitHub release
+>   kambrium.log_done "release '$$RELEASE_TAG' already exists on GitHub repository : deletig release tag"
+> else
+>   kambrium.log_skipped "release '$$RELEASE_TAG' does not exist on GitHub repository : skip deleting existing release tag"
+> fi
+>
+> # create GitHub release
+> set -x
+> response=$$(
+>   jq -n --arg RELEASE_TAG "$$RELEASE_TAG" --arg RELEASE_NOTES "$$RELEASE_NOTES" '{ tag_name: $$RELEASE_TAG, body: $$RELEASE_NOTES}' \
+    | $(CURL) \
+      -L \
+      -X POST \
+      --data-binary @- \
+      -H "$$GITHUB_ACCEPT_HEADER" \
+      -H "$$GITHUB_API_VERSION_HEADER" \
+      -H "$$GITHUB_AUTHORIZATION_HEADER" \
+      "$$GITHUB_RELEASE_API"
+> )
+>
+> echo "$$response"
+# > # Make the API request to create a release
+# > response=$(curl -s -H "Authorization: token $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST -d "$release_payload" "$API_URL")
+# > # Check the response status
+# > if [ $(echo "$response" | jq -r .id) ]; then
+# >   echo "Release $TAG_NAME created successfully!"
+# > else
+# >   echo "Failed to create release. Response: $response"
+# > fi
+>
+> # docker run -it --rm -v $(HOME):/root --user "$$(id -u $(USER)):$$(id -g $(USER))" -e GITHUB_TOKEN="$$GITHUB_TOKEN" -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
