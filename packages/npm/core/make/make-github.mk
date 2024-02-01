@@ -331,27 +331,44 @@ github-release : build
 > GITHUB_ACCEPT_HEADER='Accept: application/vnd.github+json'
 > GITHUB_AUTHORIZATION_HEADER="Authorization: Bearer $$GITHUB_TOKEN"
 >
+> RELEASE_NAME="v$${RELEASE_TAG#*@}"
+>
 > # check if release tag already exists on GitHub and delete it if it does
 > # we cannot use our $(CURL) wrapper here since it it configured to return exit code!=0 on 404
-> if [[ $$(curl -s -o /dev/null -w "%{http_code}" -H "$$GITHUB_API_VERSION_HEADER" "$$GITHUB_RELEASE_API/tags/$$RELEASE_TAG") != '404' ]]; then
+> set -x
+> # @TODO: use lukes variant
+> if [[ $$(curl -L -s -o /dev/null -w "%{http_code}" -H "$$GITHUB_API_VERSION_HEADER" "$$GITHUB_RELEASE_API/tags/$$RELEASE_NAME") != '404' ]]; then
 >   # @TODO: delete existing GitHub release
->   kambrium.log_done "release '$$RELEASE_TAG' already exists on GitHub repository : deletig release tag"
+>   kambrium.log_done "release '$$RELEASE_NAME' already exists on GitHub repository : deletig release tag"
 > else
->   kambrium.log_skipped "release '$$RELEASE_TAG' does not exist on GitHub repository : skip deleting existing release tag"
+>   kambrium.log_skipped "release '$$RELEASE_NAME' does not exist on GitHub repository : skip deleting existing release tag"
 > fi
 >
 > # create GitHub release
-> set -x
+> # get current branch name
+> TARGET_BRANCH=$$(git rev-parse --abbrev-ref HEAD)
+> # create release
+> # see https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens?apiVersion=2022-11-28
+> # for required personal access token permissions
+> # the release endpoint requires "code" and "workflow" permissions
 > response=$$(
->   jq -n --arg RELEASE_TAG "$$RELEASE_TAG" --arg RELEASE_NOTES "$$RELEASE_NOTES" '{ tag_name: $$RELEASE_TAG, body: $$RELEASE_NOTES}' \
-    | $(CURL) \
-      -L \
-      -X POST \
-      --data-binary @- \
-      -H "$$GITHUB_ACCEPT_HEADER" \
-      -H "$$GITHUB_API_VERSION_HEADER" \
-      -H "$$GITHUB_AUTHORIZATION_HEADER" \
-      "$$GITHUB_RELEASE_API"
+> curl \
+    -L \
+    -v \
+    -H "$$GITHUB_ACCEPT_HEADER" \
+    -H "$$GITHUB_API_VERSION_HEADER" \
+    -H "$$GITHUB_AUTHORIZATION_HEADER" \
+    -X POST \
+    -d "$$( \
+      jq \
+        -n \
+        --arg RELEASE_TAG "$$RELEASE_TAG" \
+        --arg RELEASE_NOTES "$$RELEASE_NOTES" \
+        --arg TARGET_BRANCH "$$TARGET_BRANCH" \
+        --arg RELEASE_NAME "$${RELEASE_NAME}" \
+        '{ target_commitish : $$TARGET_BRANCH, tag_name: $$RELEASE_TAG, name: $$RELEASE_NAME, body: $$RELEASE_NOTES}' \
+    )" \
+    "$$GITHUB_RELEASE_API"
 > )
 >
 > echo "$$response"
