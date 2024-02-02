@@ -320,11 +320,11 @@ github-release : build
 >   fi
 > done < <(echo "$$packageReleases")
 >
-> echo "$$RELEASE_NOTES"
->
-> for RELEASE_ASSET in "$${RELEASE_ASSETS[@]}"; do
->   echo "RELEASE_ASSET $$RELEASE_ASSET"
-> done
+# > echo "$$RELEASE_NOTES"
+# >
+# > for RELEASE_ASSET in "$${RELEASE_ASSETS[@]}"; do
+# >   echo "RELEASE_ASSET $$RELEASE_ASSET"
+# > done
 >
 > GITHUB_RELEASE_API="https://api.github.com/repos/$$GITHUB_OWNER/$$GITHUB_REPO/releases"
 > GITHUB_API_VERSION_HEADER='X-GitHub-Api-Version: 2022-11-28'
@@ -333,13 +333,17 @@ github-release : build
 >
 > RELEASE_NAME="v$${RELEASE_TAG#*@}"
 >
-> # check if release tag already exists on GitHub and delete it if it does
-> # we cannot use our $(CURL) wrapper here since it it configured to return exit code!=0 on 404
-> set -x
-> # @TODO: use lukes variant
-> if [[ $$(curl -L -s -o /dev/null -w "%{http_code}" -H "$$GITHUB_API_VERSION_HEADER" "$$GITHUB_RELEASE_API/tags/$$RELEASE_NAME") != '404' ]]; then
+> # we cannot use the github rest api to check if a release exists since it pages its results always
+> # thats why we use the graphql api to check if a release exists
+> GRAPHQL_QUERY=$$(cat <<EOF
+> {
+>   "query": "query { repository(owner:\"lgersman\", name:\"pnpmkambrium-cm4all-wp-impex\") { releases(first:100, orderBy:{field:CREATED_AT, direction:DESC}) { nodes { name tag { name } } } } }"
+> }
+> EOF
+> )
+> if $(CURL) -L -H "$$GITHUB_AUTHORIZATION_HEADER" -d "$$GRAPHQL_QUERY" https://api.github.com/graphql | jq --exit-status ".data.repository.releases.nodes[] | select(.name==\"$$RELEASE_NAME\")" > /dev/null ; then
 >   # @TODO: delete existing GitHub release
->   kambrium.log_done "release '$$RELEASE_NAME' already exists on GitHub repository : deletig release tag"
+>   kambrium.log_done "release '$$RELEASE_NAME' already exists on GitHub repository : delete release tag"
 > else
 >   kambrium.log_skipped "release '$$RELEASE_NAME' does not exist on GitHub repository : skip deleting existing release tag"
 > fi
