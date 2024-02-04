@@ -71,118 +71,6 @@ github-details-push: $(shell jq --exit-status '.private? | not' packages/docs/gh
 > kambrium.log_done
 
 # HELP<<EOF
-# creates a GitHub release for the given package
-#   - creates a GitHub release for the given package
-#   - uploads the release assets
-#
-# supported variables are :
-#   - `GITHUB_TOKEN` (required) GitHub token
-#   - `GITHUB_OWNER` (required) GitHub username
-#   - `GITHUB_REPO` (optional,default=property `repository.url` in root file `package.json`) GitHub repository name
-#   - `RELEASE_ASSET_DIR` (optional,default=`dist`) the directory containing the release assets
-#   - `RELEASE_ASSET_SPECIFICATION` (optional,default=`none`) the release asset specification
-#   - `ASSET_UPLOAD` (optional,default=`true`) if set to `true` no asset upload will be performed
-#
-# environment variables can be provided using:
-#   - make variables provided at commandline
-#   - `.env` file from sub package
-#   - `.env` file from monorepo root
-#   - environment
-#
-# example: `make --silent release-packages/docs`
-#   will create a GitHub release for the package `packages/docs`
-# EOF
-.PHONY: release-packages/%
-release-packages/% : packages/$$*
-#
-# Check if environment is sufficiently defined!
-> DOT_ENV=".env" && [[ -f $$DOT_ENV ]] && source $$DOT_ENV
->
-# check environment dependencies
-# GITHUB credentials
-> : $${GITHUB_OWNER:?"GITHUB_OWNER environment is required but not given"}
-> : $${GITHUB_TOKEN:?"GITHUB_TOKEN environment is required but not given"}
-> GITHUB_REPO=$${GITHUB_REPO:-jq -r '.name | values' package.json}
-> GITHUB_REPO_URL="https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}"
->
-# Release configuration
-> PACKAGE_NAME=$$(jq -r '.name | values' packages/$*/package.json)
-> PACKAGE_VERSION=$$(jq -r '.version | values' packages/$*/package.json)
-> RELEASE_TITLE=$${PACKAGE_NAME}/v$${PACKAGE_VERSION}
-> LAST_COMMIT_SHA=$$(git rev-parse HEAD)
->
-# asset configuration
-> ASSET_UPLOAD=$${ASSET_UPLOAD:-"true"}
-> RELEASE_ASSET_DIR=$${RELEASE_ASSET_DIR:-"dist"}
-> RELEASE_ASSET_SPECIFICATION=$${RELEASE_ASSET_SPECIFICATION:-"none"}
-> ASSET_PATH="./packages/$*/$${RELEASE_ASSET_DIR}"
->
-# pretty print the configuration to console
-> printf "[CONFIGURATION]\n\
-[REPOSITORY] $${GITHUB_OWNER} $${GITHUB_REPO}\n\
-[RELEASE] $${PACKAGE_NAME} v$${PACKAGE_VERSION}\n\
-[ASSETS] $${ASSET_PATH}\n\n"
->
-# Check if the Release tag already Exists on remote
-> printf \
-"[INFO] Checking if release $$RELEASE_TITLE already exists on remote "
-> USED_TAGS=$$($(CURL) \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer $$GITHUB_TOKEN" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  $$GITHUB_REPO_URL/tags | jq -r ".[] | .name")
-# check if the release tag is in the list of used tags
-> if grep -q $$RELEASE_TITLE <<< $$USED_TAGS; then \
->   printf "[ERROR] \n$${RELEASE_TITLE}: Release has already been created. Aborting! \n"
->   exit 0;
-> fi
-> printf "[SUCCESS]\n"
->
-# check if release assets are synced with remote
-> printf "[INFO] Probing Assets "
-> kambrium.probeRemote > /dev/null 2>&1
-> printf "[SUCCESS]\n"
->
-# normalize assets to contain both full file path and remote file name
-> kambrium.normalizeRelease $$ASSET_PATH $${RELEASE_ASSET_SPECIFICATION}
-> printf "[INFO] Normalizing Assets"
-> NORMALIZED_ASSETS=$$(kambrium.normalizeRelease $$ASSET_PATH $${RELEASE_ASSET_SPECIFICATION})
-> printf "[SUCCESS]\n"
->
-# Create empty Release on remote and get the release id
-> printf "[INFO] Creating Release "
-> RELEASE_PAYLOAD=`jq -n \
-> --arg tag_name "$$RELEASE_TITLE" \
-> --arg desc "" \
-> --arg target_commit "$$LAST_COMMIT_SHA" \
-> '{tag_name: $$tag_name ,"target_commitish":$$target_commit ,name: $$tag_name ,body: $$desc,draft: false,prerelease: false,generate_release_notes: true}'`
-> RELEASE_DATA=$$($(CURL) \
--X POST \
--H "Accept: application/vnd.github+json" \
--H "Authorization: Bearer $${GITHUB_TOKEN}" \
--H "X-GitHub-Api-Version: 2022-11-28" \
-$${GITHUB_REPO_URL}/releases \
--d "$${RELEASE_PAYLOAD}")
-> printf "[SUCCESS] \n"
->
-# Attach Files to Release
-> RELEASE_ID=$$(jq -S '.id' <<< $$RELEASE_DATA)
-> RELEASE_URL="https://uploads.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/releases/$${RELEASE_ID}"
-> if [[ $$ASSET_UPLOAD == "true" ]]; then \
-> printf "[INFO] Uploading Assets ";
-> kambrium.ReleaseFiles \
-    $$NORMALIZED_ASSETS \
-    $$RELEASE_URL \
-    $$GITHUB_TOKEN \
-    > /dev/null 2>&1
-> printf "[SUCCESS]\n" ;
-> else \
-> printf "[INFO] Skipping Asset Upload\n" ;
-> fi
-> kambrium.log_done
-
-DOCKER_IMAGE_GITHUB_RELEASE_GH := maniator/gh
-# HELP<<EOF
 # creates a GitHub release and uploads the release assets
 # the release tag is derived from root `package.json` property `version`
 #
@@ -330,22 +218,13 @@ github-release : build
 > GITHUB_API_VERSION_HEADER='X-GitHub-Api-Version: 2022-11-28'
 > GITHUB_ACCEPT_HEADER='Accept: application/vnd.github+json'
 > GITHUB_AUTHORIZATION_HEADER="Authorization: Bearer $$GITHUB_TOKEN"
->
-> RELEASE_NAME="v$${RELEASE_TAG#*@}"
->
-> # we cannot use the github rest api to check if a release exists since it pages its results always
-> # thats why we use the graphql api to check if a release exists
-> GRAPHQL_QUERY=$$(cat <<EOF
-> {
->   "query": "query { repository(owner:\"lgersman\", name:\"pnpmkambrium-cm4all-wp-impex\") { releases(first:100, orderBy:{field:CREATED_AT, direction:DESC}) { nodes { name tag { name } } } } }"
-> }
-> EOF
-> )
-> if $(CURL) -L -H "$$GITHUB_AUTHORIZATION_HEADER" -d "$$GRAPHQL_QUERY" https://api.github.com/graphql | jq --exit-status ".data.repository.releases.nodes[] | select(.name==\"$$RELEASE_NAME\")" > /dev/null ; then
->   # @TODO: delete existing GitHub release
->   kambrium.log_done "release '$$RELEASE_NAME' already exists on GitHub repository : delete release tag"
-> else
->   kambrium.log_skipped "release '$$RELEASE_NAME' does not exist on GitHub repository : skip deleting existing release tag"
+> # check if a release tagged '$$RELEASE_TAG' already exists on GitHub repository
+> response=$$($(CURL) -w "\n%{http_code}" -L -H "$$GITHUB_AUTHORIZATION_HEADER" -H "$$GITHUB_ACCEPT_HEADER" -H "$$GITHUB_API_VERSION_HEADER" https://api.github.com/repos/$$GITHUB_OWNER/$$GITHUB_REPO/releases/tags/$$RELEASE_TAG 2>/dev/null  ||:)
+> # response contains the the json response followed by http status in the last line
+> if [[ $$(echo "$$response" | tail -n1) != '404' ]]; then
+>   RELEASE_ID=$$(echo "$$response" | head -n -1 | jq '.id')
+>   $(CURL) -L -X DELETE -H "$$GITHUB_AUTHORIZATION_HEADER" -H "$$GITHUB_ACCEPT_HEADER" -H "$$GITHUB_API_VERSION_HEADER" https://api.github.com/repos/$$GITHUB_OWNER/$$GITHUB_REPO/releases/$$RELEASE_ID
+>   kambrium.log_done "a release tagged '$$RELEASE_TAG' already existed(id='$$RELEASE_ID') : deleted release"
 > fi
 >
 > # create GitHub release
@@ -356,33 +235,35 @@ github-release : build
 > # for required personal access token permissions
 > # the release endpoint requires "code" and "workflow" permissions
 > response=$$(
-> curl \
-    -L \
-    -v \
-    -H "$$GITHUB_ACCEPT_HEADER" \
-    -H "$$GITHUB_API_VERSION_HEADER" \
-    -H "$$GITHUB_AUTHORIZATION_HEADER" \
-    -X POST \
-    -d "$$( \
-      jq \
-        -n \
-        --arg RELEASE_TAG "$$RELEASE_TAG" \
-        --arg RELEASE_NOTES "$$RELEASE_NOTES" \
-        --arg TARGET_BRANCH "$$TARGET_BRANCH" \
-        --arg RELEASE_NAME "$${RELEASE_NAME}" \
-        '{ target_commitish : $$TARGET_BRANCH, tag_name: $$RELEASE_TAG, name: $$RELEASE_NAME, body: $$RELEASE_NOTES}' \
-    )" \
-    "$$GITHUB_RELEASE_API"
+> $(CURL) \
+      -L \
+      -H "$$GITHUB_ACCEPT_HEADER" \
+      -H "$$GITHUB_API_VERSION_HEADER" \
+      -H "$$GITHUB_AUTHORIZATION_HEADER" \
+      -d "$$( \
+        jq \
+          -n \
+          --arg RELEASE_TAG "$$RELEASE_TAG" \
+          --arg RELEASE_NOTES "$$RELEASE_NOTES" \
+          --arg TARGET_BRANCH "$$TARGET_BRANCH" \
+          --arg RELEASE_NAME "v$${RELEASE_TAG#*@}" \
+          '{ target_commitish : $$TARGET_BRANCH, tag_name: $$RELEASE_TAG, name: $$RELEASE_NAME, body: $$RELEASE_NOTES}' \
+      )" \
+      "$$GITHUB_RELEASE_API"
 > )
+> RELEASE_ID=$$(echo "$$response" | jq '.id')
+> kambrium.log_done "created new GitHub release(name='v$${RELEASE_TAG#*@}', id=$$RELEASE_ID) tagged '$$RELEASE_TAG'"
 >
-> echo "$$response"
-# > # Make the API request to create a release
-# > response=$(curl -s -H "Authorization: token $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST -d "$release_payload" "$API_URL")
-# > # Check the response status
-# > if [ $(echo "$response" | jq -r .id) ]; then
-# >   echo "Release $TAG_NAME created successfully!"
-# > else
-# >   echo "Failed to create release. Response: $response"
-# > fi
->
-> # docker run -it --rm -v $(HOME):/root --user "$$(id -u $(USER)):$$(id -g $(USER))" -e GITHUB_TOKEN="$$GITHUB_TOKEN" -v $$(pwd):/gh $(DOCKER_FLAGS) $(DOCKER_IMAGE_GITHUB_RELEASE_GH)
+> # upload release assets if any
+> for RELEASE_ASSET in "$${RELEASE_ASSETS[@]}"; do
+>   RELEASE_ASSET_NAME=$$(basename "$$RELEASE_ASSET")
+>   $(CURL) -L \
+      -H "$$GITHUB_ACCEPT_HEADER" \
+      -H "$$GITHUB_API_VERSION_HEADER" \
+      -H "$$GITHUB_AUTHORIZATION_HEADER" \
+      -H "Content-Type: application/octet-stream" \
+      "https://uploads.github.com/repos/$$GITHUB_OWNER/$$GITHUB_REPO/releases/$$RELEASE_ID/assets?name=$$RELEASE_ASSET_NAME" \
+      --data-binary "@$$RELEASE_ASSET" 1>/dev/null
+>   kambrium.log_done "uploaded release assed(name='$$RELEASE_ASSET_NAME'), file='$$RELEASE_ASSET') to GitHub release(id=$$RELEASE_ID)"
+> done
+> kambrium.log_done
