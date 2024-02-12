@@ -6,7 +6,7 @@ ARG PHP_VERSION=8.3
 FROM php:${PHP_VERSION}-cli as base
 
 # rector version to use in docker image
-ENV RECTOR_VERSION=0.18.12
+ENV RECTOR_VERSION=1.0.0
 
 # Fix add-apt-repository is broken with non-UTF-8 locales, see https://github.com/oerdnj/deb.sury.org/issues/56
 ENV LC_ALL C.UTF-8
